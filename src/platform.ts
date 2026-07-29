@@ -385,20 +385,71 @@ export class LocalPlatformAdapter implements PlatformAdapter {
     const game = await this.getGame(input.gameId);
     if (game.availability !== 'available') throw new Error(`${game.name} 尚未部署`);
     if (game.maxPlayers < 2) throw new Error(`${game.name} 是单人游戏，无需匹配`);
-    const ticket: QueueTicket = {
-      ...input,
-      queueId: crypto.randomUUID(),
-      status: 'searching',
-      queuedAt: new Date().toISOString(),
-      estimatedWaitSeconds: 6,
-    };
-    this.queues.set(ticket.queueId, ticket);
-    return clone(ticket);
+    
+    // 在线匹配: 调用后端 API
+    try {
+      const response = await fetch('/api/queues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ gameId: input.gameId, seasonId: input.seasonId, mode: 'casual' }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: '网络错误' }));
+        throw new Error(error.message || '加入队列失败');
+      }
+      const data = await response.json();
+      const ticket: QueueTicket = {
+        ...input,
+        queueId: data.id || crypto.randomUUID(),
+        status: 'searching',
+        queuedAt: new Date().toISOString(),
+        estimatedWaitSeconds: 10,
+      };
+      this.queues.set(ticket.queueId, ticket);
+      return clone(ticket);
+    } catch (error) {
+      // 如果后端不可用，回退到本地模拟
+      console.warn('在线匹配不可用，使用本地模拟:', error);
+      const ticket: QueueTicket = {
+        ...input,
+        queueId: crypto.randomUUID(),
+        status: 'searching',
+        queuedAt: new Date().toISOString(),
+        estimatedWaitSeconds: 6,
+      };
+      this.queues.set(ticket.queueId, ticket);
+      return clone(ticket);
+    }
   }
 
   async getQueueStatus(queueId: string): Promise<QueueTicket> {
     const ticket = this.queues.get(queueId);
     if (!ticket) throw new Error('匹配队列不存在');
+    
+    // 尝试轮询后端匹配状态
+    try {
+      const response = await fetch('/api/queues/current', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // 如果后端返回 ready_check 或 matched，更新 ticket
+        if (data.status === 'matched' || data.matchId) {
+          ticket.status = 'matched';
+          ticket.matchedRoomId = data.matchId;
+          // 保存 matchId 和 side 供跳转使用
+          (ticket as any).onlineMatchId = data.matchId;
+          (ticket as any).mySide = data.side;
+        }
+        return clone(ticket);
+      }
+    } catch (error) {
+      console.warn('轮询匹配状态失败，使用本地模拟:', error);
+    }
+    
+    // 本地模拟逻辑（后端不可用时回退）
     if (ticket.status === 'searching' && Date.now() - Date.parse(ticket.queuedAt) >= ticket.estimatedWaitSeconds * 1000) {
       ticket.status = 'matched';
       ticket.match = await this.startMatch({ gameId: ticket.gameId, seasonId: ticket.seasonId });
@@ -410,6 +461,17 @@ export class LocalPlatformAdapter implements PlatformAdapter {
   async cancelQueue(queueId: string): Promise<QueueTicket> {
     const ticket = this.queues.get(queueId);
     if (!ticket) throw new Error('匹配队列不存在');
+    
+    // 调用后端取消 API
+    try {
+      await fetch('/api/queues/current', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.warn('取消队列 API 调用失败:', error);
+    }
+    
     if (ticket.status === 'searching') ticket.status = 'cancelled';
     return clone(ticket);
   }

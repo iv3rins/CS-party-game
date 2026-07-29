@@ -176,7 +176,22 @@ function Lobby() {
     setSelectedGameId(game.gameId); setQueue(null); setRoom(null); setError('');
     setRating(game.ranked && signedIn ? await platform.getRating(game.gameId, game.seasonId) : null);
   };
-  const enterGame = async () => { try { await platform.launchGame(selectedGame.gameId); } catch (caught) { setError(caught instanceof Error ? caught.message : '无法进入游戏'); } };
+  const enterGame = async () => { 
+    try { 
+      // 如果是在线匹配成功，跳转到在线对局
+      if (queue && queue.status === 'matched' && (queue as any).onlineMatchId) {
+        const matchId = (queue as any).onlineMatchId;
+        const side = (queue as any).mySide || 'ct';
+        window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${selectedGame.gameId}?matchId=${matchId}&side=${side}` } }));
+        setQueue(null);
+        return;
+      }
+      // 否则正常启动游戏（本地模式）
+      await platform.launchGame(selectedGame.gameId); 
+    } catch (caught) { 
+      setError(caught instanceof Error ? caught.message : '无法进入游戏'); 
+    } 
+  };
   const startQueue = async () => { try { setQueue(await platform.joinQueue({ gameId: selectedGame.gameId, seasonId: selectedGame.seasonId })); } catch (caught) { setError(caught instanceof Error ? caught.message : '无法开始匹配'); } };
   const createRoom = async () => { try { const next = await platform.createRoom({ gameId: selectedGame.gameId, seasonId: selectedGame.seasonId, config: { name: roomName, visibility, roundSeconds: 180, allowSpectators } }); setRoom(next); setModal('room'); } catch (caught) { setError(caught instanceof Error ? caught.message : '创建房间失败'); } };
   const joinRoom = async () => { try { const next = await platform.joinRoom({ inviteCode: inviteCode.trim() }); setRoom(next); setModal('room'); setInviteCode(''); } catch (caught) { setError(caught instanceof Error ? caught.message : '加入房间失败'); } };
