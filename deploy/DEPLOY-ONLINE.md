@@ -2,7 +2,8 @@
 
 VPS: `64.90.30.38`  
 域名: `game.n1k0major.top`  
-提交: `ac59b06`（或更新的 main HEAD）
+提交: `59aaecd`（或更新的 main HEAD）
+系统: Debian 12
 
 ---
 
@@ -13,7 +14,7 @@ VPS: `64.90.30.38`
 ```bash
 # 在 VPS 上执行
 cd /opt/cs-party-game
-export DEPLOY_COMMIT=ac59b06  # 或省略使用 main 最新
+export DEPLOY_COMMIT=59aaecd  # 或省略使用 main 最新
 sudo -u cs-party-deploy bash deploy/deploy.sh
 ```
 
@@ -26,33 +27,43 @@ sudo -u cs-party-deploy bash deploy/deploy.sh
 
 ## 二、后端部署（新增步骤）
 
-### 1. 安装 PostgreSQL 15
+### 1. 安装 PostgreSQL 15 (Debian 12)
+
+Debian 12 官方仓库默认提供 PostgreSQL 15：
 
 ```bash
-# Ubuntu/Debian
+# 更新软件源
 sudo apt-get update
+
+# 安装 PostgreSQL 15
 sudo apt-get install -y postgresql-15 postgresql-client-15
 
-# 启动服务
+# 启动并设置开机自启
 sudo systemctl enable postgresql
 sudo systemctl start postgresql
+
+# 验证安装
+sudo systemctl status postgresql
+psql --version  # 应显示 15.x
 ```
 
-### 2. 创建数据库和用户
+### 2. 创建统一数据库（共享账号和天梯）
+
+**重要**：使用统一的 `cspa_main` 数据库，所有游戏共享账号、天梯和对局记录。
 
 ```bash
 # 生成随机密码
 DB_PASSWORD=$(openssl rand -base64 24)
-echo "数据库密码: $DB_PASSWORD" | tee /opt/cs-party-game/db-password.txt
-chmod 600 /opt/cs-party-game/db-password.txt
+echo "数据库密码: $DB_PASSWORD" | sudo tee /opt/cs-party-game/db-password.txt
+sudo chmod 600 /opt/cs-party-game/db-password.txt
 
-# 创建数据库
+# 创建数据库和用户
 sudo -u postgres psql << EOF
-CREATE DATABASE cs_push;
-CREATE USER cs_push_app WITH PASSWORD '$DB_PASSWORD';
-GRANT ALL PRIVILEGES ON DATABASE cs_push TO cs_push_app;
-\c cs_push
-GRANT ALL ON SCHEMA public TO cs_push_app;
+CREATE DATABASE cspa_main;
+CREATE USER cspa_app WITH PASSWORD '$DB_PASSWORD';
+GRANT ALL PRIVILEGES ON DATABASE cspa_main TO cspa_app;
+\c cspa_main
+GRANT ALL ON SCHEMA public TO cspa_app;
 EOF
 ```
 
@@ -61,7 +72,7 @@ EOF
 ```bash
 cd /opt/cs-party-game
 sudo -u cs-party-deploy git pull origin main
-sudo -u cs-party-deploy bash -c "cd /opt/cs-party-game && PGPASSWORD='$DB_PASSWORD' psql -U cs_push_app -h 127.0.0.1 -d cs_push -f server/migrations/001_initial.sql"
+sudo -u cs-party-deploy bash -c "cd /opt/cs-party-game && PGPASSWORD='$DB_PASSWORD' psql -U cspa_app -h 127.0.0.1 -d cspa_main -f server/migrations/001_initial.sql"
 ```
 
 ### 4. 构建后端
@@ -81,7 +92,7 @@ sudo tee /opt/cs-party-game/server.env > /dev/null << EOF
 NODE_ENV=production
 HOST=127.0.0.1
 PORT=3001
-DATABASE_URL=postgres://cs_push_app:$DB_PASSWORD@127.0.0.1/cs_push
+DATABASE_URL=postgres://cspa_app:$DB_PASSWORD@127.0.0.1/cspa_main
 COOKIE_SECRET=$COOKIE_SECRET
 SESSION_DAYS=30
 RATE_LIMIT_MAX=120
@@ -195,7 +206,7 @@ sudo journalctl -u cs-push-server -n 100
 
 ```bash
 # 添加到 crontab
-echo "0 3 * * * cd /opt/cs-party-game/server && NODE_ENV=production DATABASE_URL='postgres://cs_push_app:PASSWORD@127.0.0.1/cs_push' node -e \"require('./dist/server/src/cleanup.js').cleanupCommandLogs(new (require('./dist/server/src/postgresRepository.js')).PostgresRepository())\"" | sudo tee -a /etc/cron.d/cs-push-cleanup
+echo "0 3 * * * cd /opt/cs-party-game/server && NODE_ENV=production DATABASE_URL='postgres://cspa_app:PASSWORD@127.0.0.1/cspa_main' node -e \"require('./dist/server/src/cleanup.js').cleanupCommandLogs(new (require('./dist/server/src/postgresRepository.js')).PostgresRepository())\"" | sudo tee -a /etc/cron.d/cs-push-cleanup
 ```
 
 ### 手动触发清理
@@ -210,7 +221,7 @@ node -e "require('./dist/server/src/cleanup.js').cleanupCommandLogs(new (require
 
 ```bash
 # 每日备份示例
-sudo -u postgres pg_dump cs_push > /opt/cs-party-game/backups/cs_push_$(date +%Y%m%d).sql
+sudo -u postgres pg_dump cspa_main > /opt/cs-party-game/backups/cspa_main_$(date +%Y%m%d).sql
 ```
 
 ---
@@ -232,7 +243,7 @@ sudo -u cs-party-deploy npm ci --omit=dev
 sudo -u cs-party-deploy npm run build
 
 # 3. 执行新迁移（如有）
-# PGPASSWORD='密码' psql -U cs_push_app -h 127.0.0.1 -d cs_push -f server/migrations/00X_xxx.sql
+# PGPASSWORD='密码' psql -U cspa_app -h 127.0.0.1 -d cspa_main -f server/migrations/00X_xxx.sql
 
 # 4. 重启后端服务
 sudo systemctl restart cs-push-server
