@@ -15,11 +15,10 @@
 
 ## 上线前准备
 
-1. 将 `game.n1k0major.top` 的 DNS `A` 记录指向服务器公网 IPv4。
+1. 将 `game.n1komajor.top` 的 DNS `A` 记录指向服务器公网 IPv4。
 2. 在云服务器安全组中开放 TCP `22`、`80`、`443`；脚本会在已安装 UFW 时自动放行这三个端口。
 3. 将包含 `deploy/deploy.sh` 的代码推送到公开 GitHub 仓库 `https://github.com/iv3rins/CS-party-game.git` 的 `main` 分支。
 4. 确认服务器可以访问 GitHub、NodeSource、npm 和 Let's Encrypt。
-5. 确认服务器公网 IP 为 `64.90.30.38`，且 TCP `80/443` 没有被其他服务占用。
 
 ## 首次部署
 
@@ -51,7 +50,7 @@ DEPLOY_COMMIT="$RELEASE_COMMIT" bash /tmp/cs-party-deploy.sh
 - 执行 `npm ci`、lint、测试和生产构建。
 - 将构建结果发布到版本化目录，并原子切换 `current` 软链接。
 - 配置 Nginx SPA 路由，使 `/lobby`、`/games/cs-push` 和 `/games/cs-career` 可直接刷新。
-- 为 `game.n1k0major.top` 申请 Let's Encrypt 证书并强制 HTTPS。
+- 为 `game.n1komajor.top` 申请 Let's Encrypt 证书并强制 HTTPS。
 - 保留最近 5 个构建版本。
 
 ## 后续更新
@@ -88,9 +87,9 @@ npm run build
 systemctl status nginx
 nginx -t
 journalctl -u nginx -n 100 --no-pager
-curl -I https://game.n1k0major.top/lobby
-curl -I https://game.n1k0major.top/games/cs-push
-curl -I https://game.n1k0major.top/games/cs-career
+curl -I https://game.n1komajor.top/lobby
+curl -I https://game.n1komajor.top/games/cs-push
+curl -I https://game.n1komajor.top/games/cs-career
 readlink -f /opt/cs-party-game/current
 ```
 
@@ -101,7 +100,7 @@ readlink -f /opt/cs-party-game/current
 在本机连接服务器后执行：
 
 ```bash
-ssh root@64.90.30.38
+ssh root@你的服务器公网IP
 RELEASE_COMMIT="填写已推送的完整提交哈希"
 curl -fsSLo /tmp/cs-party-deploy.sh \
   "https://raw.githubusercontent.com/iv3rins/CS-party-game/$RELEASE_COMMIT/deploy/deploy.sh"

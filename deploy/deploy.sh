@@ -4,7 +4,7 @@ set -Eeuo pipefail
 REPO_URL="${REPO_URL:-https://github.com/iv3rins/CS-party-game.git}"
 BRANCH="${BRANCH:-main}"
 DEPLOY_COMMIT="${DEPLOY_COMMIT:-}"
-DOMAIN="${DOMAIN:-game.n1k0major.top}"
+DOMAIN="${DOMAIN:-game.n1komajor.top}"
 LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-iverins.user@gmail.com}"
 DEPLOY_USER="${DEPLOY_USER:-cs-party-deploy}"
 DEPLOY_ROOT="/opt/cs-party-game"
