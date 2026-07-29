@@ -5,13 +5,19 @@
 - This repository contains the CS Party Arena shell and the `cs-career` single-player career simulator.
 - `cs-career` uses `gameId: 'cs-career'`, `seasonId: 'career-v1'`, and route `/games/cs-career`. These identifiers are persistent API partition keys.
 - The career game is deterministic per seed. Game simulation must not call `Math.random()`; inject or persist the seed and use the career engine's seeded RNG.
+- **`cs-career` is strictly single-player.** It must not implement matchmaking, multiplayer lobbies, rooms, or any form of cross-player interaction. All multiplayer infrastructure belongs to the lobby and platform adapter.
 
 ## Platform integration
 
 - Read and follow [docs/platform-api.md](docs/platform-api.md) before changing platform-facing behavior.
-- UI components access account data, preferences, game discovery, game launch, and lobby navigation only through `platform` in `src/platform.ts`.
+- **Lobby (`src/lobby/Lobby.tsx`) and platform adapter (`src/platform.ts`) are the only owners of multiplayer infrastructure**: account identity, matchmaking, queues, rooms, ratings, leaderboards, match history, and cross-player interaction.
+- **Single-player games must not implement their own multiplayer, matchmaking, lobbies, or room systems.** They may only:
+  - Read static game manifest metadata via `platform.listGames()`
+  - Launch the game via `platform.launchGame(gameId)`
+  - Leave to lobby via `platform.leaveToLobby()`
+  - Read account display name and preferences for UI personalization
 - Single-player career saves are local game data, separate from platform ratings, queues, rooms, and match records.
-- Use `platform.launchGame()` to launch a manifest game and `platform.leaveToLobby()` to leave it.
+- Multiplayer games (e.g., `cs-push`) integrate with the platform through `platform.startMatch()`, `platform.completeMatch()`, `platform.joinQueue()`, `platform.createRoom()`, and `platform.joinRoom()`. The lobby coordinates these flows; individual game pages do not reimplement matchmaking or room UI.
 
 ## Code conventions
 
