@@ -1,17 +1,20 @@
 # Debian 12 部署
 
-站点以 Nginx 静态文件部署，不运行常驻 Node 服务。
+站点包含前端静态资源和后端 Fastify/PostgreSQL/WebSocket 服务。
 
-## 当前发布性质
+## 发布架构
 
-当前发布为 **CS Party Arena 前端体验版**：
+- **前端 SPA**: Nginx 静态托管，部署到 `/opt/cs-party-game/current`
+- **后端服务**: systemd 常驻服务，监听 `127.0.0.1:3001`，提供 `/api/*` 和 `/ws` WebSocket
+- **数据库**: PostgreSQL 15，数据库名 `cs_push`
+- **反向代理**: Nginx 将 `/api/` 和 `/ws` 代理到后端
 
-- `CS推推` 可进行本地 AI 演练。
-- 账号、偏好、天梯和近期战绩保存在当前浏览器 `localStorage`。
-- 匹配与房间为本地模拟流程，不连接其他设备；内存房间刷新后消失。
-- 排行榜不是服务器全局榜单，对局结果也不是服务端权威结算。
+## 当前功能
 
-因此本脚本只部署前端静态资源。真实多人、跨设备房间和权威天梯需要后续 Fastify/PostgreSQL/WebSocket 服务，不能仅靠本脚本实现。
+- `CS推推` 支持本地 AI 演练（单机模式）
+- `CS推推` 支持在线对战（通过 `?matchId=xxx&side=ct` 参数启用 WebSocket 客户端）
+- 账号、会话、天梯、匹配队列由后端 PostgreSQL 持久化
+- 跨设备实时对战通过 WebSocket 同步游戏状态
 
 ## 上线前准备
 
@@ -21,6 +24,10 @@
 4. 确认服务器可以访问 GitHub、NodeSource、npm 和 Let's Encrypt。
 
 ## 首次部署
+
+部署分为前端和后端两个独立步骤。
+
+### 步骤 1: 部署前端 SPA
 
 以 root 登录服务器：
 
@@ -53,9 +60,37 @@ DEPLOY_COMMIT="$RELEASE_COMMIT" bash /tmp/cs-party-deploy.sh
 - 为 `game.n1komajor.top` 申请 Let's Encrypt 证书并强制 HTTPS。
 - 保留最近 5 个构建版本。
 
+### 步骤 2: 部署后端服务
+
+前端部署成功后，在同一服务器上部署后端：
+
+```bash
+RELEASE_COMMIT="相同的完整提交哈希"
+curl -fsSLo /tmp/cs-party-deploy-server.sh \
+  "https://raw.githubusercontent.com/iv3rins/CS-party-game/$RELEASE_COMMIT/deploy/deploy-server.sh"
+less /tmp/cs-party-deploy-server.sh
+bash /tmp/cs-party-deploy-server.sh
+```
+
+后端部署会：
+
+- 安装 PostgreSQL 15 并创建数据库 `cs_push` 和用户 `cs_push_user`
+- 执行 `server/migrations/001_initial.sql` 初始化数据库表结构
+- 在 `server/` 目录执行 `npm ci --omit=dev` 和 `npm run build`
+- 将后端构建发布到 `/opt/cs-party-game/current-server`
+- 生成 `/opt/cs-party-game/server.env`（包含 `DATABASE_URL`、32+ 字符 `COOKIE_SECRET`、`SESSION_DAYS=30`、`RATE_LIMIT_MAX=120`）
+- 安装 systemd 服务 `cs-push-server.service` 并启动
+- 更新 Nginx 配置片段，添加后端代理：
+  - `/api/*` 代理到 `http://127.0.0.1:3001`
+  - `/ws` WebSocket 代理到 `http://127.0.0.1:3001`
+- 健康检查 `http://127.0.0.1:3001/api/health` 和 `https://$DOMAIN/api/health`
+- 保留最近 3 个后端版本
+
 ## 后续更新
 
-更新合并并推送到 `main` 后，使用新的完整提交哈希重复固定提交部署流程：
+更新合并并推送到 `main` 后，使用新的完整提交哈希重复固定提交部署流程。
+
+### 更新前端
 
 ```bash
 RELEASE_COMMIT="新的完整提交哈希"
@@ -63,6 +98,16 @@ curl -fsSLo /tmp/cs-party-deploy.sh \
   "https://raw.githubusercontent.com/iv3rins/CS-party-game/$RELEASE_COMMIT/deploy/deploy.sh"
 less /tmp/cs-party-deploy.sh
 DEPLOY_COMMIT="$RELEASE_COMMIT" bash /tmp/cs-party-deploy.sh
+```
+
+### 更新后端
+
+```bash
+RELEASE_COMMIT="新的完整提交哈希"
+curl -fsSLo /tmp/cs-party-deploy-server.sh \
+  "https://raw.githubusercontent.com/iv3rins/CS-party-game/$RELEASE_COMMIT/deploy/deploy-server.sh"
+less /tmp/cs-party-deploy-server.sh
+bash /tmp/cs-party-deploy-server.sh
 ```
 
 脚本会拉取最新提交。仅在以下情况执行 `npm ci`：
@@ -79,9 +124,11 @@ npm run lint
 npm run build
 ```
 
-构建失败时不会切换线上 `current` 版本。
+构建失败时不会切换线上 `current` 版本。后端更新会自动重启 `cs-push-server` 服务。
 
 ## 常用检查
+
+### 前端
 
 ```bash
 systemctl status nginx
@@ -94,6 +141,28 @@ readlink -f /opt/cs-party-game/current
 ```
 
 三个 URL 都应返回 `200`，并且直接刷新游戏路径不能出现 Nginx `404`。
+
+### 后端
+
+```bash
+systemctl status cs-push-server
+journalctl -u cs-push-server -n 100 --no-pager
+journalctl -u cs-push-server -f  # 实时日志
+curl http://127.0.0.1:3001/api/health
+curl https://game.n1komajor.top/api/health
+readlink -f /opt/cs-party-game/current-server
+cat /opt/cs-party-game/server.env  # 查看配置（包含敏感信息）
+```
+
+后端服务应处于 `active (running)` 状态，健康检查返回 `{"status":"ok"}`。
+
+### 数据库
+
+```bash
+sudo -u postgres psql -d cs_push -c "\dt"  # 查看表结构
+sudo -u postgres psql -d cs_push -c "SELECT COUNT(*) FROM accounts;"  # 账号数
+sudo -u postgres psql -d cs_push -c "SELECT COUNT(*) FROM matches WHERE status='playing';"  # 进行中对局
+```
 
 ## 本次部署命令
 

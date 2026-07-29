@@ -1,0 +1,24 @@
+[Unit]
+Description=CS Party Arena Backend Server
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=cs-party-deploy
+WorkingDirectory=/opt/cs-party-game/current-server
+EnvironmentFile=/opt/cs-party-game/server.env
+ExecStart=/usr/local/bin/node /opt/cs-party-game/current-server/dist/server/src/main.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/cs-party-game
+
+[Install]
+WantedBy=multi-user.target

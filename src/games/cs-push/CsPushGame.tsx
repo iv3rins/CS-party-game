@@ -7,6 +7,7 @@ import { Account, GAME_ID, getRankTier, MatchSession, platform, Rating, SEASON_I
 import { audio, SoundEvent } from './audio';
 import { ItemIcon, OperatorAvatar, UiIcon, WeaponIcon } from '../../shared/icons';
 import { hasSeenTutorial, markTutorialSeen } from './tutorial';
+import { OnlineMatchClient } from './onlineClient';
 
 const ITEM_KINDS: ItemKind[] = ['flash', 'smoke', 'c4', 'defuse'];
 const WEAPON_KINDS: WeaponKind[] = ['deagle', 'galil', 'm4a1', 'ak47', 'awp'];
@@ -106,7 +107,12 @@ function TutorialContent({ step }: { step: TutorialStep }) {
   return null;
 }
 
-function App() {
+type CsPushGameProps = {
+  matchId?: string;
+  mySide?: 'ct' | 't';
+};
+
+function App({ matchId, mySide }: CsPushGameProps) {
   const [battle, setBattle] = useState<{ game: GameState; shop: ProductKind[] }>(makeInitialBattle);
   const { game, shop } = battle;
   const setGame = useCallback((update: (current: GameState) => GameState) => setBattle(current => ({ ...current, game: update(current.game) })), []);
@@ -124,15 +130,84 @@ function App() {
   const submitted = useRef(false);
   const previousGame = useRef(game);
   const match = useRef<MatchSession | null>(null);
+  const [onlineMode] = useState(() => Boolean(matchId));
+  const [onlineClient] = useState(() => {
+    if (!matchId) return null;
+    return new OnlineMatchClient(matchId);
+  });
+  const [pendingCommands, setPendingCommands] = useState<Set<string>>(new Set());
+  const [opponentConnected, setOpponentConnected] = useState(true);
+  const [reconnectDeadline, setReconnectDeadline] = useState<string | null>(null);
+  const [onlineFinished, setOnlineFinished] = useState(false);
 
   useEffect(() => {
     platform.getAccount().then(setAccount);
     platform.getRating(GAME_ID, SEASON_ID).then(setRating);
-    platform.startMatch({ gameId: GAME_ID, seasonId: SEASON_ID }).then(session => { match.current = session; });
-  }, []);
+    if (!onlineMode) {
+      platform.startMatch({ gameId: GAME_ID, seasonId: SEASON_ID }).then(session => { match.current = session; });
+    }
+  }, [onlineMode]);
 
   useEffect(() => {
-    if (isDebug || tutorialOpen || game.status !== 'playing') return;
+    if (!onlineClient) return;
+    onlineClient.connect().catch(error => {
+      setToast(`连接失败: ${error.message}`);
+    });
+    onlineClient.onSnapshot(snapshot => {
+      const mapped: GameState = {
+        ...snapshot.state,
+        playerBase: mySide === 'ct' ? snapshot.state.playerBase : snapshot.state.aiBase,
+        aiBase: mySide === 'ct' ? snapshot.state.aiBase : snapshot.state.playerBase,
+        playerMoney: mySide === 'ct' ? snapshot.state.playerMoney : snapshot.state.aiMoney,
+        aiMoney: mySide === 'ct' ? snapshot.state.aiMoney : snapshot.state.playerMoney,
+        playerItems: mySide === 'ct' ? snapshot.state.playerItems : snapshot.state.aiItems,
+        aiItems: mySide === 'ct' ? snapshot.state.aiItems : snapshot.state.playerItems,
+        playerDefuseCharges: mySide === 'ct' ? snapshot.state.playerDefuseCharges : snapshot.state.aiDefuseCharges,
+        aiDefuseCharges: mySide === 'ct' ? snapshot.state.aiDefuseCharges : snapshot.state.playerDefuseCharges,
+        lanes: snapshot.state.lanes.map(lane => ({
+          ...lane,
+          player: mySide === 'ct' ? lane.player : lane.ai,
+          ai: mySide === 'ct' ? lane.ai : lane.player,
+        })),
+      };
+      setBattle(prev => ({ ...prev, game: mapped, shop: snapshot.shops[mySide as Side] }));
+    });
+    onlineClient.onCommandStatus((commandId, status, error) => {
+      if (status === 'accepted') {
+        setPendingCommands(prev => {
+          const next = new Set(prev);
+          next.delete(commandId);
+          return next;
+        });
+      } else if (status === 'rejected') {
+        setPendingCommands(prev => {
+          const next = new Set(prev);
+          next.delete(commandId);
+          return next;
+        });
+        setToast(error || '操作被服务器拒绝');
+      }
+    });
+    onlineClient.onFinished(result => {
+      setOnlineFinished(true);
+      const outcome = result.result.outcome;
+      const myOutcome = (outcome === mySide ? 'player-win' : outcome === 'draw' ? 'draw' : 'ai-win');
+      setBattle(prev => ({ ...prev, game: { ...prev.game, status: myOutcome } }));
+    });
+    onlineClient.onConnection((principalId, connected, deadline) => {
+      setOpponentConnected(connected);
+      setReconnectDeadline(deadline || null);
+    });
+    onlineClient.onError(error => {
+      setToast(`连接错误: ${error.message}`);
+    });
+    return () => {
+      onlineClient.disconnect();
+    };
+  }, [onlineClient, mySide]);
+
+  useEffect(() => {
+    if (onlineMode || isDebug || tutorialOpen || game.status !== 'playing') return;
     let previous = performance.now();
     const timer = window.setInterval(() => {
       const now = performance.now();
@@ -141,7 +216,7 @@ function App() {
       setGame(current => tickGame(current, dt));
     }, 100);
     return () => clearInterval(timer);
-  }, [game.status, tutorialOpen, setGame]);
+  }, [onlineMode, game.status, tutorialOpen, setGame]);
 
   useEffect(() => {
     const previous = previousGame.current;
@@ -179,6 +254,7 @@ function App() {
   }, [tutorialOpen, tutorialStep]);
 
   useEffect(() => {
+    if (onlineMode) return;
     if (game.status === 'playing') return;
     if (submitted.current) return;
     submitted.current = true;
@@ -186,10 +262,10 @@ function App() {
     const session = match.current;
     if (!session) return;
     platform.completeMatch({ matchId: session.matchId, gameId: GAME_ID, seasonId: SEASON_ID, outcome, opponentElo: session.opponentElo }).then(setRating);
-  }, [game.status]);
+  }, [onlineMode, game.status]);
 
   useEffect(() => {
-    if (isDebug || tutorialOpen || game.status !== 'playing') return;
+    if (onlineMode || isDebug || tutorialOpen || game.status !== 'playing') return;
     const ai = window.setInterval(() => {
       setGame(current => {
         const affordable = (Object.keys(PRODUCTS) as ProductKind[]).filter(kind => PRODUCTS[kind].type === 'weapon' && PRODUCTS[kind].price <= current.aiMoney) as WeaponKind[];
@@ -203,10 +279,30 @@ function App() {
       });
     }, 1700);
     return () => clearInterval(ai);
-  }, [game.status, tutorialOpen, setGame]);
+  }, [onlineMode, game.status, tutorialOpen, setGame]);
 
   const selectedKind = selected === null ? null : shop[selected];
   const deploy = useCallback((laneIndex: number, shopIndex: number) => {
+    if (onlineMode) {
+      if (tutorialOpen || !onlineClient) return;
+      const kind = shop[shopIndex];
+      if (!kind) return;
+      const commandId = crypto.randomUUID();
+      const product = PRODUCTS[kind];
+      if (game.playerMoney < product.price) {
+        setToast('经济不足，继续控场积攒资金。');
+        return;
+      }
+      void audio.unlock();
+      void audio.play('purchase');
+      const command: import('./onlineClient').MatchCommand = product.type === 'weapon'
+        ? { type: 'buy_deploy', slot: shopIndex, lane: laneIndex }
+        : { type: 'use_item', slot: shopIndex, lane: laneIndex };
+      onlineClient.sendCommand(commandId, command);
+      setPendingCommands(prev => new Set(prev).add(commandId));
+      setSelected(null);
+      return;
+    }
     setBattle(current => {
       if (tutorialOpen) return current;
       const kind = current.shop[shopIndex];
@@ -231,7 +327,7 @@ function App() {
       return { game: next, shop: current.shop.map((item, index) => index === shopIndex ? weightedProduct() : item) };
     });
     setSelected(null);
-  }, [tutorialOpen]);
+  }, [onlineMode, onlineClient, tutorialOpen, shop, game.playerMoney]);
 
   const closeTutorial = () => { markTutorialSeen(); setTutorialOpen(false); };
   const restart = () => { submitted.current = false; match.current = null; platform.startMatch({ gameId: GAME_ID, seasonId: SEASON_ID }).then(session => { match.current = session; }); setBattle({ game: createInitialState(randomPositions()), shop: makeShop() }); setSelected(null); };
@@ -240,7 +336,11 @@ function App() {
 
   const currentTutorial = tutorialSteps[tutorialStep];
 
-  return <main className={`cs-push-root app-shell ${intelOpen ? 'intel-expanded' : 'intel-collapsed'}`} data-game-elapsed={game.elapsed.toFixed(2)} data-money={Math.floor(game.playerMoney)}>
+  const hasPendingCommand = pendingCommands.size > 0;
+
+  return <main className={`cs-push-root app-shell ${intelOpen ? 'intel-expanded' : 'intel-collapsed'} ${onlineMode ? 'online-mode' : ''}`} data-game-elapsed={game.elapsed.toFixed(2)} data-money={Math.floor(game.playerMoney)}>
+    {hasPendingCommand && <div className="command-pending-overlay" role="status"><div className="pending-spinner"><span>等待服务器确认...</span></div></div>}
+    {!opponentConnected && reconnectDeadline && <div className="connection-warning" role="alert"><UiIcon name="timer" /><span>对手已断线，{new Date(reconnectDeadline).toLocaleTimeString()} 前未重连将判负</span></div>}
     <header className="topbar">
       <button className="icon-button" onClick={() => platform.leaveToLobby()} title="返回合集大厅"><UiIcon name="back" /></button>
       <div className="brand"><span className="brand-mark">CS</span><strong>PARTY ARENA</strong><small>/ 001</small></div>
@@ -304,7 +404,7 @@ function App() {
     </section>
 
     {tutorialOpen && <div className="tutorial-overlay" role="dialog" aria-modal="true" aria-label="CS推推新手教程">{spotlight && <div className="tutorial-cutout" style={{ top: spotlight.top, left: spotlight.left, width: spotlight.width, height: spotlight.height }} />}<section className="tutorial-card"><div className="tutorial-card-head"><span>CS推推 / 新手行动</span><strong>{tutorialStep + 1} / {tutorialSteps.length}</strong></div><h2>{currentTutorial.title}</h2><p>{currentTutorial.body}</p><TutorialContent step={currentTutorial} /><div className="tutorial-actions"><button className="tutorial-skip" onClick={closeTutorial}>跳过教程</button><span>{tutorialStep > 0 && <button onClick={() => setTutorialStep(step => step - 1)}>上一步</button>}<button className="tutorial-next" onClick={() => tutorialStep === tutorialSteps.length - 1 ? closeTutorial() : setTutorialStep(step => step + 1)}>{tutorialStep === tutorialSteps.length - 1 ? '开始对局' : '下一步'}</button></span></div></section></div>}
-    {game.status !== 'playing' && <div className="result-overlay"><div className="result-panel"><span>MATCH COMPLETE</span><h2>{result}</h2><p>CT {Math.ceil(game.playerBase)} — {Math.ceil(game.aiBase)} T</p><div className="elo-result"><small>CS推推 · 独立天梯</small><strong>{getRankTier(rating?.elo ?? 1000).name} · {rating?.elo ?? 1000} ELO</strong></div><button onClick={restart}><UiIcon name="restart"/>再次行动</button></div></div>}
+    {game.status !== 'playing' && <div className="result-overlay"><div className="result-panel"><span>MATCH COMPLETE</span><h2>{result}</h2><p>CT {Math.ceil(game.playerBase)} — {Math.ceil(game.aiBase)} T</p>{!onlineMode && <div className="elo-result"><small>CS推推 · 独立天梯</small><strong>{getRankTier(rating?.elo ?? 1000).name} · {rating?.elo ?? 1000} ELO</strong></div>}{onlineMode ? <button onClick={() => platform.leaveToLobby()}><UiIcon name="back"/>返回大厅</button> : <button onClick={restart}><UiIcon name="restart"/>再次行动</button>}</div></div>}
   </main>;
 }
 

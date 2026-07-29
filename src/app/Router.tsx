@@ -19,7 +19,12 @@ export default function Router() {
     window.addEventListener('cspa:navigate', navigate);
     return () => { window.removeEventListener('popstate', sync); window.removeEventListener('cspa:navigate', navigate); };
   }, []);
-  if (gamePath === '/games/cs-push') return <CsPushGame />;
+  if (gamePath === '/games/cs-push') {
+    const params = new URLSearchParams(window.location.search);
+    const matchId = params.get('matchId') || undefined;
+    const mySide = params.get('side') as 'ct' | 't' | null;
+    return <CsPushGame matchId={matchId} mySide={mySide || undefined} />;
+  }
   if (gamePath === '/games/cs-career') return <CareerGame />;
   return <Lobby />;
 }
