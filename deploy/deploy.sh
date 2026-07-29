@@ -126,6 +126,20 @@ validate_and_build() {
   [[ -f "$SOURCE_DIR/dist/index.html" ]] || fail "构建未生成 dist/index.html"
 }
 
+configure_firewall() {
+  if ! command -v ufw >/dev/null 2>&1; then
+    log "未安装 UFW，跳过本机防火墙配置；请确认云安全组放行 80/443"
+    return
+  fi
+  log "放行 SSH、HTTP 和 HTTPS"
+  ufw allow OpenSSH >/dev/null
+  ufw allow 80/tcp >/dev/null
+  ufw allow 443/tcp >/dev/null
+  if ufw status | grep -q '^Status: inactive'; then
+    ufw --force enable >/dev/null
+  fi
+}
+
 configure_nginx() {
   log "配置 Nginx SPA 路由和静态缓存"
   cat > "$NGINX_SNIPPET" <<EOF
@@ -171,7 +185,7 @@ NEW_RELEASE=""
 
 publish_release() {
   local revision
-  revision=$(git -C "$SOURCE_DIR" rev-parse --short HEAD)
+  revision=$(as_deploy_user git -C "$SOURCE_DIR" rev-parse --short HEAD)
   NEW_RELEASE="$RELEASES_DIR/$(date -u +%Y%m%d%H%M%S)-$revision"
   [[ -L "$CURRENT_LINK" ]] && OLD_TARGET=$(readlink -f "$CURRENT_LINK")
 
@@ -238,6 +252,7 @@ main() {
   update_source
   install_project_dependencies
   validate_and_build
+  configure_firewall
   configure_nginx
   publish_release
   if ! activate_and_verify; then

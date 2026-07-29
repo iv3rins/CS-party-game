@@ -16,7 +16,7 @@
 ## 上线前准备
 
 1. 将 `game.n1k0major.top` 的 DNS `A` 记录指向服务器公网 IPv4。
-2. 在云服务器安全组和防火墙中开放 TCP `22`、`80`、`443`。
+2. 在云服务器安全组中开放 TCP `22`、`80`、`443`；脚本会在已安装 UFW 时自动放行这三个端口。
 3. 将包含 `deploy/deploy.sh` 的代码推送到公开 GitHub 仓库 `https://github.com/iv3rins/CS-party-game.git` 的 `main` 分支。
 4. 确认服务器可以访问 GitHub、NodeSource、npm 和 Let's Encrypt。
 5. 确认服务器公网 IP 为 `64.90.30.38`，且 TCP `80/443` 没有被其他服务占用。
@@ -44,6 +44,8 @@ DEPLOY_COMMIT="$RELEASE_COMMIT" bash /tmp/cs-party-deploy.sh
 首次运行会：
 
 - 安装缺失的 Git、Nginx、Node.js 22、Certbot 和 rsync。
+- 创建无特权构建用户 `cs-party-deploy`，避免 root 与 Git 工作区混用。
+- 已安装 UFW 时放行 SSH、HTTP 和 HTTPS。
 - 没有 Swap 时创建 1GB `/swapfile`。
 - 克隆 `main` 分支到 `/opt/cs-party-game/source`。
 - 执行 `npm ci`、lint、测试和生产构建。
