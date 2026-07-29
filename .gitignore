@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+artifacts/
+test-results/
+*.test.ts
+*.test.tsx
+.pi-vite.log
+.pi-subagents/
+.env
+.env.*
+!.env.example
+src/assets/docs/*.docx
