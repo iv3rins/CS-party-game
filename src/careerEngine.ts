@@ -3,8 +3,8 @@ import { CAREER_QUOTES, QuoteTag } from './careerQuotes';
 import { CAREER_EVENT_CATALOG, eligibleCatalogEvents } from './careerEventCatalog';
 
 export const CAREER_SAVE_KEY = 'cspa:career:cs-career:v1';
-export const CAREER_VERSION = 9;
-export const CAREER_RULES_VERSION = 'career-market-ui-frequency-v9';
+export const CAREER_VERSION = 10;
+export const CAREER_RULES_VERSION = 'career-contract-streamer-mobile-v10';
 
 export type Pace = 'hardcore' | 'standard' | 'fast';
 export type OriginId = 'northeast' | 'academy' | 'campus' | 'overseas' | 'southwest' | 'south' | 'central' | 'northwest';
@@ -18,9 +18,9 @@ export type EventResume = 'start-season' | 'continue-season' | 'continue-report'
 export type DefensiveSite = 'a' | 'b' | 'rotator';
 export type SeasonHalf = 'first' | 'second';
 export type ChoiceKind = 'offseason' | 'annual';
-export type EmploymentStatus = 'signed' | 'free-agent';
+export type EmploymentStatus = 'signed' | 'free-agent' | 'streamer';
 export type ContractTier = 't1' | 't2' | 't3';
-export type StatChange = Partial<Record<Track, number>> & { health?: number; earnings?: number; teamForm?: number; rosterStability?: number; positionFamiliarity?: number; defensiveSite?: DefensiveSite; resetVrs?: boolean; preserveCore?: boolean; transfer?: boolean; contractTier?: ContractTier; employmentStatus?: EmploymentStatus; noOfferWindows?: number; rolePreparation?: RoleChangePreparation; roleChange?: Role; iglArchetype?: IglArchetype; bootcampBonus?: number; highPressureChokingRisk?: number; internationalAdaptation?: number };
+export type StatChange = Partial<Record<Track, number>> & { health?: number; earnings?: number; assets?: number; teamForm?: number; rosterStability?: number; positionFamiliarity?: number; defensiveSite?: DefensiveSite; resetVrs?: boolean; preserveCore?: boolean; transfer?: boolean; internationalTransfer?: boolean; contractTier?: ContractTier; employmentStatus?: EmploymentStatus; noOfferWindows?: number; rolePreparation?: RoleChangePreparation; roleChange?: Role; iglArchetype?: IglArchetype; bootcampBonus?: number; highPressureChokingRisk?: number; internationalAdaptation?: number };
 export interface TournamentResultPatch { placementDelta?: number; placement?: string; ratingDelta?: number; }
 export interface DelayedOutcome { tag: string; riskHint: string; minSeasons: number; maxSeasons: number; changes: StatChange; revealText: string; }
 export interface PendingConsequence { id: string; sourceDecisionId: string; dueSeason: number; tag: string; changes: StatChange; revealText: string; }
@@ -36,6 +36,8 @@ export interface TournamentResult { id: string; tournamentId: string; name: stri
 export interface HonorAward { id: string; season: number; tournamentName: string; kind: 'MVP' | 'EVP' | 'VP' | '冠军'; honorClass: HonorClass; }
 export interface Top20Entry { rank: number; playerId: string; nick: string; team: string; score: number; isPlayer: boolean; }
 export interface AnnualTop20 { calendarYear: number; careerYear: number; eligible: boolean; playerRank?: number; entries: Top20Entry[]; review?: string; generatedQuote?: string; t1Maps?: number; nominationChance?: number; }
+export interface RenewalFactor { label: string; value: number; }
+export interface RenewalEvaluation { season: number; chance: number; attitude: '稳妥' | '观望' | '危险'; factors: RenewalFactor[]; contractExpired: boolean; retained?: boolean; summary: string; }
 export interface SeasonRecord {
   season: number; careerYear: number; half: SeasonHalf; age: number; team: string; tier: string; rating: number; kd: number; adr: number;
   matches: number; winRate: number; placement: string; teamPrize: number; playerPrize: number; salaryPaid: number; note: string; deltas: StatDeltas; tournaments: TournamentResult[]; globalRank: number; regionRank: number; rankingDelta: number; honors: HonorAward[];
@@ -48,7 +50,7 @@ export interface CareerState {
   version: number; rulesVersion: string; dataVersion: string; seed: number; pace: Pace; name: string; origin: Origin; role: Role; defensiveSite: DefensiveSite; positionFamiliarity: number; age: number; careerYear: number; half: SeasonHalf; season: number;
   teamId: string; team: string; region: TeamRegion; roster: Array<{ nick: string; role: PlayerRole; isPlayer?: boolean }>; coreMemberIds: string[]; tier: string; globalRank: number; regionRank: number; rankingPoints: number; vrsActive: boolean; rebuildPoints: number; lastTransferFee: number; teamForm: number; rosterStability: number; negativeUpsetStreak: number; internationalAdaptation: number; cncsRevival: boolean; ability: number; connections: number; integrity: number; fame: number; health: number; salary: number;
   rolePreparation: RoleChangePreparation; roleChangeCooldown: number; roleChangeCount: number; iglArchetype?: IglArchetype; bootcampCount: number; highPressureChokingRisk: number;
-  hiddenFlags: Record<string, number>; pendingConsequences: PendingConsequence[]; employmentStatus: EmploymentStatus; noOfferWindows: number;
+  hiddenFlags: Record<string, number>; pendingConsequences: PendingConsequence[]; employmentStatus: EmploymentStatus; noOfferWindows: number; contractHalfSeasonsRemaining: number; renewalEvaluation?: RenewalEvaluation; assets: number; streamerWindows: number; highPotential: boolean;
   status: 'active' | 'retired'; phase: CareerPhase; choiceKind?: ChoiceKind; decision?: Decision; pendingEmergencies: Decision[]; resolvedEmergencies: string[]; eventResume?: EventResume; postReportEvent?: Decision;
   seasonProgress?: SeasonProgress; lastEventResult?: string; seasonBaseline?: StatSnapshot; stats: CareerStats; history: SeasonRecord[]; honors: HonorAward[]; top20History: AnnualTop20[]; log: string[];
 }
@@ -285,17 +287,34 @@ const tournamentEventFor = (state: CareerState, result: TournamentResult, index:
 const cnTeams=new Set(['TYLOO','Lynn Vision','Rare Atom','JiJieHao','Steel Helmet']);
 const isCnTeam=(state:CareerState)=>cnTeams.has(state.team);
 const hasInternationalResume=(state:CareerState)=>state.history.flatMap(record=>record.tournaments).some(result=>isLargeOrHigher(result.honorClass)&&result.rating>=1.08);
-const internationalOffer:Omit<Decision,'id'>={kind:'offseason',category:'国际转会',title:'国际纵队正式报价',briefing:'一支国际阵容愿意支付高额转会费。更稳定的 T1 与 Major 机会就在眼前，但语言、文化和队内关系都要重新建立。',options:[{id:'join-international',label:'接受国际队报价',detail:'赛事上限提高 / 获得签字费 / 关系与状态暂时下降',changes:{transfer:true,connections:-8,fame:6}},{id:'stay-cn',label:'留在中国队继续冲击',detail:'保持现阵容 / 关系 +6 / 国际机会减少',changes:{connections:6,preserveCore:true}}]};
-const freeAgentChoiceFor=(state:CareerState):Decision=>instantiate({kind:'offseason',category:'合同转会',title:'自由人窗口',briefing:`原队没有续约。年龄、最近数据和当前位置市场共同决定你还能留在哪一级赛场。`,options:[
-  {id:'accept-lower-offer',label:'接受现有低级别报价',detail:'72% 获得二线合同 / 28% 只有三线队愿意签约',changes:{},outcomes:[{id:'lower-t2',label:'一支二线队给出首发合同，但薪资和冠军机会下降',probability:72,changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,fame:-4,connections:3}},{id:'lower-t3',label:'最终只有三线队报价，职业生涯进入求生阶段',probability:28,changes:{contractTier:'t3',employmentStatus:'signed',noOfferWindows:0,fame:-7,ability:-2}}]},
-  {id:'wait-better-offer',label:'继续等待更好的队伍',detail:'18% 等到二线强队 / 82% 又一个窗口无人报价',changes:{},outcomes:[{id:'wait-success',label:'二线强队临时出现位置空缺',probability:18,changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,connections:-2,fame:2}},{id:'wait-fail',label:'窗口关闭，仍然没有职业队报价',probability:82,changes:{employmentStatus:'free-agent',noOfferWindows:state.noOfferWindows+1,fame:-5,health:-3}}]},
+const isHighPotential=(state:CareerState,rating=state.history.at(-1)?.rating??state.stats.rating)=>state.age<23&&state.ability>=75&&state.health>=65&&rating>=marketRatingFloor(state)&&state.integrity>=35;
+const internationalEligible=(state:CareerState)=>isCnTeam(state)&&state.age<23&&((state.ability>=75&&state.internationalAdaptation>=45)||(state.history.at(-1)?.rating??0)>=1.12&&hasInternationalResume(state));
+const internationalOfferFor=(state:CareerState):Decision=>instantiate({kind:'offseason',category:'国际转会',title:'国际纵队正式报价',briefing:'你的年轻高潜状态和国际履历进入海外队伍视野。更高赛事上限伴随语言、体系和首发竞争。',options:[{id:'join-international',label:'接受国际纵队轮换合同',detail:'1–2 年合同 / 初期关系 -6、战队状态 -5 / 国际机会提高',changes:{internationalTransfer:true,contractTier:'t1',connections:-6,teamForm:-5,fame:7,internationalAdaptation:10}},{id:'stay-cn',label:'留在当前体系继续首发',detail:'保持现阵容 / 关系 +6 / 等待下一次国际窗口',changes:{connections:6,preserveCore:true}}]},`s${state.season}-international`);
+const relativeTierLabel=(state:CareerState,target:ContractTier)=>{const current=teamTierForRank(state.globalRank);if(current===target)return target==='t1'?'同级 1.5 线队':'同级强队';if(target==='t1')return '升至 1.5 线';if(target==='t2')return current==='t3'?'升至二线':'降至二线';return '降至三线';};
+const freeAgentChoiceFor=(state:CareerState):Decision=>instantiate({kind:'offseason',category:'合同转会',title:'自由人窗口',briefing:'原队合同已经结束。报价会明确显示相对当前履历的升降级、合同期限和首发保障。',options:[
+  {id:'accept-market-offer',label:'接受当前职业报价',detail:`65% ${relativeTierLabel(state,'t2')}首发 / 35% ${relativeTierLabel(state,'t3')}首发`,changes:{},outcomes:[{id:'market-t2',label:`获得${relativeTierLabel(state,'t2')}首发合同`,probability:65,changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,connections:3}},{id:'market-t3',label:`获得${relativeTierLabel(state,'t3')}首发合同`,probability:35,changes:{contractTier:'t3',employmentStatus:'signed',noOfferWindows:0,fame:-3}}]},
+  {id:'wait-better-offer',label:'继续等待更高层级队伍',detail:'24% 等到二线强队 / 76% 本窗口没有报价',changes:{},outcomes:[{id:'wait-success',label:'二线强队临时出现首发空缺',probability:24,changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,connections:-2,fame:2}},{id:'wait-fail',label:'窗口关闭，仍然没有职业队报价；你转为直播维持曝光并继续等待',probability:76,changes:{employmentStatus:'streamer',noOfferWindows:state.noOfferWindows+1,assets:-6,fame:-2,health:-2}}]},
+  {id:'become-streamer',label:'暂别赛场，直播等待机会',detail:'进入半年主播窗口 / 保留复出资格 / 可用资产承担生活成本',changes:{employmentStatus:'streamer',noOfferWindows:0},outcomes:[{id:'stream-start',label:'直播间开始稳定运营，你仍在维持职业训练',probability:80,changes:{fame:3}},{id:'stream-slow',label:'直播起步缓慢，但你保留了继续等待的空间',probability:20,changes:{fame:1}}]},
 ]},`s${state.season}-free-agent`);
 const breachChoiceFor=(state:CareerState):Decision=>instantiate({kind:'offseason',category:'合同转会',title:'违约加盟争冠队',briefing:'一支顶级队伍出现临时空缺，但转会窗口即将关闭。对方暗示你先与原队撕破合同，再解决买断问题。',options:[
   {id:'breach-for-superteam',label:'主动违约抱团争冠',detail:'32% 加盟成功 / 43% 被原队冷藏 / 25% 两边都不要',changes:{integrity:-8,connections:-6,earnings:-12},outcomes:[{id:'breach-success',label:'争冠队支付后续费用，你进入一线阵容，但背负违约口碑',probability:32,changes:{contractTier:'t1',employmentStatus:'signed',noOfferWindows:0,fame:10,integrity:-8}},{id:'breach-benched',label:'争冠队撤回承诺，原队将你冷藏到合同结束',probability:43,changes:{ability:-7,fame:-6,connections:-10,employmentStatus:'signed'}},{id:'breach-free',label:'合同解除，但市场认为风险过高，没有队伍立即报价',probability:25,changes:{employmentStatus:'free-agent',noOfferWindows:1,fame:-10,integrity:-7}}]},
   {id:'honor-contract',label:'履行合同等待正式报价',detail:'76% 保住首发 / 24% 错过窗口后资源下降',changes:{integrity:5,fame:-3},outcomes:[{id:'stay-starting',label:'原队认可职业态度，继续给你首发资源',probability:76,changes:{connections:6,teamForm:3}},{id:'stay-cost',label:'争冠机会消失，原队也开始培养替代者',probability:24,changes:{connections:-3,ability:-2,rosterStability:-4}}]},
 ]},`s${state.season}-contract-breach`);
+const streamerChoiceFor=(state:CareerState):Decision=>{
+  const income=Math.max(1,Math.round(2+state.fame*.14));
+  const livingCost=Math.round(7+state.streamerWindows*1.5);
+  const offerChance=Math.max(5,Math.min(72,Math.round(state.ability*.55+state.fame*.2+state.connections*.15+state.internationalAdaptation*.1-state.age-state.streamerWindows*8)));
+  return instantiate({kind:'offseason',category:'退役转型',title:'主播待业窗口',briefing:`半年预计直播收入 ${income} 万、生活成本 ${livingCost} 万。当前可用资产 ${state.assets} 万，职业报价基础概率 ${offerChance}%。`,options:[
+    {id:'stream-focus',label:'专注直播积累观众',detail:`预计净资产 ${income-livingCost>=0?'+':''}${income-livingCost} 万 / 能力 -3 / 报价概率较低`,changes:{assets:income-livingCost,earnings:income,fame:5,ability:-3,employmentStatus:'streamer'},outcomes:[{id:'stream-no-offer',label:'直播数据增长，但暂时没有合适的职业报价',probability:Math.max(20,100-Math.round(offerChance*.55)),changes:{}},{id:'stream-t3',label:'一支三线队提供首发复出合同',probability:Math.min(80,Math.round(offerChance*.55)),changes:{contractTier:'t3',employmentStatus:'signed',noOfferWindows:0}}]},
+    {id:'stream-train',label:'自费训练保持竞技状态',detail:`训练与生活净支出 ${livingCost+5} 万 / 能力 -1 / 报价概率提高`,changes:{assets:-(livingCost+5),ability:-1,health:2,employmentStatus:'streamer'},outcomes:[{id:'train-no-offer',label:'训练状态尚可，但本窗口没有合适位置',probability:Math.max(15,100-offerChance),changes:{}},{id:'train-t2',label:'一支二线队提供首发复出合同',probability:Math.min(85,offerChance),changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,connections:2}}]},
+    {id:'stream-tryout',label:'主动联系队伍参加试训',detail:`差旅与团队费用 ${livingCost+7} 万 / 关系 -2 / 高层级报价概率提高`,changes:{assets:-(livingCost+7),connections:-2,ability:-2,employmentStatus:'streamer'},outcomes:[{id:'tryout-no-offer',label:'试训结束后没有队伍立即签约',probability:Math.max(12,100-Math.round(offerChance*1.15)),changes:{}},{id:'tryout-t1',label:internationalEligible(state)?'国际纵队提供轮换短约':'1.5 线队提供轮换短约',probability:Math.min(88,Math.round(offerChance*1.15)),changes:{contractTier:'t1',internationalTransfer:internationalEligible(state),employmentStatus:'signed',noOfferWindows:0,connections:2,internationalAdaptation:internationalEligible(state)?6:0}}]},
+  ]},`s${state.season}-streamer-${state.streamerWindows}`);
+};
 const choiceFor = (state: CareerState, kind: ChoiceKind) => {
+  if(state.employmentStatus==='streamer')return streamerChoiceFor(state);
   if(state.employmentStatus==='free-agent')return freeAgentChoiceFor(state);
+  const internationalChance=isHighPotential(state)?.32:.18;
+  if(kind==='offseason'&&internationalEligible(state)&&seeded(state,'international-offer')()<internationalChance)return internationalOfferFor(state);
   const breachEligible=kind==='offseason'&&state.fame>=45&&state.ability>=72&&seeded(state,'breach-offer')()<.06;
   if(breachEligible)return breachChoiceFor(state);
   return pickCatalogEvent(state,kind,`s${state.season}-${kind}`) ?? instantiate(kind==='annual'?annualTemplates[0]:offseasonTemplates[0],`s${state.season}-${kind}-fallback`);
@@ -309,19 +328,30 @@ const transferFeeFor = (state: CareerState, core = false) => {
 };
 const teamTierForRank=(rank:number):ContractTier=>rank<=20?'t1':rank<=60?'t2':'t3';
 const marketRatingFloor=(state:CareerState)=>state.role==='igl'?(state.iglArchetype==='brain'?.84:state.iglArchetype==='fragging'?.94:state.iglArchetype==='awp-caller'?1.06:.98):state.role==='support'?.94:state.role==='awper'?1.05:1.00;
-const marketEvaluation=(state:CareerState,rating:number,honors:HonorAward[])=>{
+const contractLengthFor=(state:CareerState)=>{
+  const roll=seeded(state,`contract-length:${state.season}:${state.teamId}`)();
+  const potential=isHighPotential(state);
+  if(potential)return roll<.55?6:4;
+  if(state.age<=24)return roll<.25?6:roll<.78?4:2;
+  return roll<.18?4:2;
+};
+const marketEvaluation=(state:CareerState,rating:number,honors:HonorAward[],contractExpired:boolean):RenewalEvaluation=>{
   const tier=teamTierForRank(state.globalRank);
-  const agePenalty=Math.max(0,state.age-25)*(tier==='t1'?5:tier==='t2'?3:2);
-  const ratingGap=(rating-marketRatingFloor(state))*100;
-  const honorValue=honors.reduce((sum,honor)=>sum+(honor.kind==='MVP'?12:honor.kind==='EVP'?6:honor.kind==='冠军'?5:2),0);
-  const tierPressure=tier==='t1'?18:tier==='t2'?7:0;
-  const score=state.ability*.55+ratingGap+state.connections*.15+honorValue-agePenalty-tierPressure;
-  const retentionChance=Math.max(.05,Math.min(.96,(score-20)/65));
-  const retained=seeded(state,`contract-retention:${state.season}`)()<retentionChance;
-  if(retained)return {employmentStatus:'signed' as const,noOfferWindows:0,log:`合同市场：${Math.round(retentionChance*100)}% 续约评估通过`};
-  const lowerOfferChance=Math.max(.08,Math.min(.85,(score+(tier==='t1'?16:8))/75));
-  const lowerOffer=seeded(state,`contract-lower-offer:${state.season}`)()<lowerOfferChance;
-  return lowerOffer?{employmentStatus:'signed' as const,noOfferWindows:0,downgrade:tier==='t1'?'t2' as const:'t3' as const,log:`合同市场：原队放弃续约，只收到${tier==='t1'?'二线':'三线'}报价`}:{employmentStatus:'free-agent' as const,noOfferWindows:state.noOfferWindows+1,log:`合同市场：没有职业队报价（连续 ${state.noOfferWindows+1} 个窗口）`};
+  const factors:RenewalFactor[]=[
+    {label:'基础市场判断',value:42},
+    {label:'当前能力',value:Math.round((state.ability-60)*.55)},
+    {label:'最近 Rating',value:Math.round((rating-marketRatingFloor(state))*85)},
+    {label:'队内关系',value:Math.round((state.connections-50)*.18)},
+    {label:'健康与出勤',value:Math.round((state.health-60)*.12)},
+    {label:'赛事荣誉',value:Math.min(14,honors.reduce((sum,honor)=>sum+(honor.kind==='MVP'?7:honor.kind==='EVP'?4:honor.kind==='冠军'?3:1),0))},
+    {label:'年龄与赛场压力',value:-Math.round(Math.max(0,state.age-25)*(tier==='t1'?3:tier==='t2'?2:1)+(tier==='t1'?8:tier==='t2'?3:0))},
+    {label:'年轻高潜',value:isHighPotential(state,rating)?10:0},
+  ].filter(factor=>factor.value!==0);
+  const chance=Math.max(8,Math.min(94,factors.reduce((sum,factor)=>sum+factor.value,0)));
+  const attitude:RenewalEvaluation['attitude']=chance>=70?'稳妥':chance>=40?'观望':'危险';
+  if(!contractExpired)return {season:state.season,chance,attitude,factors,contractExpired:false,summary:`管理层${attitude}：合同尚余 ${state.contractHalfSeasonsRemaining} 个半年`};
+  const retained=seeded(state,`contract-retention:${state.season}`)()<chance/100;
+  return {season:state.season,chance,attitude,factors,contractExpired:true,retained,summary:retained?`原队以 ${chance}% 评估通过续约`:`原队以 ${chance}% 评估决定不续约，进入公开市场`};
 };
 const monthlySalaryFor = (state: CareerState) => {
   const bestTop=state.top20History.reduce((best,item)=>Math.min(best,item.playerRank??99),99);
@@ -330,12 +360,16 @@ const monthlySalaryFor = (state: CareerState) => {
   return Number((minimum+(maximum-minimum)*personalFactor).toFixed(1));
 };
 const applyChanges = (state: CareerState, changes: StatChange): CareerState => {
-  let next: CareerState = { ...state, ability: clamp(state.ability + (changes.ability ?? 0)), connections: clamp(state.connections + (changes.connections ?? 0)), integrity: clamp(state.integrity + (changes.integrity ?? 0)), fame: clamp(state.fame + (changes.fame ?? 0)), health: clamp(state.health + (changes.health ?? 0)), teamForm:clamp(state.teamForm+(changes.teamForm??0)), rosterStability:clamp(state.rosterStability+(changes.rosterStability??0)), positionFamiliarity:clamp(state.positionFamiliarity+(changes.positionFamiliarity??0)), defensiveSite:changes.defensiveSite??state.defensiveSite, iglArchetype:changes.iglArchetype??state.iglArchetype, employmentStatus:changes.employmentStatus??state.employmentStatus,noOfferWindows:changes.noOfferWindows??state.noOfferWindows, highPressureChokingRisk:clamp(state.highPressureChokingRisk+(changes.highPressureChokingRisk??0)), internationalAdaptation:clamp(state.internationalAdaptation+(changes.internationalAdaptation??0)), stats: { ...state.stats, earnings: Math.max(0, state.stats.earnings + (changes.earnings ?? 0)) } };
+  const earned=changes.earnings??0;
+  let next: CareerState = { ...state, ability: clamp(state.ability + (changes.ability ?? 0)), connections: clamp(state.connections + (changes.connections ?? 0)), integrity: clamp(state.integrity + (changes.integrity ?? 0)), fame: clamp(state.fame + (changes.fame ?? 0)), health: clamp(state.health + (changes.health ?? 0)), assets:state.assets+(changes.assets??(earned>0?earned*.55:earned)),teamForm:clamp(state.teamForm+(changes.teamForm??0)), rosterStability:clamp(state.rosterStability+(changes.rosterStability??0)), positionFamiliarity:clamp(state.positionFamiliarity+(changes.positionFamiliarity??0)), defensiveSite:changes.defensiveSite??state.defensiveSite, iglArchetype:changes.iglArchetype??state.iglArchetype, employmentStatus:changes.employmentStatus??state.employmentStatus,noOfferWindows:changes.noOfferWindows??state.noOfferWindows, highPressureChokingRisk:clamp(state.highPressureChokingRisk+(changes.highPressureChokingRisk??0)), internationalAdaptation:clamp(state.internationalAdaptation+(changes.internationalAdaptation??0)), stats: { ...state.stats, earnings: Math.max(0, state.stats.earnings + earned) } };
   if(changes.contractTier){
     const [minRank,maxRank]=changes.contractTier==='t1'?[8,20]:changes.contractTier==='t2'?[21,60]:[61,98];
-    const candidates=CAREER_TEAMS.filter(team=>team.baseRank>=minRank&&team.baseRank<=maxRank);
-    const target=candidates[Math.floor(seeded(state,`contract-team:${changes.contractTier}`)()*candidates.length)];
-    if(target)next={...next,teamId:target.id,team:target.name,region:target.region,roster:rosterWithPlayer(target,state.name,state.role),globalRank:target.baseRank,regionRank:regionRankFor(target.baseRank,target.region),tier:changes.contractTier==='t1'?'1.5 线赛场':changes.contractTier==='t2'?'二线赛场':'三线赛场',teamForm:55,rosterStability:58,employmentStatus:'signed',noOfferWindows:0};
+    const candidates=CAREER_TEAMS.filter(team=>team.baseRank>=minRank&&team.baseRank<=maxRank&&(changes.internationalTransfer?team.region==='Europe':true));
+    const target=candidates[Math.floor(seeded(state,`contract-team:${changes.contractTier}:${state.streamerWindows}`)()*candidates.length)];
+    if(target){
+      const contractHalfSeasonsRemaining=contractLengthFor(next);
+      next={...next,teamId:target.id,team:target.name,region:target.region,roster:rosterWithPlayer(target,state.name,state.role),globalRank:target.baseRank,regionRank:regionRankFor(target.baseRank,target.region),tier:changes.contractTier==='t1'?'1.5 线赛场':changes.contractTier==='t2'?'二线赛场':'三线赛场',teamForm:55,rosterStability:58,employmentStatus:'signed',noOfferWindows:0,contractHalfSeasonsRemaining,streamerWindows:state.employmentStatus==='streamer'?state.streamerWindows:0,renewalEvaluation:undefined,log:[`签约 ${target.name} / ${contractHalfSeasonsRemaining/2} 年合同 / ${relativeTierLabel(state,changes.contractTier)}`,...next.log]};
+    }
   }
   if (changes.rolePreparation) next = { ...next, rolePreparation: changes.rolePreparation };
   if (changes.bootcampBonus) next = { ...next, bootcampCount: state.bootcampCount + 1 };
@@ -402,12 +436,12 @@ const applyChanges = (state: CareerState, changes: StatChange): CareerState => {
     next = { ...next, role: newRole, rolePreparation: 'none', roleChangeCooldown: 4, roleChangeCount: state.roleChangeCount + 1, ability: clamp(next.ability + abilityChange), fame: clamp(next.fame + fameChange), connections: clamp(next.connections + connectionsChange), log: [`转职 ${newRole} / ${outcomeText}`, ...next.log] };
   }
   if (changes.resetVrs) next = { ...next, vrsActive:false, rankingPoints:0, rebuildPoints:0, globalRank:101, regionRank:Math.max(1,CAREER_TEAMS.filter(team=>team.region===state.region).length+1), tier:'三线赛场', log:[`${state.team} 三人核心不足，模拟 VRS 积分清零`,...next.log] };
-  if (changes.transfer) {
+  if (changes.transfer || changes.internationalTransfer) {
     const fee = transferFeeFor(state, Boolean(changes.preserveCore));
-    const bonus = Math.round(fee * signingRateFor(state));
-    const international=state.decision?.category==='国际转会';
+    const bonus = Math.round(fee * signingRateFor(state) * (state.highPotential?1.4:1));
+    const international=Boolean(changes.internationalTransfer);
     const target=international?CAREER_TEAMS.find(team=>team.region==='Europe'&&team.baseRank>=12&&team.baseRank<=25):undefined;
-    next = { ...next, lastTransferFee:fee, ...(target?{teamId:target.id,team:target.name,region:target.region,roster:rosterWithPlayer(target,state.name,state.role),globalRank:target.baseRank,regionRank:regionRankFor(target.baseRank,target.region),rankingPoints:Math.round(1800-target.baseRank*15),vrsActive:true,rebuildPoints:0,tier:'1.5 线赛场',teamForm:55,rosterStability:58,internationalAdaptation:clamp(state.internationalAdaptation+12)}:{}), stats:{...next.stats, earnings:next.stats.earnings+bonus, signingIncome:next.stats.signingIncome+bonus}, log:[`转会费 ${fee} 万 / 签字费 ${bonus} 万`,...next.log] };
+    next = { ...next, lastTransferFee:fee, assets:next.assets+bonus*.55, ...(target?{teamId:target.id,team:target.name,region:target.region,roster:rosterWithPlayer(target,state.name,state.role),globalRank:target.baseRank,regionRank:regionRankFor(target.baseRank,target.region),rankingPoints:Math.round(1800-target.baseRank*15),vrsActive:true,rebuildPoints:0,tier:'1.5 线赛场',teamForm:55,rosterStability:58,internationalAdaptation:clamp(state.internationalAdaptation+12)}:{}), stats:{...next.stats, earnings:next.stats.earnings+bonus, signingIncome:next.stats.signingIncome+bonus}, log:[`转会费 ${fee} 万 / 签字费 ${bonus} 万`,...next.log] };
   }
   return next;
 };
@@ -694,7 +728,7 @@ export const createCareer = (input: { seed: string; name: string; pace: Pace; or
   const team = initialTeamFor(origin.id);
   return {
     version: CAREER_VERSION, rulesVersion: CAREER_RULES_VERSION, dataVersion: CAREER_DATA_VERSION, seed, pace: input.pace, name, origin, role: input.role, defensiveSite:input.role==='entry'?'a':input.role==='support'?'b':'rotator', positionFamiliarity:68,
-    age: 16, careerYear: 1, half: 'first', season: 1, teamId: team.id, team: team.name, region: team.region, roster: rosterWithPlayer(team, name, input.role), coreMemberIds:team.roster.slice(0,3).map(player=>player.id), tier: team.baseRank > 80 ? '三线赛场' : team.baseRank <= 12 ? '一线赛场' : team.baseRank <= 20 ? '1.5 线赛场' : '二线赛场', globalRank: team.baseRank, regionRank: regionRankFor(team.baseRank, team.region), rankingPoints: Math.max(120,Math.round(1800-team.baseRank*15)), vrsActive:true, rebuildPoints:0, lastTransferFee:0, teamForm:Math.round(Math.max(55,75-team.baseRank*.15)), rosterStability:72, negativeUpsetStreak:0, internationalAdaptation:origin.id==='overseas'?68:origin.id==='academy'?35:origin.id==='south'?30:25, cncsRevival:false, ability, connections, integrity, fame, health: 82, salary:initialSalaryFor(team.baseRank,ability,fame), rolePreparation: 'none', roleChangeCooldown: 0, roleChangeCount: 0, iglArchetype:input.role==='igl'?(input.iglArchetype&&input.iglArchetype!=='dynasty'?input.iglArchetype:'brain'):undefined, bootcampCount: 0, highPressureChokingRisk: 20, hiddenFlags:{}, pendingConsequences:[], employmentStatus:'signed', noOfferWindows:0, status: 'active', phase: 'ready', pendingEmergencies: [], resolvedEmergencies: [], honors: [], top20History: [],
+    age: 16, careerYear: 1, half: 'first', season: 1, teamId: team.id, team: team.name, region: team.region, roster: rosterWithPlayer(team, name, input.role), coreMemberIds:team.roster.slice(0,3).map(player=>player.id), tier: team.baseRank > 80 ? '三线赛场' : team.baseRank <= 12 ? '一线赛场' : team.baseRank <= 20 ? '1.5 线赛场' : '二线赛场', globalRank: team.baseRank, regionRank: regionRankFor(team.baseRank, team.region), rankingPoints: Math.max(120,Math.round(1800-team.baseRank*15)), vrsActive:true, rebuildPoints:0, lastTransferFee:0, teamForm:Math.round(Math.max(55,75-team.baseRank*.15)), rosterStability:72, negativeUpsetStreak:0, internationalAdaptation:origin.id==='overseas'?68:origin.id==='academy'?35:origin.id==='south'?30:25, cncsRevival:false, ability, connections, integrity, fame, health: 82, salary:initialSalaryFor(team.baseRank,ability,fame), rolePreparation: 'none', roleChangeCooldown: 0, roleChangeCount: 0, iglArchetype:input.role==='igl'?(input.iglArchetype&&input.iglArchetype!=='dynasty'?input.iglArchetype:'brain'):undefined, bootcampCount: 0, highPressureChokingRisk: 20, hiddenFlags:{}, pendingConsequences:[], employmentStatus:'signed', noOfferWindows:0, contractHalfSeasonsRemaining:4, assets:5, streamerWindows:0, highPotential:false, status: 'active', phase: 'ready', pendingEmergencies: [], resolvedEmergencies: [], honors: [], top20History: [],
     stats: { matches: 0, rating: 1.01, kd: 1.02, adr: 72, trophies: 0, mvps: 0, earnings: 0, salaryIncome:0, prizeIncome:0, signingIncome:0 }, history: [], log: [`16 岁 / 生涯第 1 年上半年 / 加入 ${team.name}`, DATA_SNAPSHOT_NOTE],
   };
 };
@@ -747,23 +781,28 @@ const finishSeason = (state: CareerState): CareerState => {
   const growthRoll=seeded(state,'t1-growth')();
   const growthChance=Math.min(0.35,t1Matches*0.008);
   const hasGrowth=t1Matches>=5&&nextAge<=25&&growthRoll<growthChance;
-  const growthAmount=hasGrowth?(seeded(state,'t1-growth-amount')()*3+2):0;
-  const peakBonus=peakAgeBonus(nextAge);
+  const potentialMultiplier=isHighPotential(state)?1.4:1;
+  const growthAmount=hasGrowth?(seeded(state,'t1-growth-amount')()*3+2)*potentialMultiplier:0;
+  const peakBonus=peakAgeBonus(nextAge)*potentialMultiplier;
   const totalAbilityChange=peakBonus+growthAmount;
   const growthLog=hasGrowth?`T1赛事磨练：能力 +${Math.round(growthAmount)}`:peakBonus>0?`工夫到家：能力 +${peakBonus}`:'';
   const finalAbility=clamp(ability+totalAbilityChange);
-  const interim: CareerState = { ...state, age: nextAge, tier, globalRank:Math.max(1,globalRank-revivalBoost), regionRank, rankingPoints:rankingPoints+revivalBoost*10, vrsActive, rebuildPoints, teamForm:clamp(teamForm+revivalBoost),rosterStability:clamp(rosterStability+(cncsRevival?6:0)),negativeUpsetStreak,cncsRevival, iglArchetype:dynastyEvolution?'dynasty':state.iglArchetype, ability:finalAbility, fame:clamp(fame+(cncsRevival?5:0)), health, roleChangeCooldown: Math.max(0, state.roleChangeCooldown - 1), phase: 'report', decision: undefined, pendingEmergencies: [], stats: { matches: state.stats.matches + matches, rating, kd, adr, trophies, mvps, earnings, salaryIncome:state.stats.salaryIncome+salaryPaid, prizeIncome:state.stats.prizeIncome+playerPrize, signingIncome:state.stats.signingIncome }, honors: [...state.honors, ...honors] };
+  const contractHalfSeasonsRemaining=Math.max(0,state.contractHalfSeasonsRemaining-1);
+  const highPotential=isHighPotential({...state,age:nextAge,ability:finalAbility,health} as CareerState,rating);
+  const interim: CareerState = { ...state, age: nextAge, tier, globalRank:Math.max(1,globalRank-revivalBoost), regionRank, rankingPoints:rankingPoints+revivalBoost*10, vrsActive, rebuildPoints, teamForm:clamp(teamForm+revivalBoost),rosterStability:clamp(rosterStability+(cncsRevival?6:0)),negativeUpsetStreak,cncsRevival, iglArchetype:dynastyEvolution?'dynasty':state.iglArchetype, ability:finalAbility, fame:clamp(fame+(cncsRevival?5:0)), health, assets:state.assets+(playerPrize+salaryPaid)*.55,highPotential,contractHalfSeasonsRemaining, roleChangeCooldown: Math.max(0, state.roleChangeCooldown - 1), phase: 'report', decision: undefined, pendingEmergencies: [], stats: { matches: state.stats.matches + matches, rating, kd, adr, trophies, mvps, earnings, salaryIncome:state.stats.salaryIncome+salaryPaid, prizeIncome:state.stats.prizeIncome+playerPrize, signingIncome:state.stats.signingIncome }, honors: [...state.honors, ...honors] };
   const record: SeasonRecord = {
     season: state.season, careerYear: state.careerYear, half: state.half, age: nextAge, team: state.team, tier, rating, kd, adr, matches, winRate,
     placement: best ? `${best.name} · ${best.placement}` : '未获赛事资格', teamPrize, playerPrize, salaryPaid, note: state.resolvedEmergencies.length ? `经历 ${state.resolvedEmergencies.length} 次随机事件` : '赛季平稳结束', deltas: difference(before, snapshot(interim)),
     tournaments, globalRank, regionRank, rankingDelta, honors,
   };
-  const market=marketEvaluation(interim,rating,honors);
-  const marketRank=market.downgrade==='t2'?Math.max(21,globalRank):market.downgrade==='t3'?Math.max(61,globalRank):globalRank;
-  const marketTier=market.downgrade==='t2'?'二线赛场':market.downgrade==='t3'?'三线赛场':tier;
-  const forcedRetirement = (nextAge >= 29 && ability < 35) || state.integrity < 12 || health < 8 || market.noOfferWindows>=2;
+  const shouldEvaluate=contractHalfSeasonsRemaining===0||state.half==='second';
+  const market=shouldEvaluate?marketEvaluation(interim,rating,honors,contractHalfSeasonsRemaining===0):undefined;
+  const retained=market?.contractExpired&&market.retained;
+  const employmentStatus:EmploymentStatus=market?.contractExpired&&!market.retained?'free-agent':'signed';
+  const nextContract=retained?contractLengthFor(interim):contractHalfSeasonsRemaining;
+  const forcedRetirement = (nextAge >= 29 && ability < 35) || state.integrity < 12 || health < 8;
   const completedHistory = [...state.history, record];
-  const completed: CareerState = { ...interim, globalRank:marketRank,regionRank:regionRankFor(Math.min(100,marketRank),state.region),tier:marketTier,employmentStatus:market.employmentStatus,noOfferWindows:market.noOfferWindows,status: forcedRetirement ? 'retired' : 'active', phase: forcedRetirement ? 'retired' : 'report', history: completedHistory, resolvedEmergencies: [], seasonProgress:undefined, lastEventResult:undefined, seasonBaseline: undefined, eventResume: undefined, postReportEvent: forcedRetirement ? undefined : state.postReportEvent, log: [market.log,dynastyLog,crisisLog,growthLog,`生涯第 ${state.careerYear} 年${state.half === 'first' ? '上半年' : '下半年'} / 全球第 ${globalRank} / ${record.placement}`, ...state.log].filter(Boolean) };
+  const completed: CareerState = { ...interim,employmentStatus,noOfferWindows:employmentStatus==='free-agent'?state.noOfferWindows+1:0,contractHalfSeasonsRemaining:nextContract,renewalEvaluation:market,status: forcedRetirement ? 'retired' : 'active', phase: forcedRetirement ? 'retired' : 'report', history: completedHistory, resolvedEmergencies: [], seasonProgress:undefined, lastEventResult:undefined, seasonBaseline: undefined, eventResume: undefined, postReportEvent: forcedRetirement ? undefined : state.postReportEvent, log: [market?.summary,dynastyLog,crisisLog,growthLog,highPotential&&!state.highPotential?'年轻高潜状态生效：成长与市场机会提高':'',`生涯第 ${state.careerYear} 年${state.half === 'first' ? '上半年' : '下半年'} / 全球第 ${globalRank} / ${record.placement}`, ...state.log].filter((item):item is string=>Boolean(item)) };
   if (forcedRetirement && state.half === 'second' && !completed.top20History.some(item => item.careerYear === state.careerYear)) return { ...completed, top20History: [...completed.top20History, generateAnnualTop20(completed, completedHistory.filter(item => item.careerYear === state.careerYear))] };
   return completed;
 };
@@ -776,7 +815,7 @@ const applyDueConsequences=(state:CareerState)=>{
   return {...applied,pendingConsequences:state.pendingConsequences.filter(item=>item.dueSeason>state.season),log:[...due.map(item=>`延迟后果 / ${item.revealText}`),...applied.log]};
 };
 export const startSeason = (state: CareerState): CareerState => {
-  if (state.status !== 'active' || state.phase !== 'ready') return state;
+  if (state.status !== 'active' || state.phase !== 'ready' || state.employmentStatus !== 'signed') return state;
   const consequenceState=applyDueConsequences(state);
   const baseline = snapshot(consequenceState);
   const rng=seeded(state,'season-report');
@@ -869,13 +908,13 @@ const enterChoiceAfterReport = (state: CareerState): CareerState => {
   return { ...state, phase: 'choice', choiceKind, decision: choiceFor(state, choiceKind), postReportEvent: undefined, eventResume: undefined };
 };
 const advanceAfterReport = (state: CareerState): CareerState => {
-  if(state.employmentStatus==='free-agent')return enterChoiceAfterReport(state);
-  if (state.pace === 'fast' && state.half === 'first') return { ...state, half: 'second', season: state.season + 1, phase: 'ready', decision: undefined, postReportEvent: undefined, eventResume: undefined };
   if (state.half === 'second' && !state.top20History.some(item => item.careerYear === state.careerYear)) {
     const yearRecords = state.history.filter(record => record.careerYear === state.careerYear);
     const award = generateAnnualTop20(state, yearRecords);
     return { ...state, phase: 'awards', top20History: [...state.top20History, award], decision: undefined, postReportEvent: undefined, eventResume: undefined };
   }
+  if(state.employmentStatus!=='signed')return enterChoiceAfterReport(state);
+  if (state.pace === 'fast' && state.half === 'first') return { ...state, half: 'second', season: state.season + 1, phase: 'ready', decision: undefined, postReportEvent: undefined, eventResume: undefined };
   return enterChoiceAfterReport(state);
 };
 
@@ -925,17 +964,25 @@ export const resolveCareerChoice = (state: CareerState, optionId: string, previe
   const recoveryIds=['train','recover','full-rest','extra-practice','annual-rest','annual-train','stay','team-role','annual-stay'];
   const changedWithForm=recoveryIds.includes(option.id)?{...changed,teamForm:clamp(changed.teamForm+(option.id.includes('rest')||option.id==='recover'?12:7)),rosterStability:clamp(changed.rosterStability+(option.id.includes('stay')||option.id==='team-role'?10:4))}:changed;
   const marketSalary = monthlySalaryFor(changedWithForm);
-  const salary = option.id === 'keep-core' ? Number(Math.max(.5, marketSalary * .82).toFixed(1)) : marketSalary;
+  const salary = option.id === 'keep-core' ? Number(Math.max(.5, marketSalary * .82).toFixed(1)) : changedWithForm.employmentStatus==='signed'?marketSalary:0;
   const nextIsFirst = state.half === 'second';
-  const marketRetirement=changedWithForm.employmentStatus==='free-agent'&&changedWithForm.noOfferWindows>=2;
+  const streamerWindows=changedWithForm.employmentStatus==='streamer'?state.streamerWindows+1:changedWithForm.employmentStatus==='signed'?0:state.streamerWindows;
+  const nextAge=state.employmentStatus==='streamer'&&nextIsFirst?state.age+1:changedWithForm.age;
+  const insolvent=state.employmentStatus==='streamer'&&changedWithForm.assets<=-30;
   return {
-    ...changedWithForm, salary, status:marketRetirement?'retired':'active',phase:marketRetirement?'retired':'ready', decision: undefined, choiceKind: undefined, season: state.season + 1, half: nextIsFirst ? 'first' : 'second', careerYear: nextIsFirst ? state.careerYear + 1 : state.careerYear,
-    lastEventResult:outcomeResult.outcomeLabel, log: [marketRetirement?'连续两个转会窗口无人报价，被迫结束职业生涯':'',`${state.decision.kind === 'annual' ? '年度选择' : '休赛期'} / ${option.label} / ${outcomeResult.outcomeLabel}`, ...changedWithForm.log].filter(Boolean),
+    ...changedWithForm, salary, streamerWindows, age:nextAge,status:insolvent?'retired':'active',phase:insolvent?'retired':changedWithForm.employmentStatus==='signed'?'ready':'choice', decision: insolvent?undefined:changedWithForm.employmentStatus==='signed'?undefined:choiceFor({...changedWithForm,age:nextAge,streamerWindows,season:state.season+1},'offseason'), choiceKind: insolvent||changedWithForm.employmentStatus==='signed'?undefined:'offseason', season: state.season + 1, half: nextIsFirst ? 'first' : 'second', careerYear: nextIsFirst ? state.careerYear + 1 : state.careerYear,
+    lastEventResult:outcomeResult.outcomeLabel, log: [insolvent?'可用资产跌至 -30 万，被迫结束等待并正式退役':'',`${state.decision.kind === 'annual' ? '年度选择' : '休赛期'} / ${option.label} / ${outcomeResult.outcomeLabel}`, ...changedWithForm.log].filter(Boolean),
   };
 };
 
+export const becomeStreamer = (state:CareerState):CareerState => {
+  if(state.status!=='active'||state.history.length===0||!['report','choice'].includes(state.phase))return state;
+  const streamerState:CareerState={...state,employmentStatus:'streamer',salary:0,phase:'choice',choiceKind:'offseason',streamerWindows:0,contractHalfSeasonsRemaining:0,renewalEvaluation:undefined,postReportEvent:undefined};
+  return {...streamerState,decision:streamerChoiceFor(streamerState),log:[`${state.age} 岁 / 暂别职业赛场，开始直播等待复出`,...state.log]};
+};
+
 export const retireCareer = (state: CareerState): CareerState => {
-  if (state.status !== 'active' || state.phase !== 'report' || state.history.length === 0) return state;
+  if (state.status !== 'active' || !['report','choice'].includes(state.phase) || state.history.length === 0) return state;
   let top20History = state.top20History;
   if (state.half === 'second' && !top20History.some(item => item.careerYear === state.careerYear)) {
     const yearRecords = state.history.filter(record => record.careerYear === state.careerYear);
@@ -1016,17 +1063,11 @@ export const emergencyProgress = (state: CareerState) => {
 const validPhases: CareerPhase[] = ['ready','season','emergency','report','awards','choice','retired'];
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
 const mapsForLegacyResult=(result:TournamentResult)=>result.maps??Math.max(result.matches,Math.round(result.matches*(result.tier==='Major'?2.7:result.tier==='T1'?2.4:2.1)));
-const migrateCareer=(raw:unknown):unknown=>{
-  if(!raw||typeof raw!=='object')return raw;
-  const value=raw as CareerState&{version:number};
-  if(value.version!==7&&value.version!==8)return raw;
-  const migrateResult=(result:TournamentResult):TournamentResult=>({...result,maps:mapsForLegacyResult(result),mapWins:result.mapWins??Math.max(result.wins,Math.round(mapsForLegacyResult(result)*result.wins/Math.max(1,result.matches)))});
-  return {...value,version:CAREER_VERSION,rulesVersion:CAREER_RULES_VERSION,iglArchetype:value.role==='igl'?(value.iglArchetype??'brain'):undefined,hiddenFlags:value.hiddenFlags??{},pendingConsequences:value.pendingConsequences??[],employmentStatus:value.employmentStatus??'signed',noOfferWindows:value.noOfferWindows??0,seasonProgress:value.seasonProgress?{...value.seasonProgress,results:value.seasonProgress.results.map(migrateResult)}:undefined,history:value.history.map(record=>({...record,tournaments:record.tournaments.map(migrateResult)}))};
-};
+const migrateCareer=(raw:unknown):unknown=>raw;
 const isValidCareer = (state: unknown): state is CareerState => {
   if (!state || typeof state !== 'object') return false;
   const value = state as Partial<CareerState>;
-  return value.version === CAREER_VERSION && value.rulesVersion === CAREER_RULES_VERSION && value.dataVersion === CAREER_DATA_VERSION && typeof value.name === 'string' && ['a','b','rotator'].includes(value.defensiveSite as string) && isFiniteNumber(value.positionFamiliarity) && typeof value.teamId === 'string' && typeof value.team === 'string' && typeof value.origin === 'object' && typeof value.role === 'string' && (value.status === 'active' || value.status === 'retired') && validPhases.includes(value.phase as CareerPhase) && isFiniteNumber(value.seed) && isFiniteNumber(value.age) && isFiniteNumber(value.careerYear) && isFiniteNumber(value.season) && isFiniteNumber(value.ability) && isFiniteNumber(value.connections) && isFiniteNumber(value.integrity) && isFiniteNumber(value.fame) && isFiniteNumber(value.health) && isFiniteNumber(value.globalRank) && isFiniteNumber(value.regionRank) && typeof value.stats === 'object' && value.stats !== null && isFiniteNumber(value.teamForm) && isFiniteNumber(value.rosterStability) && isFiniteNumber(value.internationalAdaptation) && typeof value.cncsRevival === 'boolean' && typeof value.vrsActive === 'boolean' && Array.isArray(value.roster) && value.roster.length === 5 && Array.isArray(value.history) && Array.isArray(value.honors) && Array.isArray(value.top20History) && Array.isArray(value.pendingEmergencies) && Array.isArray(value.resolvedEmergencies) && Array.isArray(value.log) && ['none','awper-training','igl-assistant'].includes(value.rolePreparation as string) && isFiniteNumber(value.roleChangeCooldown) && isFiniteNumber(value.roleChangeCount) && isFiniteNumber(value.bootcampCount) && isFiniteNumber(value.highPressureChokingRisk) && typeof value.hiddenFlags==='object' && value.hiddenFlags!==null && Array.isArray(value.pendingConsequences) && (value.employmentStatus==='signed'||value.employmentStatus==='free-agent') && isFiniteNumber(value.noOfferWindows);
+  return value.version === CAREER_VERSION && value.rulesVersion === CAREER_RULES_VERSION && value.dataVersion === CAREER_DATA_VERSION && typeof value.name === 'string' && ['a','b','rotator'].includes(value.defensiveSite as string) && isFiniteNumber(value.positionFamiliarity) && typeof value.teamId === 'string' && typeof value.team === 'string' && typeof value.origin === 'object' && typeof value.role === 'string' && (value.status === 'active' || value.status === 'retired') && validPhases.includes(value.phase as CareerPhase) && isFiniteNumber(value.seed) && isFiniteNumber(value.age) && isFiniteNumber(value.careerYear) && isFiniteNumber(value.season) && isFiniteNumber(value.ability) && isFiniteNumber(value.connections) && isFiniteNumber(value.integrity) && isFiniteNumber(value.fame) && isFiniteNumber(value.health) && isFiniteNumber(value.globalRank) && isFiniteNumber(value.regionRank) && typeof value.stats === 'object' && value.stats !== null && isFiniteNumber(value.teamForm) && isFiniteNumber(value.rosterStability) && isFiniteNumber(value.internationalAdaptation) && typeof value.cncsRevival === 'boolean' && typeof value.vrsActive === 'boolean' && Array.isArray(value.roster) && value.roster.length === 5 && Array.isArray(value.history) && Array.isArray(value.honors) && Array.isArray(value.top20History) && Array.isArray(value.pendingEmergencies) && Array.isArray(value.resolvedEmergencies) && Array.isArray(value.log) && ['none','awper-training','igl-assistant'].includes(value.rolePreparation as string) && isFiniteNumber(value.roleChangeCooldown) && isFiniteNumber(value.roleChangeCount) && isFiniteNumber(value.bootcampCount) && isFiniteNumber(value.highPressureChokingRisk) && typeof value.hiddenFlags==='object' && value.hiddenFlags!==null && Array.isArray(value.pendingConsequences) && ['signed','free-agent','streamer'].includes(value.employmentStatus as string) && isFiniteNumber(value.noOfferWindows) && isFiniteNumber(value.contractHalfSeasonsRemaining) && isFiniteNumber(value.assets) && isFiniteNumber(value.streamerWindows) && typeof value.highPotential==='boolean';
 };
 export const loadCareer = (): CareerState | null => {
   try { const stored = localStorage.getItem(CAREER_SAVE_KEY); if (!stored) return null; const state=migrateCareer(JSON.parse(stored)); return isValidCareer(state) ? state : null; } catch { return null; }

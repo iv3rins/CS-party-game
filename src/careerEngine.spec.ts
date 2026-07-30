@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advanceTournament, createCareer, getCurrentCareerScore, previewDecisionOutcome, resolveEmergency, startSeason } from './careerEngine';
+import { advanceTournament, becomeStreamer, continueFromReport, createCareer, getCurrentCareerScore, previewDecisionOutcome, resolveCareerChoice, resolveEmergency, startSeason } from './careerEngine';
 import { CAREER_EVENT_CATALOG, EVENT_CATALOG_SIZE } from './careerEventCatalog';
 
 const create = (seed: string, role: 'entry' | 'igl' = 'entry') => createCareer({ seed, name: 'Spec', pace: 'hardcore', originId: 'overseas', role, iglArchetype: role === 'igl' ? 'brain' : undefined });
@@ -62,6 +62,37 @@ describe('career weighted event contracts', () => {
     const score=getCurrentCareerScore({...state,ability:100,fame:100,integrity:100});
     expect(score.score).toBeGreaterThanOrEqual(0);
     expect(score.score).toBeLessThanOrEqual(72);
+  });
+
+  it('keeps contracts stable at midyear and explains year-end management attitude', () => {
+    const settle = (initial: ReturnType<typeof create>) => {
+      let state=startSeason(initial);
+      while(state.phase!=='report'&&state.phase!=='retired'){
+        if(state.phase==='emergency'&&state.decision)state=resolveEmergency(state,state.decision.options[0].id);
+        else if(state.phase==='season')state=advanceTournament(state);
+      }
+      return state;
+    };
+    const first=settle({...create('contract-term'),pace:'standard',contractHalfSeasonsRemaining:4});
+    expect(first).toMatchObject({employmentStatus:'signed',contractHalfSeasonsRemaining:3});
+    expect(first.renewalEvaluation).toBeUndefined();
+    let choice=continueFromReport(first);
+    while(choice.phase==='emergency'&&choice.decision)choice=resolveEmergency(choice,choice.decision.options[0].id);
+    const secondReady=resolveCareerChoice(choice,choice.decision!.options[0].id);
+    const second=settle(secondReady);
+    expect(second.renewalEvaluation?.factors.length).toBeGreaterThan(3);
+  });
+
+  it('enters a deterministic three-route streamer comeback window', () => {
+    let state=startSeason(create('streamer-window'));
+    while(state.phase!=='report'){
+      if(state.phase==='emergency'&&state.decision)state=resolveEmergency(state,state.decision.options[0].id);
+      else state=advanceTournament(state);
+    }
+    const streamer=becomeStreamer(state);
+    expect(streamer).toMatchObject({employmentStatus:'streamer',phase:'choice'});
+    expect(streamer.decision?.options.map(option=>option.id)).toEqual(['stream-focus','stream-train','stream-tryout']);
+    expect(streamer.decision).toEqual(becomeStreamer(state).decision);
   });
 
   it('settles only one tournament per engine step and records maps', () => {
