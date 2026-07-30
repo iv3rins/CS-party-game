@@ -11,7 +11,8 @@ const repository=config.DATABASE_URL.startsWith('memory://')
   ?new MemoryRepository()
   :new PostgresRepository(config.DATABASE_URL);
 if(repository instanceof PostgresRepository){
-  const migration=await readFile(fileURLToPath(new URL('../migrations/001_initial.sql',import.meta.url)),'utf8');
+  const migrationPath = fileURLToPath(new URL('../migrations/001_initial.sql',import.meta.url));
+  const migration=await readFile(migrationPath,'utf8');
   await repository.migrate(migration);
 }
 const app=await buildApp({repository,cookieSecret:config.COOKIE_SECRET,sessionDays:config.SESSION_DAYS,rateLimitMax:config.RATE_LIMIT_MAX});
