@@ -65,6 +65,16 @@ run_migrations() {
     log "首次运行迁移脚本"
     sudo -u postgres psql -d "$DATABASE_NAME" -f "$migration_file"
   fi
+
+  log "授权数据库应用用户"
+  sudo -u postgres psql -v ON_ERROR_STOP=1 -d "$DATABASE_NAME" \
+    -v app_user="$DATABASE_USER" <<'SQL'
+GRANT USAGE, CREATE ON SCHEMA public TO :"app_user";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO :"app_user";
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO :"app_user";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO :"app_user";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO :"app_user";
+SQL
 }
 
 build_server() {
