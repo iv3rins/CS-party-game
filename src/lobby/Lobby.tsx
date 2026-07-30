@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BookOpen, LogIn, Settings, Shield, Trophy, UserRound, Users, Volume2, VolumeX, Wifi, X } from 'lucide-react';
-import { Account, GameManifest, GameRoom, getRankTier, PlatformPreferences, QueueTicket, Rating, gameManifest, platform } from '../platform';
+import { Account, careerGameManifest, GameManifest, GameRoom, getRankTier, PlatformPreferences, QueueTicket, Rating, gameManifest, platform } from '../platform';
 import { OperatorAvatar } from '../shared/icons';
 import { resetTutorial } from '../games/cs-push/tutorial';
 
@@ -152,13 +152,16 @@ function Lobby() {
   const selectedGame = useMemo(() => games.find(game => game.gameId === selectedGameId) ?? gameManifest, [games, selectedGameId]);
   const multiplayer = isMultiplayer(selectedGame);
   const availableGames = games.filter(game => game.availability === 'available');
+  const multiplayerGames=availableGames.filter(isMultiplayer);
+  const singlePlayerGames=availableGames.filter(game=>!isMultiplayer(game));
   const comingSoonGames = games.filter(game => game.availability !== 'available');
   const signedIn = account ? !account.isGuest : false;
 
   useEffect(() => {
     Promise.all([platform.getAccount(), platform.listGames(), platform.getPreferences()]).then(async ([nextAccount, nextGames, nextPreferences]) => {
-      setAccount(nextAccount); setGames(nextGames); setPreferences(nextPreferences);
-      const initial = nextGames.find(game => game.gameId === selectedGameId) ?? nextGames[0];
+      const merged=[...new Map([...nextGames,careerGameManifest].map(game=>[game.gameId,game])).values()];
+      setAccount(nextAccount); setGames(merged); setPreferences(nextPreferences);
+      const initial = merged.find(game => game.gameId === selectedGameId) ?? merged[0];
       if (initial) { setSelectedGameId(initial.gameId); if (initial.ranked && !nextAccount.isGuest) setRating(await platform.getRating(initial.gameId, initial.seasonId)); }
     }).catch(() => setError('大厅数据载入失败，请刷新后重试。'));
   }, []);
@@ -241,7 +244,7 @@ function Lobby() {
       <div className="lobby-center"><GameStage game={selectedGame} /><div className="lobby-welcome">{signedIn ? `欢迎，${account?.displayName}` : '访客试玩模式'}</div></div>
 
       <aside className="lobby-action-panel">
-        <div className="game-tabs" role="tablist" aria-label="选择游戏">{availableGames.map(game => <button role="tab" aria-selected={game.gameId === selectedGame.gameId} className={game.gameId === selectedGame.gameId ? 'active' : ''} key={game.gameId} onClick={() => void selectGame(game)}><b>{game.index}</b><span>{game.name}</span><small>{isMultiplayer(game) ? '多人' : '单人'}</small></button>)}</div>
+        <div className="game-sections" role="tablist" aria-label="选择游戏"><section><strong>多人游戏</strong>{multiplayerGames.map(game => <button role="tab" aria-selected={game.gameId === selectedGame.gameId} className={game.gameId === selectedGame.gameId ? 'active' : ''} key={game.gameId} onClick={() => void selectGame(game)}><b>{game.index}</b><span>{game.name}</span><small>多人</small></button>)}</section><section><strong>单人游戏</strong>{singlePlayerGames.map(game => <button role="tab" aria-selected={game.gameId === selectedGame.gameId} className={game.gameId === selectedGame.gameId ? 'active' : ''} key={game.gameId} onClick={() => void selectGame(game)}><b>{game.index}</b><span>{game.name}</span><small>单人</small></button>)}</section></div>
         <section className="selected-game-action"><small>{multiplayer ? 'PVP MODE' : 'CAREER MODE'}</small><h2>{selectedGame.name}</h2><p>{multiplayer ? '快速匹配或创建私人房间，与其他玩家实时对战。' : '从 16 岁开始，继续你的职业选手档案。'}</p>
           {multiplayer ? <><button className="lobby-main-command" onClick={() => void startQueue()}><Users />快速匹配</button><div className="lobby-room-commands"><button onClick={() => setModal('create')}>创建房间</button><button onClick={() => setModal('join')}>加入房间</button></div></> : <button className="lobby-main-command" onClick={() => void enterGame()}><UserRound />开始游玩</button>}
         </section>

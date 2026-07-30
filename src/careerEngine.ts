@@ -1,20 +1,30 @@
 import { CAREER_DATA_VERSION, CAREER_TEAMS, CareerTeam, DATA_SNAPSHOT_NOTE, HonorClass, PlayerRole, TeamRegion, TOURNAMENTS, TournamentTier } from './careerData';
 import { CAREER_QUOTES, QuoteTag } from './careerQuotes';
+import { CAREER_EVENT_CATALOG, eligibleCatalogEvents } from './careerEventCatalog';
 
 export const CAREER_SAVE_KEY = 'cspa:career:cs-career:v1';
-export const CAREER_VERSION = 6;
-export const CAREER_RULES_VERSION = 'tournament-flow-position-v4';
+export const CAREER_VERSION = 9;
+export const CAREER_RULES_VERSION = 'career-market-ui-frequency-v9';
 
 export type Pace = 'hardcore' | 'standard' | 'fast';
 export type OriginId = 'northeast' | 'academy' | 'campus' | 'overseas' | 'southwest' | 'south' | 'central' | 'northwest';
 export type Role = 'entry' | 'awper' | 'igl' | 'support';
+export type RoleChangePreparation = 'awper-training' | 'igl-assistant' | 'none';
+export type RoleChangeOutcome = 'breakthrough' | 'struggle' | 'disaster';
+export type IglArchetype = 'brain' | 'fragging' | 'dynasty' | 'awp-caller';
 export type Track = 'ability' | 'connections' | 'integrity' | 'fame';
 export type CareerPhase = 'ready' | 'season' | 'emergency' | 'report' | 'awards' | 'choice' | 'retired';
 export type EventResume = 'start-season' | 'continue-season' | 'continue-report';
 export type DefensiveSite = 'a' | 'b' | 'rotator';
 export type SeasonHalf = 'first' | 'second';
 export type ChoiceKind = 'offseason' | 'annual';
-export type StatChange = Partial<Record<Track, number>> & { health?: number; earnings?: number; teamForm?: number; rosterStability?: number; positionFamiliarity?: number; defensiveSite?: DefensiveSite; resetVrs?: boolean; preserveCore?: boolean; transfer?: boolean };
+export type EmploymentStatus = 'signed' | 'free-agent';
+export type ContractTier = 't1' | 't2' | 't3';
+export type StatChange = Partial<Record<Track, number>> & { health?: number; earnings?: number; teamForm?: number; rosterStability?: number; positionFamiliarity?: number; defensiveSite?: DefensiveSite; resetVrs?: boolean; preserveCore?: boolean; transfer?: boolean; contractTier?: ContractTier; employmentStatus?: EmploymentStatus; noOfferWindows?: number; rolePreparation?: RoleChangePreparation; roleChange?: Role; iglArchetype?: IglArchetype; bootcampBonus?: number; highPressureChokingRisk?: number; internationalAdaptation?: number };
+export interface TournamentResultPatch { placementDelta?: number; placement?: string; ratingDelta?: number; }
+export interface DelayedOutcome { tag: string; riskHint: string; minSeasons: number; maxSeasons: number; changes: StatChange; revealText: string; }
+export interface PendingConsequence { id: string; sourceDecisionId: string; dueSeason: number; tag: string; changes: StatChange; revealText: string; }
+export interface OutcomePreview { optionId: string; outcomeId: string; outcomeLabel: string; probability: number; changes: StatChange; resultPatch?: TournamentResultPatch; delayedRisk?: string; }
 
 export interface Origin { id: OriginId; name: string; place: string; description: string; abilityBase: number; connectionsBase: number; integrityBase: number; fameBase: number; }
 export interface CareerStats { matches: number; rating: number; kd: number; adr: number; trophies: number; mvps: number; earnings: number; salaryIncome: number; prizeIncome: number; signingIncome: number; }
@@ -22,21 +32,23 @@ export interface StatSnapshot { ability: number; connections: number; integrity:
 export interface StatDeltas extends StatSnapshot {}
 export interface ContextRatings { major: number; elite: number; playoffs: number; arena: number; bigMatches: number; finals: number; elimination: number; vsTop5: number; vsTop10: number; vsTop20: number; }
 export interface UpsetRecord { kind: 'positive' | 'negative'; opponent: string; opponentRank: number; format: string; score: string; probability: number; rankingImpact: number; }
-export interface TournamentResult { id: string; tournamentId: string; name: string; organizer: string; tier: TournamentTier; honorClass: HonorClass; invited: boolean; invitationReason: string; placement: string; matches: number; wins: number; teamPrize: number; playerPrize: number; salaryPaid: number; rating: number; rankingDelta: number; context: ContextRatings; upset?: UpsetRecord; }
+export interface TournamentResult { id: string; tournamentId: string; name: string; organizer: string; tier: TournamentTier; honorClass: HonorClass; invited: boolean; invitationReason: string; placement: string; matches: number; wins: number; maps: number; mapWins: number; teamPrize: number; playerPrize: number; salaryPaid: number; rating: number; rankingDelta: number; context: ContextRatings; upset?: UpsetRecord; expectedPlacement?: string; hasCriticalEvent?: boolean; criticalEventId?: string; }
 export interface HonorAward { id: string; season: number; tournamentName: string; kind: 'MVP' | 'EVP' | 'VP' | '冠军'; honorClass: HonorClass; }
 export interface Top20Entry { rank: number; playerId: string; nick: string; team: string; score: number; isPlayer: boolean; }
-export interface AnnualTop20 { calendarYear: number; careerYear: number; eligible: boolean; playerRank?: number; entries: Top20Entry[]; review?: string; generatedQuote?: string; }
+export interface AnnualTop20 { calendarYear: number; careerYear: number; eligible: boolean; playerRank?: number; entries: Top20Entry[]; review?: string; generatedQuote?: string; t1Maps?: number; nominationChance?: number; }
 export interface SeasonRecord {
   season: number; careerYear: number; half: SeasonHalf; age: number; team: string; tier: string; rating: number; kd: number; adr: number;
   matches: number; winRate: number; placement: string; teamPrize: number; playerPrize: number; salaryPaid: number; note: string; deltas: StatDeltas; tournaments: TournamentResult[]; globalRank: number; regionRank: number; rankingDelta: number; honors: HonorAward[];
 }
-export interface ProbabilityOutcome { label: string; probability: number; changes: StatChange; }
+export interface ProbabilityOutcome { id?: string; label: string; probability: number; changes: StatChange; resultPatch?: TournamentResultPatch; delayed?: DelayedOutcome; }
 export interface DecisionOption { id: string; label: string; detail: string; result?: string; changes: StatChange; outcomes?: ProbabilityOutcome[]; }
 export interface Decision { id: string; title: string; briefing: string; options: DecisionOption[]; kind: 'emergency' | 'field' | ChoiceKind; timing?: 'in-season' | 'post-report'; category?: string; }
-export interface SeasonProgress { tournamentIds: string[]; nextIndex: number; results: TournamentResult[]; salaryPerTournament: number; awaitingContinue: boolean; pendingEvent?: Decision; }
+export interface SeasonProgress { tournamentIds: string[]; nextIndex: number; results: TournamentResult[]; salaryPerTournament: number; pendingEvent?: Decision; }
 export interface CareerState {
   version: number; rulesVersion: string; dataVersion: string; seed: number; pace: Pace; name: string; origin: Origin; role: Role; defensiveSite: DefensiveSite; positionFamiliarity: number; age: number; careerYear: number; half: SeasonHalf; season: number;
   teamId: string; team: string; region: TeamRegion; roster: Array<{ nick: string; role: PlayerRole; isPlayer?: boolean }>; coreMemberIds: string[]; tier: string; globalRank: number; regionRank: number; rankingPoints: number; vrsActive: boolean; rebuildPoints: number; lastTransferFee: number; teamForm: number; rosterStability: number; negativeUpsetStreak: number; internationalAdaptation: number; cncsRevival: boolean; ability: number; connections: number; integrity: number; fame: number; health: number; salary: number;
+  rolePreparation: RoleChangePreparation; roleChangeCooldown: number; roleChangeCount: number; iglArchetype?: IglArchetype; bootcampCount: number; highPressureChokingRisk: number;
+  hiddenFlags: Record<string, number>; pendingConsequences: PendingConsequence[]; employmentStatus: EmploymentStatus; noOfferWindows: number;
   status: 'active' | 'retired'; phase: CareerPhase; choiceKind?: ChoiceKind; decision?: Decision; pendingEmergencies: Decision[]; resolvedEmergencies: string[]; eventResume?: EventResume; postReportEvent?: Decision;
   seasonProgress?: SeasonProgress; lastEventResult?: string; seasonBaseline?: StatSnapshot; stats: CareerStats; history: SeasonRecord[]; honors: HonorAward[]; top20History: AnnualTop20[]; log: string[];
 }
@@ -60,7 +72,17 @@ const hash = (text: string) => [...text].reduce((value, char) => Math.imul(value
 const seeded = (state: Pick<CareerState, 'seed' | 'season'>, key: string) => makeRng(hash(`${state.seed}:${state.season}:${key}`));
 const snapshot = (state: CareerState): StatSnapshot => ({ ability: state.ability, connections: state.connections, integrity: state.integrity, fame: state.fame, health: state.health, earnings: state.stats.earnings });
 const difference = (before: StatSnapshot, after: StatSnapshot): StatDeltas => ({ ability: after.ability - before.ability, connections: after.connections - before.connections, integrity: after.integrity - before.integrity, fame: after.fame - before.fame, health: after.health - before.health, earnings: after.earnings - before.earnings });
-const declineAtAge = (age: number) => age <= 30 ? 0 : age === 31 ? 6 : 10 + (age - 32) * 5;
+const declineAtAge = (age: number) => {
+  if(age<=21)return 0;
+  if(age<=25)return 0;
+  if(age===26)return 2;
+  if(age===27)return 4;
+  if(age===28)return 6;
+  if(age===29)return 8;
+  if(age===30)return 10;
+  return 12+(age-31)*4;
+};
+const peakAgeBonus = (age: number) => age === 21 ? 2 : age === 22 ? 1 : 0;
 export const ageDecline = (fromAge: number, toAge: number) => { let total = 0; for (let age = fromAge + 1; age <= toAge; age += 1) total += declineAtAge(age); return total; };
 
 const coreCrisisTemplates: Array<Omit<Decision, 'id'>> = [
@@ -208,8 +230,18 @@ const annualTemplates: Array<Omit<Decision, 'id'>> = [
   ] },
 ];
 
-const instantiate = (template: Omit<Decision, 'id'>, id: string): Decision => ({ ...template, id, options: template.options.map(option => ({ ...option, outcomes: option.outcomes?.map(outcome => ({ ...outcome })) })) });
-const eventCountFor = (state: CareerState) => { if (state.pace !== 'hardcore') return 0; const roll = seeded(state, 'event-count')(); return roll < .25 ? 0 : roll < .75 ? 1 : 2; };
+const fallbackOutcomes = (option: DecisionOption): ProbabilityOutcome[] => [
+  { id:`${option.id}-expected`, label:option.result??'决定按预期执行，但付出了相应代价', probability:62, changes:{} },
+  { id:`${option.id}-variance`, label:'执行过程出现偏差，收益与代价发生变化', probability:38, changes:{ ability:(option.changes.ability??0)>0?-2:1, connections:(option.changes.connections??0)>0?-2:1, health:(option.changes.health??0)>0?-2:0 } },
+];
+const instantiate = (template: Omit<Decision, 'id'>, id: string): Decision => ({ ...template, id, options: template.options.map(option => ({ ...option, outcomes:(option.outcomes?.length&&option.outcomes.length>=2?option.outcomes:fallbackOutcomes(option)).map((outcome,index) => ({ ...outcome, id:outcome.id??`${id}-${option.id}-${index}` })) })) });
+const eventCountFor = (state: CareerState) => {
+  const roll=seeded(state,'event-count')();
+  if(state.pace==='hardcore')return roll<.25?0:roll<.75?1:2;
+  if(state.pace==='standard')return roll<.7?0:1;
+  if(state.half==='first')return 0;
+  return roll<.85?0:1;
+};
 const tournamentEventTemplates: Array<Omit<Decision, 'id'>> = [
   { kind:'field', category:'团队', title:'复盘室里的分歧', briefing:'刚结束的比赛暴露了补枪节奏问题。队友认为你过于强调个人处理，教练要求当场统一下一场的执行方式。', options:[
     { id:'review-together',label:'留下来和全队逐回合复盘',detail:'更重视团队同步，个人恢复时间会被压缩',result:'复盘持续到深夜。队友接受了新的补枪口令，但你没有得到完整休息。',changes:{connections:4,teamForm:4,health:-2}},
@@ -238,27 +270,35 @@ const tournamentEventTemplates: Array<Omit<Decision, 'id'>> = [
     { id:'keep-routine',label:'维持原训练计划',detail:'保持竞技节奏，身体风险继续累积',result:'你维持了原计划。训练手感没有中断，紧绷感也没有完全消失。',changes:{ability:2,health:-6}},
   ]},
 ];
-const emergenciesFor = (state: CareerState) => Array.from({ length: eventCountFor(state) }, (_, index) => {
-  const coreRoll = seeded(state, `core-crisis-${index}`)();
-  const pool = coreRoll < .22 ? coreCrisisTemplates : emergencyTemplates;
-  const rng = seeded(state, `emergency-${index}`);
-  return instantiate(pool[Math.floor(rng() * pool.length)], `s${state.season}-e${index + 1}`);
-});
+const pickCatalogEvent = (state:CareerState, kind:Decision['kind'], key:string, timing?:Decision['timing']) => {
+  const pool=eligibleCatalogEvents(state,kind,timing);
+  if(!pool.length)return undefined;
+  const template=pool[Math.floor(seeded(state,`${key}:pick`)()*pool.length)];
+  return instantiate(template,`${key}-${template.catalogId}`);
+};
+const emergenciesFor = (state: CareerState) => Array.from({ length: eventCountFor(state) }, (_, index) => pickCatalogEvent(state,'emergency',`s${state.season}-e${index+1}`)).filter((event):event is Decision=>Boolean(event));
 const tournamentEventFor = (state: CareerState, result: TournamentResult, index: number) => {
-  if (seeded(state, `tournament-event-trigger:${index}:${result.tournamentId}`)() >= .3) return undefined;
-  const template = tournamentEventTemplates[Math.floor(seeded(state, `tournament-event-pick:${index}:${result.tournamentId}`)() * tournamentEventTemplates.length)];
-  const decision = instantiate(template, `s${state.season}-t${index + 1}-event`);
-  if (decision.category === '位置') decision.options = decision.options.filter(option => option.changes.defensiveSite !== state.defensiveSite);
-  return decision;
+  const trigger=state.pace==='hardcore'?.08:state.pace==='standard'?.04:0;
+  if(seeded(state,`tournament-event-trigger:${index}:${result.tournamentId}`)()>=trigger)return undefined;
+  return pickCatalogEvent(state,'field',`s${state.season}-t${index+1}`, 'in-season');
 };
 const cnTeams=new Set(['TYLOO','Lynn Vision','Rare Atom','JiJieHao','Steel Helmet']);
 const isCnTeam=(state:CareerState)=>cnTeams.has(state.team);
 const hasInternationalResume=(state:CareerState)=>state.history.flatMap(record=>record.tournaments).some(result=>isLargeOrHigher(result.honorClass)&&result.rating>=1.08);
 const internationalOffer:Omit<Decision,'id'>={kind:'offseason',category:'国际转会',title:'国际纵队正式报价',briefing:'一支国际阵容愿意支付高额转会费。更稳定的 T1 与 Major 机会就在眼前，但语言、文化和队内关系都要重新建立。',options:[{id:'join-international',label:'接受国际队报价',detail:'赛事上限提高 / 获得签字费 / 关系与状态暂时下降',changes:{transfer:true,connections:-8,fame:6}},{id:'stay-cn',label:'留在中国队继续冲击',detail:'保持现阵容 / 关系 +6 / 国际机会减少',changes:{connections:6,preserveCore:true}}]};
+const freeAgentChoiceFor=(state:CareerState):Decision=>instantiate({kind:'offseason',category:'合同转会',title:'自由人窗口',briefing:`原队没有续约。年龄、最近数据和当前位置市场共同决定你还能留在哪一级赛场。`,options:[
+  {id:'accept-lower-offer',label:'接受现有低级别报价',detail:'72% 获得二线合同 / 28% 只有三线队愿意签约',changes:{},outcomes:[{id:'lower-t2',label:'一支二线队给出首发合同，但薪资和冠军机会下降',probability:72,changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,fame:-4,connections:3}},{id:'lower-t3',label:'最终只有三线队报价，职业生涯进入求生阶段',probability:28,changes:{contractTier:'t3',employmentStatus:'signed',noOfferWindows:0,fame:-7,ability:-2}}]},
+  {id:'wait-better-offer',label:'继续等待更好的队伍',detail:'18% 等到二线强队 / 82% 又一个窗口无人报价',changes:{},outcomes:[{id:'wait-success',label:'二线强队临时出现位置空缺',probability:18,changes:{contractTier:'t2',employmentStatus:'signed',noOfferWindows:0,connections:-2,fame:2}},{id:'wait-fail',label:'窗口关闭，仍然没有职业队报价',probability:82,changes:{employmentStatus:'free-agent',noOfferWindows:state.noOfferWindows+1,fame:-5,health:-3}}]},
+]},`s${state.season}-free-agent`);
+const breachChoiceFor=(state:CareerState):Decision=>instantiate({kind:'offseason',category:'合同转会',title:'违约加盟争冠队',briefing:'一支顶级队伍出现临时空缺，但转会窗口即将关闭。对方暗示你先与原队撕破合同，再解决买断问题。',options:[
+  {id:'breach-for-superteam',label:'主动违约抱团争冠',detail:'32% 加盟成功 / 43% 被原队冷藏 / 25% 两边都不要',changes:{integrity:-8,connections:-6,earnings:-12},outcomes:[{id:'breach-success',label:'争冠队支付后续费用，你进入一线阵容，但背负违约口碑',probability:32,changes:{contractTier:'t1',employmentStatus:'signed',noOfferWindows:0,fame:10,integrity:-8}},{id:'breach-benched',label:'争冠队撤回承诺，原队将你冷藏到合同结束',probability:43,changes:{ability:-7,fame:-6,connections:-10,employmentStatus:'signed'}},{id:'breach-free',label:'合同解除，但市场认为风险过高，没有队伍立即报价',probability:25,changes:{employmentStatus:'free-agent',noOfferWindows:1,fame:-10,integrity:-7}}]},
+  {id:'honor-contract',label:'履行合同等待正式报价',detail:'76% 保住首发 / 24% 错过窗口后资源下降',changes:{integrity:5,fame:-3},outcomes:[{id:'stay-starting',label:'原队认可职业态度，继续给你首发资源',probability:76,changes:{connections:6,teamForm:3}},{id:'stay-cost',label:'争冠机会消失，原队也开始培养替代者',probability:24,changes:{connections:-3,ability:-2,rosterStability:-4}}]},
+]},`s${state.season}-contract-breach`);
 const choiceFor = (state: CareerState, kind: ChoiceKind) => {
-  const canInternational=isCnTeam(state)&&state.ability>=72&&state.internationalAdaptation>=45&&hasInternationalResume(state);
-  if(kind==='offseason'&&canInternational&&seeded(state,'international-offer')()<.35)return instantiate(internationalOffer,`s${state.season}-international`);
-  const pool = kind === 'annual' ? annualTemplates : offseasonTemplates; const rng = seeded(state, `${kind}-choice`); return instantiate(pool[Math.floor(rng() * pool.length)], `s${state.season}-${kind}`);
+  if(state.employmentStatus==='free-agent')return freeAgentChoiceFor(state);
+  const breachEligible=kind==='offseason'&&state.fame>=45&&state.ability>=72&&seeded(state,'breach-offer')()<.06;
+  if(breachEligible)return breachChoiceFor(state);
+  return pickCatalogEvent(state,kind,`s${state.season}-${kind}`) ?? instantiate(kind==='annual'?annualTemplates[0]:offseasonTemplates[0],`s${state.season}-${kind}-fallback`);
 };
 
 const signingRateFor = (state: CareerState) => .03 + Math.min(.05, (state.connections + state.fame) / 4000);
@@ -267,6 +307,22 @@ const transferFeeFor = (state: CareerState, core = false) => {
   const starValue = state.ability * 8 + state.fame * 5 + state.top20History.filter(item => item.playerRank).length * 160;
   return Math.round(Math.min(core ? 5000 : 2500, Math.max(core ? 1500 : 50, (tierBase + starValue) * (core ? 2.2 : 1))));
 };
+const teamTierForRank=(rank:number):ContractTier=>rank<=20?'t1':rank<=60?'t2':'t3';
+const marketRatingFloor=(state:CareerState)=>state.role==='igl'?(state.iglArchetype==='brain'?.84:state.iglArchetype==='fragging'?.94:state.iglArchetype==='awp-caller'?1.06:.98):state.role==='support'?.94:state.role==='awper'?1.05:1.00;
+const marketEvaluation=(state:CareerState,rating:number,honors:HonorAward[])=>{
+  const tier=teamTierForRank(state.globalRank);
+  const agePenalty=Math.max(0,state.age-25)*(tier==='t1'?5:tier==='t2'?3:2);
+  const ratingGap=(rating-marketRatingFloor(state))*100;
+  const honorValue=honors.reduce((sum,honor)=>sum+(honor.kind==='MVP'?12:honor.kind==='EVP'?6:honor.kind==='冠军'?5:2),0);
+  const tierPressure=tier==='t1'?18:tier==='t2'?7:0;
+  const score=state.ability*.55+ratingGap+state.connections*.15+honorValue-agePenalty-tierPressure;
+  const retentionChance=Math.max(.05,Math.min(.96,(score-20)/65));
+  const retained=seeded(state,`contract-retention:${state.season}`)()<retentionChance;
+  if(retained)return {employmentStatus:'signed' as const,noOfferWindows:0,log:`合同市场：${Math.round(retentionChance*100)}% 续约评估通过`};
+  const lowerOfferChance=Math.max(.08,Math.min(.85,(score+(tier==='t1'?16:8))/75));
+  const lowerOffer=seeded(state,`contract-lower-offer:${state.season}`)()<lowerOfferChance;
+  return lowerOffer?{employmentStatus:'signed' as const,noOfferWindows:0,downgrade:tier==='t1'?'t2' as const:'t3' as const,log:`合同市场：原队放弃续约，只收到${tier==='t1'?'二线':'三线'}报价`}:{employmentStatus:'free-agent' as const,noOfferWindows:state.noOfferWindows+1,log:`合同市场：没有职业队报价（连续 ${state.noOfferWindows+1} 个窗口）`};
+};
 const monthlySalaryFor = (state: CareerState) => {
   const bestTop=state.top20History.reduce((best,item)=>Math.min(best,item.playerRank??99),99);
   const personalFactor=Math.min(1,Math.max(0,(state.ability-45)/55*.72+state.fame/100*.18+(bestTop<=5?.1:bestTop<=20?.05:0)));
@@ -274,7 +330,77 @@ const monthlySalaryFor = (state: CareerState) => {
   return Number((minimum+(maximum-minimum)*personalFactor).toFixed(1));
 };
 const applyChanges = (state: CareerState, changes: StatChange): CareerState => {
-  let next: CareerState = { ...state, ability: clamp(state.ability + (changes.ability ?? 0)), connections: clamp(state.connections + (changes.connections ?? 0)), integrity: clamp(state.integrity + (changes.integrity ?? 0)), fame: clamp(state.fame + (changes.fame ?? 0)), health: clamp(state.health + (changes.health ?? 0)), teamForm:clamp(state.teamForm+(changes.teamForm??0)), rosterStability:clamp(state.rosterStability+(changes.rosterStability??0)), positionFamiliarity:clamp(state.positionFamiliarity+(changes.positionFamiliarity??0)), defensiveSite:changes.defensiveSite??state.defensiveSite, stats: { ...state.stats, earnings: Math.max(0, state.stats.earnings + (changes.earnings ?? 0)) } };
+  let next: CareerState = { ...state, ability: clamp(state.ability + (changes.ability ?? 0)), connections: clamp(state.connections + (changes.connections ?? 0)), integrity: clamp(state.integrity + (changes.integrity ?? 0)), fame: clamp(state.fame + (changes.fame ?? 0)), health: clamp(state.health + (changes.health ?? 0)), teamForm:clamp(state.teamForm+(changes.teamForm??0)), rosterStability:clamp(state.rosterStability+(changes.rosterStability??0)), positionFamiliarity:clamp(state.positionFamiliarity+(changes.positionFamiliarity??0)), defensiveSite:changes.defensiveSite??state.defensiveSite, iglArchetype:changes.iglArchetype??state.iglArchetype, employmentStatus:changes.employmentStatus??state.employmentStatus,noOfferWindows:changes.noOfferWindows??state.noOfferWindows, highPressureChokingRisk:clamp(state.highPressureChokingRisk+(changes.highPressureChokingRisk??0)), internationalAdaptation:clamp(state.internationalAdaptation+(changes.internationalAdaptation??0)), stats: { ...state.stats, earnings: Math.max(0, state.stats.earnings + (changes.earnings ?? 0)) } };
+  if(changes.contractTier){
+    const [minRank,maxRank]=changes.contractTier==='t1'?[8,20]:changes.contractTier==='t2'?[21,60]:[61,98];
+    const candidates=CAREER_TEAMS.filter(team=>team.baseRank>=minRank&&team.baseRank<=maxRank);
+    const target=candidates[Math.floor(seeded(state,`contract-team:${changes.contractTier}`)()*candidates.length)];
+    if(target)next={...next,teamId:target.id,team:target.name,region:target.region,roster:rosterWithPlayer(target,state.name,state.role),globalRank:target.baseRank,regionRank:regionRankFor(target.baseRank,target.region),tier:changes.contractTier==='t1'?'1.5 线赛场':changes.contractTier==='t2'?'二线赛场':'三线赛场',teamForm:55,rosterStability:58,employmentStatus:'signed',noOfferWindows:0};
+  }
+  if (changes.rolePreparation) next = { ...next, rolePreparation: changes.rolePreparation };
+  if (changes.bootcampBonus) next = { ...next, bootcampCount: state.bootcampCount + 1 };
+  if (changes.roleChange) {
+    const newRole = changes.roleChange;
+    const preparationBonus = (state.rolePreparation === 'awper-training' && newRole === 'awper') || (state.rolePreparation === 'igl-assistant' && newRole === 'igl') ? 20 : 0;
+    const outcomeRoll = seeded(state, `rolechange-outcome:${newRole}`)();
+    const abilityMod = state.ability / 100;
+    const connectionsMod = state.connections / 100;
+    let outcome: RoleChangeOutcome;
+    let abilityChange = 0;
+    let fameChange = 0;
+    let connectionsChange = 0;
+    if (newRole === 'awper') {
+      const successChance = 0.35 + abilityMod * 0.20 + preparationBonus * 0.01;
+      if (outcomeRoll < successChance) {
+        outcome = 'breakthrough';
+        abilityChange = 12; fameChange = 15; connectionsChange = 8;
+      } else if (outcomeRoll < successChance + 0.30) {
+        outcome = 'struggle';
+        abilityChange = -6; fameChange = -3; connectionsChange = -2;
+      } else {
+        outcome = 'disaster';
+        abilityChange = -15; fameChange = -8; connectionsChange = -5;
+      }
+    } else if (newRole === 'igl') {
+      const successChance = 0.40 + connectionsMod * 0.25 + preparationBonus * 0.01;
+      if (outcomeRoll < successChance) {
+        outcome = 'breakthrough';
+        abilityChange = 5; fameChange = 8; connectionsChange = 15;
+      } else if (outcomeRoll < successChance + 0.35) {
+        outcome = 'struggle';
+        abilityChange = -4; fameChange = -2; connectionsChange = -6;
+      } else {
+        outcome = 'disaster';
+        abilityChange = -8; fameChange = -5; connectionsChange = -12;
+      }
+    } else if (newRole === 'support') {
+      const successChance = 0.50 + connectionsMod * 0.20;
+      if (outcomeRoll < successChance) {
+        outcome = 'breakthrough';
+        abilityChange = 3; fameChange = -2; connectionsChange = 12;
+      } else if (outcomeRoll < successChance + 0.35) {
+        outcome = 'struggle';
+        abilityChange = -5; fameChange = -5; connectionsChange = -3;
+      } else {
+        outcome = 'disaster';
+        abilityChange = -10; fameChange = -8; connectionsChange = -8;
+      }
+    } else {
+      const successChance = 0.45 + abilityMod * 0.15;
+      if (outcomeRoll < successChance) {
+        outcome = 'breakthrough';
+        abilityChange = 8; fameChange = 6; connectionsChange = 5;
+      } else if (outcomeRoll < successChance + 0.35) {
+        outcome = 'struggle';
+        abilityChange = -4; fameChange = -3; connectionsChange = -2;
+      } else {
+        outcome = 'disaster';
+        abilityChange = -12; fameChange = -6; connectionsChange = -6;
+      }
+    }
+    const outcomeText = outcome === 'breakthrough' ? '转职大成功，打开新天地' : outcome === 'struggle' ? '转职艰难，表现下滑' : '转职灾难，职业生涯受重创';
+    next = { ...next, role: newRole, rolePreparation: 'none', roleChangeCooldown: 4, roleChangeCount: state.roleChangeCount + 1, ability: clamp(next.ability + abilityChange), fame: clamp(next.fame + fameChange), connections: clamp(next.connections + connectionsChange), log: [`转职 ${newRole} / ${outcomeText}`, ...next.log] };
+  }
   if (changes.resetVrs) next = { ...next, vrsActive:false, rankingPoints:0, rebuildPoints:0, globalRank:101, regionRank:Math.max(1,CAREER_TEAMS.filter(team=>team.region===state.region).length+1), tier:'三线赛场', log:[`${state.team} 三人核心不足，模拟 VRS 积分清零`,...next.log] };
   if (changes.transfer) {
     const fee = transferFeeFor(state, Boolean(changes.preserveCore));
@@ -302,22 +428,71 @@ const rosterWithPlayer = (team: CareerTeam, name: string, role: Role) => {
   return team.roster.map((player, index) => index === replacedIndex ? { nick: name, role: targetRole, isPlayer: true } : { nick: player.nick, role: player.role });
 };
 const regionRankFor = (globalRank: number, region: TeamRegion) => Math.max(1, CAREER_TEAMS.filter(team => team.region === region && team.baseRank <= globalRank).length);
-const invitationFor = (tier: TournamentTier, globalRank: number, regionRank: number) => {
-  if (tier === 'Major') return regionRank <= 10 ? { invited: true, reason: `VRS ${regionRank <= 4 ? '后段阶段' : '第一阶段'}区域邀请` } : { invited: false, reason: '未达到 Major 区域邀请门槛' };
-  if (tier === 'T1') return globalRank <= 20 ? { invited: true, reason: `VRS 全球第 ${globalRank} 名顺位邀请` } : { invited: true, reason: '通过公开预选赛晋级' };
-  if (tier === 'T2') return globalRank > 12 ? { invited: true, reason: `符合 T2 邀请规则（全球第 ${globalRank}）` } : { invited: false, reason: '全球前 12 不符合 T2 邀请条件' };
-  return { invited: true, reason: '非排名赛自由邀请' };
+const sigmoid=(value:number)=>1/(1+Math.exp(-value));
+const invitationFor = (state:CareerState, tournament:typeof TOURNAMENTS[number]) => {
+  const {globalRank,regionRank}=state;
+  if(tournament.tier==='Major'){
+    if(regionRank<=10)return {invited:true,reason:`VRS ${regionRank<=4?'后段阶段':'第一阶段'}区域邀请`};
+    const chance=Math.max(.01,Math.min(.45,sigmoid((14-regionRank)/3)*(.60+state.teamForm/220)));
+    const qualified=seeded(state,`qualifier:${tournament.id}`)()<chance;
+    return {invited:qualified,reason:qualified?`通过 Major 区域预选（${Math.round(chance*100)}%）`:`Major 区域预选出局（晋级率 ${Math.round(chance*100)}%）`};
+  }
+  if(tournament.tier==='T1'){
+    if(globalRank<=20)return {invited:true,reason:`VRS 全球第 ${globalRank} 名顺位邀请`};
+    const chance=Math.max(.03,Math.min(.75,sigmoid((32-globalRank)/8)*(.65+state.teamForm/250)*(.75+state.rosterStability/400)));
+    const qualified=seeded(state,`qualifier:${tournament.id}`)()<chance;
+    return {invited:qualified,reason:qualified?`通过公开预选（${Math.round(chance*100)}%）`:`公开预选出局（晋级率 ${Math.round(chance*100)}%）`};
+  }
+  if(tournament.tier==='T2'){
+    if(globalRank>12)return {invited:true,reason:`符合 T2 VRS 邀请规则（全球第 ${globalRank}）`};
+    const chance=Math.max(.08,Math.min(.55,.18+(100-state.teamForm)/400));
+    const qualified=seeded(state,`qualifier:${tournament.id}`)()<chance;
+    return {invited:qualified,reason:qualified?`通过 T2 公开预选（${Math.round(chance*100)}%）`:'未通过 T2 公开预选'};
+  }
+  return {invited:true,reason:'非排名赛自由邀请'};
 };
 const honorWeight: Record<HonorClass, number> = { medium: 1, large: 2, elite: 3, 'super-elite': 4, major: 5 };
+const iglProfileFor=(state:CareerState)=>{
+  if(state.role!=='igl')return {ratingBase:undefined as number|undefined,ratingSpread:.16,teamBoost:0,stabilityBoost:0};
+  const archetype=state.iglArchetype??'brain';
+  if(archetype==='fragging')return {ratingBase:.95,ratingSpread:.10,teamBoost:2,stabilityBoost:1};
+  if(archetype==='dynasty')return {ratingBase:1.00,ratingSpread:.10,teamBoost:8,stabilityBoost:8};
+  if(archetype==='awp-caller')return {ratingBase:1.10,ratingSpread:.10,teamBoost:state.teamForm>=65?6:-3,stabilityBoost:2};
+  return {ratingBase:.84,ratingSpread:.08,teamBoost:7,stabilityBoost:7};
+};
+const dynastyEvolutionFor=(state:CareerState,results:TournamentResult[])=>{
+  if(state.role!=='igl'||state.iglArchetype==='dynasty'||state.globalRank>5||state.teamForm<85||state.rosterStability<85)return false;
+  const teammateQuality=state.roster.filter(player=>!player.isPlayer).map(player=>70+seeded(state,`roster-quality:${state.teamId}:${player.nick}`)()*30);
+  if(teammateQuality.length!==4||teammateQuality.some(value=>value<82))return false;
+  const eliteDeepRuns=results.filter(result=>isLargeOrHigher(result.honorClass)&&['冠军','亚军','四强'].includes(result.placement)).length;
+  const eliteTitles=results.filter(result=>isLargeOrHigher(result.honorClass)&&result.placement==='冠军').length;
+  if(eliteDeepRuns<2&&eliteTitles<1)return false;
+  return seeded(state,`dynasty-evolution:${state.careerYear}:${state.half}`)()<.002;
+};
 const tournamentCalendarFor = (state: CareerState) => {
-  const count = 5 + Math.floor(seeded(state, 'calendar-count')() * 4);
-  const ordered = TOURNAMENTS
-    .filter(tournament => (!tournament.region || tournament.region === state.region) && (state.vrsActive || tournament.tier === 'unranked' || tournament.id === 'regional-challenger'))
-    .map(tournament => ({ tournament, order: seeded(state, `calendar-order:${tournament.id}`)() }))
-    .sort((a, b) => a.order - b.order)
-    .map(item => item.tournament);
-  const eligible = ordered.filter(tournament => invitationFor(tournament.tier, state.globalRank, state.regionRank).invited);
-  return eligible.slice(0, Math.min(count, eligible.length));
+  const count=5+Math.floor(seeded(state,'calendar-count')()*4);
+  const majors=TOURNAMENTS.filter(tournament=>tournament.tier==='Major');
+  const yearMajorOffset=seeded(state,`major-year:${state.careerYear}`)()<.5?0:1;
+  const majorIndex=(state.careerYear*2+(state.half==='second'?1:0)+yearMajorOffset)%majors.length;
+  const major=majors[majorIndex];
+  const ordered=TOURNAMENTS
+    .filter(tournament=>tournament.tier!=='Major'&&(!tournament.region||tournament.region===state.region))
+    .map(tournament=>({tournament,order:seeded(state,`calendar-order:${tournament.id}`)()}))
+    .sort((a,b)=>a.order-b.order)
+    .map(item=>item.tournament);
+  const entered=ordered.filter(tournament=>invitationFor(state,tournament).invited);
+  const fallback=ordered.filter(tournament=>tournament.tier==='unranked'||tournament.tier==='T2');
+  const unique=[...new Map([...entered,...fallback].map(tournament=>[tournament.id,tournament])).values()];
+  const majorEntry=invitationFor(state,major);
+  const reserve=majorEntry.invited?1:0;
+  const picked=unique.slice(0,count-reserve);
+  if(majorEntry.invited)picked.splice(Math.min(picked.length,Math.floor(picked.length*.65)),0,major);
+  while(picked.length<Math.min(5,count)){
+    const replacement=ordered.find(tournament=>!picked.some(item=>item.id===tournament.id));
+    if(!replacement)break;
+    picked.push(replacement);
+  }
+  return picked.slice(0,count);
 };
 const contextRatingsFor = (state: CareerState, tournament: typeof TOURNAMENTS[number], rating: number): ContextRatings => {
   const value = (key:string, modifier=0) => Number(Math.max(.55,rating+modifier+(seeded(state,`context:${tournament.id}:${key}`)()-.5)*.16).toFixed(2));
@@ -340,22 +515,38 @@ const upsetFor = (state: CareerState, tournament: typeof TOURNAMENTS[number]) =>
 };
 const simulateTournament = (state: CareerState, tournament: typeof TOURNAMENTS[number], salaryPaid: number): TournamentResult => {
   const rng = seeded(state, `tournament:${tournament.id}`);
-  const invitation = invitationFor(tournament.tier, state.globalRank, state.regionRank);
+  const invitation = invitationFor(state,tournament);
   const pressure = honorWeight[tournament.honorClass] * 2.4;
   const dataBonus = tournament.tier === 'unranked' ? .14 : tournament.tier === 'T2' ? .1 : tournament.tier === 'Major' ? -.03 : 0;
   const slumpChance = Math.min(.32, .1 + Math.max(0, 60 - state.health) / 180 + Math.max(0, state.age - 30) * .025);
   const slumped = seeded(state, `tournament-slump:${tournament.id}`)() < slumpChance;
   const slumpPenalty = slumped ? .19 + seeded(state, `tournament-slump-depth:${tournament.id}`)() * .12 : 0;
-  const teamDefinition=CAREER_TEAMS.find(team=>team.id===state.teamId);
-  const teamStrength=teamDefinition?.strength??Math.max(25,100-Math.min(100,state.globalRank)*.68);
+  const rankStrength=Math.max(25,101-Math.min(100,state.globalRank)*.72);
   const siteFit=(state.positionFamiliarity-50)*.06+(state.defensiveSite==='rotator'?(state.connections-50)*.025:0);
-  const performance = teamStrength*.55+state.teamForm*.28+state.rosterStability*.08+state.ability*.09+siteFit+rng()*18-pressure-slumpPenalty*25;
+  const roleAgePenalty=state.role==='awper'?Math.max(0,state.age-26)*1.4:state.role==='entry'?Math.max(0,state.age-26)*1.1:state.role==='igl'?0:Math.max(0,state.age-28)*.7;
+  const effectiveRating = 0.65 + Math.max(0, state.ability - 38) / 68 * 0.70;
+  const carryBonus = Math.max(0, effectiveRating - 1.08) * 140;
+  const iglProfile=iglProfileFor(state);
+  const seriesTeamBoost=tournament.format.includes('BO1')?iglProfile.teamBoost*.35:iglProfile.teamBoost;
+  const performance = rankStrength*.35+state.teamForm*.20+(state.rosterStability+iglProfile.stabilityBoost)*.15+state.ability*.20+carryBonus+seriesTeamBoost+siteFit+rng()*18-pressure-slumpPenalty*25-roleAgePenalty;
   const placement = performance >= 88 ? '冠军' : performance >= 81 ? '亚军' : performance >= 73 ? '四强' : performance >= 64 ? '八强' : performance >= 54 ? '小组赛出局' : '首轮出局';
-  let rating = Number(Math.max(.55, .78 + state.ability / 310 + siteFit/180 + rng() * .2 - pressure / 180 + dataBonus - slumpPenalty).toFixed(2));
+  const cnChoking=isCnTeam(state)&&isLargeOrHigher(tournament.honorClass)&&state.highPressureChokingRisk>0?
+    (seeded(state,`cn-choking:${tournament.id}`)()*100<state.highPressureChokingRisk?0.09:0):0;
+  const bootcampBonus=state.bootcampCount>0?.02*Math.min(3,state.bootcampCount):0;
+  const rawRating=iglProfile.ratingBase===undefined?0.65+Math.max(0,state.ability-38)/68*.70+siteFit/200+rng()*.16:iglProfile.ratingBase+(rng()-.5)*iglProfile.ratingSpread+Math.max(-.03,Math.min(.03,(state.ability-65)/600));
+  let rating = Number(Math.max(.55,rawRating-pressure/220+dataBonus-slumpPenalty-cnChoking+bootcampBonus).toFixed(2));
   const upset = upsetFor(state,tournament);
   const adjustedPlacement = upset?.kind==='negative' ? (performance>=73?'小组赛出局':'首轮出局') : upset?.kind==='positive' ? (performance>=64?'冠军':'四强') : placement;
   const matches = adjustedPlacement === '冠军' ? 7 : adjustedPlacement === '亚军' ? 6 : adjustedPlacement === '四强' ? 5 : adjustedPlacement === '八强' ? 4 : 3;
   const wins = adjustedPlacement === '冠军' ? matches : adjustedPlacement === '亚军' ? matches - 1 : adjustedPlacement === '四强' ? matches - 1 : adjustedPlacement === '八强' ? matches - 2 : Math.max(0, matches - 2);
+  const maps=Array.from({length:matches},(_,seriesIndex)=>{
+    const isFinal=seriesIndex===matches-1&&['冠军','亚军'].includes(adjustedPlacement);
+    const bestOf=tournament.format.includes('BO1')&&!isFinal?1:tournament.format.includes('BO5')&&isFinal?5:3;
+    const needed=Math.floor(bestOf/2)+1;
+    const extra=bestOf===1?0:bestOf===3?(seeded(state,`maps:${tournament.id}:${seriesIndex}`)()<.48?1:0):Math.floor(seeded(state,`maps:${tournament.id}:${seriesIndex}`)()*3);
+    return needed+extra;
+  }).reduce((sum,value)=>sum+value,0);
+  const mapWins=Math.max(wins,Math.round(maps*(wins/Math.max(1,matches))));
   if(upset?.kind==='positive') rating=Number((rating+.07).toFixed(2));
   if(upset?.kind==='negative') rating=Number(Math.max(.55,rating-.09).toFixed(2));
   const prizeBase = honorWeight[tournament.honorClass] * 30;
@@ -364,14 +555,35 @@ const simulateTournament = (state: CareerState, tournament: typeof TOURNAMENTS[n
   const baseRankingDelta = tournament.tier === 'unranked' ? 0 : Math.round((wins / matches - .45) * honorWeight[tournament.honorClass] * 24);
   const rankingDelta=baseRankingDelta+(upset?.impact??0);
   const upsetRecord:UpsetRecord|undefined=upset?{kind:upset.kind,opponent:upset.opponent.name,opponentRank:upset.opponent.baseRank,format:upset.format,score:upset.kind==='positive'?'2:1':'0:2',probability:upset.probability,rankingImpact:upset.impact}:undefined;
-  return { id: `s${state.season}-${tournament.id}`, tournamentId: tournament.id, name: tournament.name, organizer: tournament.organizer, tier: tournament.tier, honorClass: tournament.honorClass, invited: invitation.invited, invitationReason: state.vrsActive ? invitation.reason : tournament.tier === 'unranked' ? '未入榜期间参加非排名赛' : '通过公开预选赛获得资格', placement:adjustedPlacement, matches, wins, teamPrize, playerPrize, salaryPaid, rating, rankingDelta, context:contextRatingsFor(state,tournament,rating), upset:upsetRecord };
+  const isCriticalMatch=(adjustedPlacement==='冠军'||adjustedPlacement==='亚军')&&(tournament.tier==='Major'||tournament.honorClass==='super-elite')||(state.globalRank>=90&&adjustedPlacement!=='首轮出局');
+  const criticalMomentRoll=seeded(state,`critical:${tournament.id}`)();
+  const criticalTriggerRate=state.pace==='fast'?(tournament.tier==='Major'&&['冠军','亚军'].includes(adjustedPlacement)?.08:0):tournament.tier==='Major'?(state.pace==='hardcore'?.15:.08):isLargeOrHigher(tournament.honorClass)?(state.pace==='hardcore'?.10:.06):0;
+  const hasCriticalEvent=isCriticalMatch&&criticalMomentRoll<criticalTriggerRate;
+  return { id: `s${state.season}-${tournament.id}`, tournamentId: tournament.id, name: tournament.name, organizer: tournament.organizer, tier: tournament.tier, honorClass: tournament.honorClass, invited: invitation.invited, invitationReason: state.vrsActive ? invitation.reason : tournament.tier === 'unranked' ? '未入榜期间参加非排名赛' : invitation.reason, placement:adjustedPlacement, matches, wins, maps, mapWins, teamPrize, playerPrize, salaryPaid, rating, rankingDelta, context:contextRatingsFor(state,tournament,rating), upset:upsetRecord, expectedPlacement:hasCriticalEvent?adjustedPlacement:undefined, hasCriticalEvent, criticalEventId:hasCriticalEvent?`critical-${state.season}-${tournament.id}`:undefined };
 };
 const honorsForResults = (state: CareerState, results: TournamentResult[]): HonorAward[] => results.flatMap(result => {
   const awards: HonorAward[] = [];
   if (result.placement === '冠军') awards.push({ id: `${result.id}-champion`, season: state.season, tournamentName: result.name, kind: '冠军', honorClass: result.honorClass });
-  if (result.rating >= 1.18 && ['冠军','亚军'].includes(result.placement)) awards.push({ id: `${result.id}-mvp`, season: state.season, tournamentName: result.name, kind: 'MVP', honorClass: result.honorClass });
-  else if (result.rating >= 1.1 && !['首轮出局','小组赛出局'].includes(result.placement)) awards.push({ id: `${result.id}-evp`, season: state.season, tournamentName: result.name, kind: 'EVP', honorClass: result.honorClass });
-  else if(result.rating>=1.03) awards.push({id:`${result.id}-vp`,season:state.season,tournamentName:result.name,kind:'VP',honorClass:result.honorClass});
+  const roleDataPenalty=state.role==='igl'||state.role==='support'?.05:0;
+  const playoffsRating=result.context.playoffs;
+  const finalsRating=result.context.finals;
+  const vsTop10Rating=result.context.vsTop10;
+  const impactBonus=(result.context.bigMatches+result.context.elimination)/2;
+  const effectiveRating=result.rating*.4+playoffsRating*.25+finalsRating*.2+impactBonus*.15;
+  const mvpThreshold=1.28-roleDataPenalty;
+  const evpThreshold=1.18-roleDataPenalty;
+  const vpThreshold=1.10-roleDataPenalty;
+  const isMajorOrSuperElite=result.tier==='Major'||result.honorClass==='super-elite';
+  const hasPlayoffsData=result.matches>=5;
+  if(result.placement==='冠军'&&effectiveRating>=mvpThreshold&&playoffsRating>=1.20&&finalsRating>=1.15){
+    awards.push({id:`${result.id}-mvp`,season:state.season,tournamentName:result.name,kind:'MVP',honorClass:result.honorClass});
+  }else if(result.placement==='亚军'&&effectiveRating>=mvpThreshold+.07&&playoffsRating>=1.25&&finalsRating>=1.20&&isMajorOrSuperElite){
+    awards.push({id:`${result.id}-mvp`,season:state.season,tournamentName:result.name,kind:'MVP',honorClass:result.honorClass});
+  }else if(effectiveRating>=evpThreshold&&hasPlayoffsData&&['冠军','亚军','四强'].includes(result.placement)&&playoffsRating>=1.12){
+    awards.push({id:`${result.id}-evp`,season:state.season,tournamentName:result.name,kind:'EVP',honorClass:result.honorClass});
+  }else if(effectiveRating>=vpThreshold&&hasPlayoffsData&&vsTop10Rating>=1.05){
+    awards.push({id:`${result.id}-vp`,season:state.season,tournamentName:result.name,kind:'VP',honorClass:result.honorClass});
+  }
   return awards;
 });
 const isLargeOrHigher = (honorClass: HonorClass) => honorWeight[honorClass] >= honorWeight.large;
@@ -388,31 +600,82 @@ const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecord[]): A
   const calendarYear = 2025 + state.careerYear;
   const results = yearRecords.flatMap(record => record.tournaments);
   const rankedResults = results.filter(result => result.tier !== 'unranked');
-  const eligible = rankedResults.length >= 6 && rankedResults.some(result => isLargeOrHigher(result.honorClass));
-  const weightedMatches = results.reduce((sum, result) => sum + result.matches * honorWeight[result.honorClass], 0);
-  const weightedRating = results.reduce((sum, result) => sum + result.rating * result.matches * honorWeight[result.honorClass], 0) / Math.max(1, weightedMatches);
+  const t1Results=results.filter(result=>result.tier==='T1'||result.tier==='Major');
+  const t1Maps=t1Results.reduce((sum,result)=>sum+result.maps,0);
+  const t1Rating=t1Results.reduce((sum,result)=>sum+result.rating*result.maps,0)/Math.max(1,t1Maps);
+  const vsTop10=averageContext(t1Results,'vsTop10');
+  const weightedMatches = results.reduce((sum, result) => sum + result.maps * honorWeight[result.honorClass], 0);
+  const weightedRating = results.reduce((sum, result) => sum + result.rating * result.maps * honorWeight[result.honorClass], 0) / Math.max(1, weightedMatches);
   const highLevelSuccess = results.some(result => isLargeOrHigher(result.honorClass) && ['冠军','亚军','四强'].includes(result.placement));
   const playerHonors = yearRecords.flatMap(record => record.honors);
+  const mvpCount=playerHonors.filter(h=>h.kind==='MVP').length;
+  const evpCount=playerHonors.filter(h=>h.kind==='EVP').length;
+  const bigEvps=playerHonors.filter(h=>h.kind==='EVP'&&isLargeOrHigher(h.honorClass)).length;
+  const hasHardwareBase=mvpCount>=1||bigEvps>=2;
+  const meritFloor=t1Maps>=70&&t1Rating>=1.15&&vsTop10>=1.05&&bigEvps>=2;
+  const nominationChance=meritFloor?Math.min(.05,.02+Math.max(0,t1Rating-1.15)*.15+Math.max(0,vsTop10-1.05)*.08):0;
+  const nominated=meritFloor&&seeded(state,`top20-gate:${calendarYear}`)()<nominationChance;
+  const eligible=rankedResults.length>=6&&rankedResults.some(result=>isLargeOrHigher(result.honorClass))&&t1Maps>=70;
   const contextScore=(averageContext(results,'major')*1.35+averageContext(results,'elite')*1.2+averageContext(results,'playoffs')*1.25+averageContext(results,'arena')+averageContext(results,'bigMatches')*1.1+averageContext(results,'finals')*1.2+averageContext(results,'elimination')*1.15+averageContext(results,'vsTop5')*1.25+averageContext(results,'vsTop10')+averageContext(results,'vsTop20')*.8)*26;
-  const playerScore = weightedRating * 280 + contextScore + playerHonors.reduce((sum, honor) => sum + honorWeight[honor.honorClass] * (honor.kind === 'MVP' ? 34 : honor.kind === 'EVP' ? 18 : honor.kind==='VP'?6:20), 0) + results.reduce((sum, result) => sum + Math.max(0, result.rankingDelta), 0)*.7 + state.fame * .35;
-  const historicalCalibration:Record<string,number>={ZywOo:42,donk:39,m0NESY:36,ropz:32,NiKo:29,sh1ro:27,flameZ:22,frozen:21,Spinx:20,broky:18,device:17,Jimpphat:16,xertioN:15,KSCERATO:14,molodoy:13};
+  const roleScorePenalty=state.role==='igl'||state.role==='support'?55:state.role==='awper'?-18:0;
+  const cnExposurePenalty=isCnTeam(state)&&state.internationalAdaptation<55?35:isCnTeam(state)?15:0;
+  const mvpBonus=mvpCount*65;
+  const evpBonus=evpCount*28;
+  const hardwarePenalty=hasHardwareBase?0:-80;
+  const playerScore = weightedRating * 340 + contextScore + mvpBonus + evpBonus + playerHonors.reduce((sum, honor) => sum + honorWeight[honor.honorClass] * (honor.kind === '冠军' ? 18 : 3), 0) + results.reduce((sum, result) => sum + Math.max(0, result.rankingDelta), 0)*.6 + state.fame * .28 - roleScorePenalty - cnExposurePenalty + hardwarePenalty;
+  const historicalCalibration:Record<string,number>={ZywOo:62,donk:58,m0NESY:52,ropz:48,NiKo:44,sh1ro:42,flameZ:36,frozen:34,Spinx:32,broky:30,device:28,Jimpphat:26,xertioN:24,KSCERATO:22,molodoy:20};
+  const realPlayerAges:Record<string,number>={ZywOo:24,donk:18,m0NESY:19,ropz:25,NiKo:27,sh1ro:23,flameZ:25,frozen:24,Spinx:22,broky:24,device:28,Jimpphat:18,xertioN:21,KSCERATO:25,molodoy:20};
+  const realPlayerDecay=(nick:string)=>{
+    const startAge=realPlayerAges[nick]??23;
+    const currentAge=startAge+state.careerYear;
+    if(currentAge<=25)return 0;
+    if(currentAge<=27)return -10;
+    if(currentAge<=29)return -25;
+    if(currentAge<=31)return -45;
+    return -80;
+  };
+  const fictionalPlayerNames=['Akira','Blaze','Cipher','Drake','Echo','Falcon','Ghost','Hunter','Inferno','Jolt','Kilo','Lynx','Matrix','Nexus','Omega','Phoenix','Quantum','Raven','Storm','Titan','Vortex','Wolf','Xeno','Zenith'];
+  const generateFictionalPlayers=(careerYear:number)=>{
+    const count=Math.min(15,Math.floor(careerYear*1.5));
+    return Array.from({length:count},(_, i)=>{
+      const seed=hash(`fictional:${i}:${careerYear}`);
+      const rng=makeRng(seed);
+      const nick=fictionalPlayerNames[i%fictionalPlayerNames.length]+(i>=fictionalPlayerNames.length?Math.floor(i/fictionalPlayerNames.length):'');
+      const baseScore=300+rng()*250;
+      const age=18+Math.floor(rng()*8);
+      const ageBonus=age===21?30:age<=23?15:age<=25?5:0;
+      return {playerId:`fictional-${i}`,nick,team:'Generated Team',score:baseScore+ageBonus,isPlayer:false};
+    });
+  };
   const competitors = CAREER_TEAMS.flatMap(team => team.roster.map(player => {
-    const roleModifier = player.role === 'awper' || player.role === 'entry' ? 7 : player.role === 'igl' ? -3 : 1;
-    const score = team.strength * 6.1 + roleModifier + (historicalCalibration[player.nick]??0) + seeded(state, `top20:${calendarYear}:${player.id}`)() * 90;
+    const roleModifier = player.role === 'awper' ? 15 : player.role === 'entry' ? 10 : player.role === 'igl' ? -12 : player.role==='support'?-8:4;
+    const agingPenalty=realPlayerDecay(player.nick);
+    const score = team.strength * 7.8 + roleModifier + (historicalCalibration[player.nick]??0) + seeded(state, `top20:${calendarYear}:${player.id}`)() * 80 + agingPenalty;
     return { playerId: player.id, nick: player.nick, team: team.name, score, isPlayer: false };
   })).sort((a, b) => b.score - a.score || a.playerId.localeCompare(b.playerId));
+  const fictionalPlayers=generateFictionalPlayers(state.careerYear);
+  const allCompetitors=[...competitors,...fictionalPlayers];
   const candidate = { playerId: `career-player-${state.seed}`, nick: state.name, team: state.team, score: playerScore, isPlayer: true };
-  let pool = eligible ? [...competitors, candidate] : competitors;
+  let pool = eligible&&nominated ? [...allCompetitors, candidate] : allCompetitors;
   pool.sort((a, b) => b.score - a.score || a.playerId.localeCompare(b.playerId));
-  if (eligible && !highLevelSuccess) {
+  if (eligible&&nominated&&!highLevelSuccess) {
     const index = pool.findIndex(item => item.isPlayer);
     if (index >= 0 && index < 14) { const [player] = pool.splice(index, 1); pool.splice(14, 0, player); }
   }
+  if(eligible&&nominated&&!hasHardwareBase){
+    const index=pool.findIndex(item=>item.isPlayer);
+    if(index>=0&&index<16){const [player]=pool.splice(index,1);pool.splice(Math.min(20,pool.length),0,player);}
+  }
   const entries = pool.slice(0, 20).map((entry, index) => ({ ...entry, rank: index + 1, score: Math.round(entry.score) }));
-  const playerRank = entries.find(entry => entry.isPlayer)?.rank;
+  let playerRank = entries.find(entry => entry.isPlayer)?.rank;
+  const top1Qualified=playerRank===1&&weightedRating>=1.30&&mvpCount>=3&&results.filter(result=>result.placement==='冠军'&&isLargeOrHigher(result.honorClass)).length>=2;
+  if(playerRank===1&&(!top1Qualified||seeded(state,`top1-gate:${calendarYear}`)()>=.0009)){
+    const index=entries.findIndex(entry=>entry.isPlayer);
+    if(index>=0){const [player]=entries.splice(index,1);entries.splice(Math.min(1,entries.length),0,player);entries.forEach((entry,index)=>entry.rank=index+1);playerRank=2;}
+  }
   const review=playerRank?top20ReviewFor(state,calendarYear,playerRank,results,playerHonors,entries):undefined;
-  const generatedQuote=playerRank&&seeded(state,`top20-quote:${calendarYear}`)()<.35?`“我只想在最重要的比赛里保持清醒，排名是那些回合结束后的结果。”——游戏生成采访` : undefined;
-  return { calendarYear, careerYear: state.careerYear, eligible, playerRank, entries, review, generatedQuote };
+  const generatedQuote=playerRank&&seeded(state,`top20-quote:${calendarYear}`)()<.35?`"我只想在最重要的比赛里保持清醒，排名是那些回合结束后的结果。"——游戏生成采访` : undefined;
+  return { calendarYear, careerYear: state.careerYear, eligible, playerRank, entries, review, generatedQuote, t1Maps, nominationChance:Number((nominationChance*100).toFixed(2)) };
 };
 
 const applyOriginVariance = (base: number, seed: number, key: string) => {
@@ -420,7 +683,7 @@ const applyOriginVariance = (base: number, seed: number, key: string) => {
   return clamp(base + Math.round((variance - 0.5) * 16));
 };
 const initialSalaryFor=(rank:number,ability:number,fame:number)=>{const [min,max]=rank<=5?[18,78]:rank<=12?[8,25]:rank<=20?[4,10]:rank<=40?[1.5,5]:rank<=80?[.8,3]:[.5,1.5];const factor=Math.min(1,Math.max(0,(ability-45)/55*.8+fame/100*.2));return Number((min+(max-min)*factor).toFixed(1));};
-export const createCareer = (input: { seed: string; name: string; pace: Pace; originId: OriginId; role: Role }): CareerState => {
+export const createCareer = (input: { seed: string; name: string; pace: Pace; originId: OriginId; role: Role; iglArchetype?: IglArchetype }): CareerState => {
   const origin = ORIGINS.find(item => item.id === input.originId) ?? ORIGINS[0];
   const name = input.name.trim().slice(0, 16) || '无名新人';
   const seed = hash(input.seed.trim() || `${name}:${input.pace}:${origin.id}:${input.role}:${CAREER_RULES_VERSION}:${CAREER_DATA_VERSION}`);
@@ -431,7 +694,7 @@ export const createCareer = (input: { seed: string; name: string; pace: Pace; or
   const team = initialTeamFor(origin.id);
   return {
     version: CAREER_VERSION, rulesVersion: CAREER_RULES_VERSION, dataVersion: CAREER_DATA_VERSION, seed, pace: input.pace, name, origin, role: input.role, defensiveSite:input.role==='entry'?'a':input.role==='support'?'b':'rotator', positionFamiliarity:68,
-    age: 16, careerYear: 1, half: 'first', season: 1, teamId: team.id, team: team.name, region: team.region, roster: rosterWithPlayer(team, name, input.role), coreMemberIds:team.roster.slice(0,3).map(player=>player.id), tier: team.baseRank > 80 ? '三线赛场' : team.baseRank <= 12 ? '一线赛场' : team.baseRank <= 20 ? '1.5 线赛场' : '二线赛场', globalRank: team.baseRank, regionRank: regionRankFor(team.baseRank, team.region), rankingPoints: Math.max(120,Math.round(1800-team.baseRank*15)), vrsActive:true, rebuildPoints:0, lastTransferFee:0, teamForm:Math.round(Math.max(55,75-team.baseRank*.15)), rosterStability:72, negativeUpsetStreak:0, internationalAdaptation:origin.id==='overseas'?68:origin.id==='academy'?35:origin.id==='south'?30:25, cncsRevival:false, ability, connections, integrity, fame, health: 82, salary:initialSalaryFor(team.baseRank,ability,fame), status: 'active', phase: 'ready', pendingEmergencies: [], resolvedEmergencies: [], honors: [], top20History: [],
+    age: 16, careerYear: 1, half: 'first', season: 1, teamId: team.id, team: team.name, region: team.region, roster: rosterWithPlayer(team, name, input.role), coreMemberIds:team.roster.slice(0,3).map(player=>player.id), tier: team.baseRank > 80 ? '三线赛场' : team.baseRank <= 12 ? '一线赛场' : team.baseRank <= 20 ? '1.5 线赛场' : '二线赛场', globalRank: team.baseRank, regionRank: regionRankFor(team.baseRank, team.region), rankingPoints: Math.max(120,Math.round(1800-team.baseRank*15)), vrsActive:true, rebuildPoints:0, lastTransferFee:0, teamForm:Math.round(Math.max(55,75-team.baseRank*.15)), rosterStability:72, negativeUpsetStreak:0, internationalAdaptation:origin.id==='overseas'?68:origin.id==='academy'?35:origin.id==='south'?30:25, cncsRevival:false, ability, connections, integrity, fame, health: 82, salary:initialSalaryFor(team.baseRank,ability,fame), rolePreparation: 'none', roleChangeCooldown: 0, roleChangeCount: 0, iglArchetype:input.role==='igl'?(input.iglArchetype&&input.iglArchetype!=='dynasty'?input.iglArchetype:'brain'):undefined, bootcampCount: 0, highPressureChokingRisk: 20, hiddenFlags:{}, pendingConsequences:[], employmentStatus:'signed', noOfferWindows:0, status: 'active', phase: 'ready', pendingEmergencies: [], resolvedEmergencies: [], honors: [], top20History: [],
     stats: { matches: 0, rating: 1.01, kd: 1.02, adr: 72, trophies: 0, mvps: 0, earnings: 0, salaryIncome:0, prizeIncome:0, signingIncome:0 }, history: [], log: [`16 岁 / 生涯第 1 年上半年 / 加入 ${team.name}`, DATA_SNAPSHOT_NOTE],
   };
 };
@@ -478,72 +741,135 @@ const finishSeason = (state: CareerState): CareerState => {
   const cncsRevival=state.cncsRevival||(revivalEligible&&seeded(state,'cncs-revival')()<.005);
   const revivalBoost=cncsRevival&&!state.cncsRevival?18:0;
   const crisisLog=cncsRevival&&!state.cncsRevival?'CNCS 复兴线启动：中国战队获得持续国际邀请与赞助':negativeUpsetStreak>=3?'连续爆冷触发换人或解散风险':negativeUpsetStreak>=2?'连续爆冷引发队内危机':'';
-  const interim: CareerState = { ...state, age: nextAge, tier, globalRank:Math.max(1,globalRank-revivalBoost), regionRank, rankingPoints:rankingPoints+revivalBoost*10, vrsActive, rebuildPoints, teamForm:clamp(teamForm+revivalBoost),rosterStability:clamp(rosterStability+(cncsRevival?6:0)),negativeUpsetStreak,cncsRevival, ability, fame:clamp(fame+(cncsRevival?5:0)), health, phase: 'report', decision: undefined, pendingEmergencies: [], stats: { matches: state.stats.matches + matches, rating, kd, adr, trophies, mvps, earnings, salaryIncome:state.stats.salaryIncome+salaryPaid, prizeIncome:state.stats.prizeIncome+playerPrize, signingIncome:state.stats.signingIncome }, honors: [...state.honors, ...honors] };
+  const dynastyEvolution=dynastyEvolutionFor(state,tournaments);
+  const dynastyLog=dynastyEvolution?'隐藏进化：顶级阵容完成长期磨合，你成为王朝指挥':'';
+  const t1Matches=tournaments.filter(result=>result.tier==='T1'||result.tier==='Major').reduce((sum,result)=>sum+result.matches,0);
+  const growthRoll=seeded(state,'t1-growth')();
+  const growthChance=Math.min(0.35,t1Matches*0.008);
+  const hasGrowth=t1Matches>=5&&nextAge<=25&&growthRoll<growthChance;
+  const growthAmount=hasGrowth?(seeded(state,'t1-growth-amount')()*3+2):0;
+  const peakBonus=peakAgeBonus(nextAge);
+  const totalAbilityChange=peakBonus+growthAmount;
+  const growthLog=hasGrowth?`T1赛事磨练：能力 +${Math.round(growthAmount)}`:peakBonus>0?`工夫到家：能力 +${peakBonus}`:'';
+  const finalAbility=clamp(ability+totalAbilityChange);
+  const interim: CareerState = { ...state, age: nextAge, tier, globalRank:Math.max(1,globalRank-revivalBoost), regionRank, rankingPoints:rankingPoints+revivalBoost*10, vrsActive, rebuildPoints, teamForm:clamp(teamForm+revivalBoost),rosterStability:clamp(rosterStability+(cncsRevival?6:0)),negativeUpsetStreak,cncsRevival, iglArchetype:dynastyEvolution?'dynasty':state.iglArchetype, ability:finalAbility, fame:clamp(fame+(cncsRevival?5:0)), health, roleChangeCooldown: Math.max(0, state.roleChangeCooldown - 1), phase: 'report', decision: undefined, pendingEmergencies: [], stats: { matches: state.stats.matches + matches, rating, kd, adr, trophies, mvps, earnings, salaryIncome:state.stats.salaryIncome+salaryPaid, prizeIncome:state.stats.prizeIncome+playerPrize, signingIncome:state.stats.signingIncome }, honors: [...state.honors, ...honors] };
   const record: SeasonRecord = {
     season: state.season, careerYear: state.careerYear, half: state.half, age: nextAge, team: state.team, tier, rating, kd, adr, matches, winRate,
     placement: best ? `${best.name} · ${best.placement}` : '未获赛事资格', teamPrize, playerPrize, salaryPaid, note: state.resolvedEmergencies.length ? `经历 ${state.resolvedEmergencies.length} 次随机事件` : '赛季平稳结束', deltas: difference(before, snapshot(interim)),
     tournaments, globalRank, regionRank, rankingDelta, honors,
   };
-  const forcedRetirement = (nextAge >= 29 && ability < 35) || state.integrity < 12 || health < 8;
+  const market=marketEvaluation(interim,rating,honors);
+  const marketRank=market.downgrade==='t2'?Math.max(21,globalRank):market.downgrade==='t3'?Math.max(61,globalRank):globalRank;
+  const marketTier=market.downgrade==='t2'?'二线赛场':market.downgrade==='t3'?'三线赛场':tier;
+  const forcedRetirement = (nextAge >= 29 && ability < 35) || state.integrity < 12 || health < 8 || market.noOfferWindows>=2;
   const completedHistory = [...state.history, record];
-  const completed: CareerState = { ...interim, status: forcedRetirement ? 'retired' : 'active', phase: forcedRetirement ? 'retired' : 'report', history: completedHistory, resolvedEmergencies: [], seasonProgress:undefined, lastEventResult:undefined, seasonBaseline: undefined, eventResume: undefined, postReportEvent: forcedRetirement ? undefined : state.postReportEvent, log: [crisisLog,`生涯第 ${state.careerYear} 年${state.half === 'first' ? '上半年' : '下半年'} / 全球第 ${globalRank} / ${record.placement}`, ...state.log].filter(Boolean) };
+  const completed: CareerState = { ...interim, globalRank:marketRank,regionRank:regionRankFor(Math.min(100,marketRank),state.region),tier:marketTier,employmentStatus:market.employmentStatus,noOfferWindows:market.noOfferWindows,status: forcedRetirement ? 'retired' : 'active', phase: forcedRetirement ? 'retired' : 'report', history: completedHistory, resolvedEmergencies: [], seasonProgress:undefined, lastEventResult:undefined, seasonBaseline: undefined, eventResume: undefined, postReportEvent: forcedRetirement ? undefined : state.postReportEvent, log: [market.log,dynastyLog,crisisLog,growthLog,`生涯第 ${state.careerYear} 年${state.half === 'first' ? '上半年' : '下半年'} / 全球第 ${globalRank} / ${record.placement}`, ...state.log].filter(Boolean) };
   if (forcedRetirement && state.half === 'second' && !completed.top20History.some(item => item.careerYear === state.careerYear)) return { ...completed, top20History: [...completed.top20History, generateAnnualTop20(completed, completedHistory.filter(item => item.careerYear === state.careerYear))] };
   return completed;
 };
 
 const enterSeason = (state: CareerState): CareerState => ({ ...state, phase:'season', decision:undefined, pendingEmergencies:[], eventResume:undefined });
+const applyDueConsequences=(state:CareerState)=>{
+  const due=state.pendingConsequences.filter(item=>item.dueSeason<=state.season);
+  if(!due.length)return state;
+  const applied=due.reduce((current,item)=>applyChanges(current,item.changes),state);
+  return {...applied,pendingConsequences:state.pendingConsequences.filter(item=>item.dueSeason>state.season),log:[...due.map(item=>`延迟后果 / ${item.revealText}`),...applied.log]};
+};
 export const startSeason = (state: CareerState): CareerState => {
   if (state.status !== 'active' || state.phase !== 'ready') return state;
-  const baseline = snapshot(state);
+  const consequenceState=applyDueConsequences(state);
+  const baseline = snapshot(consequenceState);
   const rng=seeded(state,'season-report');
-  const nextAge=state.half==='second'?state.age+1:state.age;
-  const prepared={...state,ability:clamp(state.ability+Math.round(rng()*4)-1-(state.half==='second'?ageDecline(state.age,nextAge):0)),health:clamp(state.health-Math.round(rng()*5)),positionFamiliarity:clamp(state.positionFamiliarity+2),seasonBaseline:baseline,resolvedEmergencies:[],lastEventResult:undefined};
+  const nextAge=consequenceState.half==='second'?consequenceState.age+1:consequenceState.age;
+  const prepared={...consequenceState,ability:clamp(consequenceState.ability+Math.round(rng()*4)-1-(consequenceState.half==='second'?ageDecline(consequenceState.age,nextAge):0)),health:clamp(consequenceState.health-Math.round(rng()*5)),positionFamiliarity:clamp(consequenceState.positionFamiliarity+2),seasonBaseline:baseline,resolvedEmergencies:[],lastEventResult:undefined};
   const calendar=tournamentCalendarFor(prepared);
   const salaryPerTournament=Number((state.salary*6/Math.max(1,calendar.length)).toFixed(2));
-  const withProgress:CareerState={...prepared,seasonProgress:{tournamentIds:calendar.map(item=>item.id),nextIndex:0,results:[],salaryPerTournament,awaitingContinue:false}};
+  const withProgress:CareerState={...prepared,seasonProgress:{tournamentIds:calendar.map(item=>item.id),nextIndex:0,results:[],salaryPerTournament}};
   const events=emergenciesFor(withProgress);
   if(!events.length)return enterSeason(withProgress);
   return {...withProgress,phase:'emergency',decision:events[0],pendingEmergencies:events.slice(1),eventResume:'start-season'};
 };
 
 export const advanceTournament = (state:CareerState):CareerState => {
-  if(state.phase!=='season'||!state.seasonProgress||state.seasonProgress.awaitingContinue)return state;
+  if(state.phase!=='season'||!state.seasonProgress)return state;
   const progress=state.seasonProgress;
   const tournamentId=progress.tournamentIds[progress.nextIndex];
   if(!tournamentId)return finishSeason(state);
   const tournament=TOURNAMENTS.find(item=>item.id===tournamentId);
   if(!tournament)return finishSeason(state);
   const result=simulateTournament(state,tournament,progress.salaryPerTournament);
-  const nextProgress={...progress,nextIndex:progress.nextIndex+1,results:[...progress.results,result],awaitingContinue:true};
-  return {...state,seasonProgress:nextProgress,lastEventResult:undefined};
+  const nextProgress={...progress,nextIndex:progress.nextIndex+1,results:[...progress.results,result]};
+  const updatedState:CareerState={...state,seasonProgress:nextProgress,lastEventResult:undefined};
+  if(result.hasCriticalEvent&&result.criticalEventId){
+    const criticalPool=eligibleCatalogEvents(updatedState,'field','in-season').filter(event=>event.category==='赛事内关键局');
+    const template=criticalPool[Math.floor(seeded(updatedState,`${result.criticalEventId}:pick`)()*criticalPool.length)];
+    const criticalEvent=template?instantiate(template,`${result.criticalEventId}-${template.catalogId}`):undefined;
+    if(criticalEvent)return {...updatedState,phase:'emergency',seasonProgress:{...nextProgress,pendingEvent:criticalEvent},decision:criticalEvent,pendingEmergencies:[],eventResume:'continue-season'};
+  }
+  const postEvent=tournamentEventFor(updatedState,result,progress.results.length);
+  if(postEvent)return {...updatedState,phase:'emergency',seasonProgress:{...nextProgress,pendingEvent:postEvent},decision:postEvent,pendingEmergencies:[],eventResume:'continue-season'};
+  if(nextProgress.nextIndex>=nextProgress.tournamentIds.length)return finishSeason(updatedState);
+  return updatedState;
 };
 
 export const continueTournament = (state:CareerState):CareerState => {
-  if(state.phase!=='season'||!state.seasonProgress?.awaitingContinue)return state;
-  const progress={...state.seasonProgress,awaitingContinue:false};
-  const latest=progress.results.at(-1);
-  if(latest){
-    const event=tournamentEventFor(state,latest,progress.results.length-1);
-    if(event)return {...state,phase:'emergency',seasonProgress:{...progress,pendingEvent:event},decision:event,pendingEmergencies:[],eventResume:'continue-season'};
-  }
-  if(progress.nextIndex>=progress.tournamentIds.length)return finishSeason({...state,seasonProgress:progress});
-  return {...state,seasonProgress:progress};
+  return state;
 };
 
-const applyOptionOutcome = (state: CareerState, decision: Decision, option: DecisionOption) => {
-  let resolved = applyChanges(state, option.changes);
-  if (!option.outcomes?.length) return { state: resolved, outcomeLabel: '' };
-  const roll = seeded(state, `outcome:${decision.id}:${option.id}`)() * 100;
-  let cumulative = 0;
-  const outcome = option.outcomes.find(item => { cumulative += item.probability; return roll < cumulative; }) ?? option.outcomes.at(-1)!;
-  resolved = applyChanges(resolved, outcome.changes);
-  return { state: resolved, outcomeLabel: outcome.label };
+const outcomesFor=(option:DecisionOption)=>option.outcomes?.length&&option.outcomes.length>=2?option.outcomes:fallbackOutcomes(option);
+export const previewDecisionOutcome=(state:CareerState,decision:Decision,optionId:string):OutcomePreview|null=>{
+  const option=decision.options.find(item=>item.id===optionId);
+  if(!option)return null;
+  const outcomes=outcomesFor(option);
+  const total=outcomes.reduce((sum,outcome)=>sum+outcome.probability,0);
+  const roll=seeded(state,`outcome:${decision.id}:${option.id}`)()*total;
+  let cumulative=0;
+  const outcome=outcomes.find(item=>{cumulative+=item.probability;return roll<cumulative;})??outcomes.at(-1)!;
+  return {optionId,outcomeId:outcome.id??`${decision.id}-${option.id}-${outcomes.indexOf(outcome)}`,outcomeLabel:outcome.label,probability:Number((outcome.probability/total*100).toFixed(1)),changes:outcome.changes,resultPatch:outcome.resultPatch,delayedRisk:outcome.delayed?.riskHint};
+};
+const scheduleDelayedOutcome=(state:CareerState,decision:Decision,option:DecisionOption,preview:OutcomePreview)=>{
+  const outcome=outcomesFor(option).find(item=>(item.id??`${decision.id}-${option.id}-${outcomesFor(option).indexOf(item)}`)===preview.outcomeId);
+  if(!outcome?.delayed)return state;
+  const delaySpan=Math.max(0,outcome.delayed.maxSeasons-outcome.delayed.minSeasons);
+  const dueSeason=state.season+outcome.delayed.minSeasons+Math.floor(seeded(state,`delay:${decision.id}:${option.id}:${preview.outcomeId}`)()*(delaySpan+1));
+  const consequence:PendingConsequence={id:`${decision.id}:${option.id}:${preview.outcomeId}`,sourceDecisionId:decision.id,dueSeason,tag:outcome.delayed.tag,changes:outcome.delayed.changes,revealText:outcome.delayed.revealText};
+  return {...state,hiddenFlags:{...state.hiddenFlags,[outcome.delayed.tag]:(state.hiddenFlags[outcome.delayed.tag]??0)+1},pendingConsequences:[...state.pendingConsequences,consequence]};
+};
+const applyOptionOutcome=(state:CareerState,decision:Decision,option:DecisionOption,preview?:OutcomePreview)=>{
+  const canonical=previewDecisionOutcome(state,decision,option.id);
+  if(!canonical||preview&&preview.outcomeId!==canonical.outcomeId)return {state,outcomeLabel:'结果校验失败，未提交选择。',preview:null};
+  let resolved=applyChanges(state,option.changes);
+  resolved=applyChanges(resolved,canonical.changes);
+  resolved=scheduleDelayedOutcome(resolved,decision,option,canonical);
+  return {state:resolved,outcomeLabel:canonical.outcomeLabel,preview:canonical};
+};
+const placementScale=['首轮出局','小组赛出局','八强','四强','亚军','冠军'];
+const updateCriticalMatchResult=(state:CareerState,decision:Decision,preview:OutcomePreview|null):CareerState=>{
+  if(decision.category!=='赛事内关键局'||!preview?.resultPatch||!state.seasonProgress)return state;
+  const latest=state.seasonProgress.results.at(-1);
+  if(!latest)return state;
+  const currentIndex=placementScale.indexOf(latest.placement);
+  const placement=preview.resultPatch.placement??placementScale[Math.max(0,Math.min(placementScale.length-1,currentIndex+(preview.resultPatch.placementDelta??0)))];
+  const matches=placement==='冠军'?7:placement==='亚军'?6:placement==='四强'?5:placement==='八强'?4:3;
+  const wins=placement==='冠军'?matches:placement==='亚军'||placement==='四强'?matches-1:placement==='八强'?matches-2:Math.max(0,matches-2);
+  const prizeBase=honorWeight[latest.honorClass]*30;
+  const teamPrize=Math.round(prizeBase*(placement==='冠军'?2.2:placement==='亚军'?1.4:placement==='四强'?.8:placement==='八强'?.4:.1));
+  const playerPrize=Number((teamPrize*.136).toFixed(1));
+  const rating=Number(Math.max(.55,latest.rating+(preview.resultPatch.ratingDelta??0)).toFixed(2));
+  const rankingDelta=latest.tier==='unranked'?0:Math.round((wins/matches-.45)*honorWeight[latest.honorClass]*24)+(latest.upset?.rankingImpact??0);
+  const maps=Math.max(matches,Math.round(latest.maps*matches/Math.max(1,latest.matches)));
+  const mapWins=Math.max(wins,Math.round(maps*wins/Math.max(1,matches)));
+  const tournament=TOURNAMENTS.find(item=>item.id===latest.tournamentId);
+  const context=tournament?contextRatingsFor(state,tournament,rating):latest.context;
+  const updatedResult={...latest,placement,matches,wins,maps,mapWins,teamPrize,playerPrize,rating,rankingDelta,context};
+  return {...state,seasonProgress:{...state.seasonProgress,results:[...state.seasonProgress.results.slice(0,-1),updatedResult]}};
 };
 const enterChoiceAfterReport = (state: CareerState): CareerState => {
   const choiceKind: ChoiceKind = state.pace === 'fast' ? 'annual' : 'offseason';
   return { ...state, phase: 'choice', choiceKind, decision: choiceFor(state, choiceKind), postReportEvent: undefined, eventResume: undefined };
 };
 const advanceAfterReport = (state: CareerState): CareerState => {
+  if(state.employmentStatus==='free-agent')return enterChoiceAfterReport(state);
   if (state.pace === 'fast' && state.half === 'first') return { ...state, half: 'second', season: state.season + 1, phase: 'ready', decision: undefined, postReportEvent: undefined, eventResume: undefined };
   if (state.half === 'second' && !state.top20History.some(item => item.careerYear === state.careerYear)) {
     const yearRecords = state.history.filter(record => record.careerYear === state.careerYear);
@@ -553,21 +879,26 @@ const advanceAfterReport = (state: CareerState): CareerState => {
   return enterChoiceAfterReport(state);
 };
 
-export const resolveEmergency = (state: CareerState, optionId: string): CareerState => {
+export const resolveEmergency = (state: CareerState, optionId: string, preview?:OutcomePreview): CareerState => {
   if (state.phase !== 'emergency' || !state.decision) return state;
   const decision = state.decision;
   const option = decision.options.find(item => item.id === optionId);
   if (!option) return state;
-  const result = applyOptionOutcome(state, decision, option);
+  const canonical=previewDecisionOutcome(state,decision,optionId);
+  if(preview&&canonical?.outcomeId!==preview.outcomeId)return state;
+  const result = applyOptionOutcome(state, decision, option, preview);
   const resultText=result.outcomeLabel||option.result||`${option.label}的决定已经执行。`;
-  const resolved = { ...result.state, lastEventResult:resultText, log: [`${decision.title} / ${resultText}`, ...result.state.log] };
+  let resolved: CareerState = { ...result.state, lastEventResult:resultText, log: [`${decision.title} / ${resultText}`, ...result.state.log] };
+  resolved=updateCriticalMatchResult(resolved,decision,result.preview);
   const resolvedEmergencies = [...state.resolvedEmergencies, decision.title];
   if (state.pendingEmergencies.length) return { ...resolved, decision: state.pendingEmergencies[0], pendingEmergencies: state.pendingEmergencies.slice(1), resolvedEmergencies };
   if (state.eventResume === 'continue-report') return advanceAfterReport({ ...resolved, phase: 'report', decision: undefined, pendingEmergencies: [], resolvedEmergencies, eventResume: undefined });
   if(state.eventResume==='start-season')return enterSeason({...resolved,decision:undefined,pendingEmergencies:[],resolvedEmergencies});
   if(state.eventResume==='continue-season'){
     const progress=resolved.seasonProgress?{...resolved.seasonProgress,pendingEvent:undefined}:undefined;
-    return {...resolved,phase:'season' as const,decision:undefined,pendingEmergencies:[],resolvedEmergencies,eventResume:undefined,seasonProgress:progress};
+    const resumed:CareerState={...resolved,phase:'season',decision:undefined,pendingEmergencies:[],resolvedEmergencies,eventResume:undefined,seasonProgress:progress};
+    if(progress&&progress.nextIndex>=progress.tournamentIds.length)return finishSeason(resumed);
+    return resumed;
   }
   return resolved;
 };
@@ -583,19 +914,23 @@ export const continueFromAwards = (state: CareerState): CareerState => {
   return enterChoiceAfterReport(state);
 };
 
-export const resolveCareerChoice = (state: CareerState, optionId: string): CareerState => {
+export const resolveCareerChoice = (state: CareerState, optionId: string, preview?:OutcomePreview): CareerState => {
   if (state.phase !== 'choice' || !state.decision) return state;
   const option = state.decision.options.find(item => item.id === optionId);
   if (!option) return state;
-  const changed = applyChanges(state, option.changes);
+  const canonical=previewDecisionOutcome(state,state.decision,optionId);
+  if(preview&&canonical?.outcomeId!==preview.outcomeId)return state;
+  const outcomeResult=applyOptionOutcome(state,state.decision,option,preview);
+  const changed=outcomeResult.state;
   const recoveryIds=['train','recover','full-rest','extra-practice','annual-rest','annual-train','stay','team-role','annual-stay'];
   const changedWithForm=recoveryIds.includes(option.id)?{...changed,teamForm:clamp(changed.teamForm+(option.id.includes('rest')||option.id==='recover'?12:7)),rosterStability:clamp(changed.rosterStability+(option.id.includes('stay')||option.id==='team-role'?10:4))}:changed;
   const marketSalary = monthlySalaryFor(changedWithForm);
   const salary = option.id === 'keep-core' ? Number(Math.max(.5, marketSalary * .82).toFixed(1)) : marketSalary;
   const nextIsFirst = state.half === 'second';
+  const marketRetirement=changedWithForm.employmentStatus==='free-agent'&&changedWithForm.noOfferWindows>=2;
   return {
-    ...changedWithForm, salary, phase: 'ready', decision: undefined, choiceKind: undefined, season: state.season + 1, half: nextIsFirst ? 'first' : 'second', careerYear: nextIsFirst ? state.careerYear + 1 : state.careerYear,
-    log: [`${state.decision.kind === 'annual' ? '年度选择' : '休赛期'} / ${option.label}`, ...state.log],
+    ...changedWithForm, salary, status:marketRetirement?'retired':'active',phase:marketRetirement?'retired':'ready', decision: undefined, choiceKind: undefined, season: state.season + 1, half: nextIsFirst ? 'first' : 'second', careerYear: nextIsFirst ? state.careerYear + 1 : state.careerYear,
+    lastEventResult:outcomeResult.outcomeLabel, log: [marketRetirement?'连续两个转会窗口无人报价，被迫结束职业生涯':'',`${state.decision.kind === 'annual' ? '年度选择' : '休赛期'} / ${option.label} / ${outcomeResult.outcomeLabel}`, ...changedWithForm.log].filter(Boolean),
   };
 };
 
@@ -607,6 +942,30 @@ export const retireCareer = (state: CareerState): CareerState => {
     top20History = [...top20History, generateAnnualTop20(state, yearRecords)];
   }
   return { ...state, top20History, status: 'retired', phase: 'retired', postReportEvent: undefined, log: [`${state.age} 岁 / 主动宣布退役`, ...state.log] };
+};
+
+export interface CareerScore { score:number; tier:'传奇'|'名人堂'|'世界级'|'一线'|'职业级'|'求生'; next:string; }
+export const getCurrentCareerScore=(state:CareerState):CareerScore=>{
+  const results=state.history.flatMap(record=>record.tournaments);
+  const majorWins=results.filter(result=>result.tier==='Major'&&result.placement==='冠军').length;
+  const eliteWins=results.filter(result=>isLargeOrHigher(result.honorClass)&&result.placement==='冠军').reduce((sum,result)=>sum+honorWeight[result.honorClass],0);
+  const championship=Math.min(40,majorWins*18+eliteWins*2.2);
+  const mvps=state.honors.filter(honor=>honor.kind==='MVP').reduce((sum,honor)=>sum+honorWeight[honor.honorClass],0);
+  const evps=state.honors.filter(honor=>honor.kind==='EVP').reduce((sum,honor)=>sum+honorWeight[honor.honorClass],0);
+  const bestTop=state.top20History.reduce((best,item)=>Math.min(best,item.playerRank??99),99);
+  const honorScore=Math.min(30,mvps*2.5+evps+ (bestTop===1?15:bestTop<=5?11:bestTop<=10?8:bestTop<=20?5:0));
+  const t1=results.filter(result=>result.tier==='T1'||result.tier==='Major');
+  const maps=t1.reduce((sum,result)=>sum+result.maps,0);
+  const rating=t1.reduce((sum,result)=>sum+result.rating*result.maps,0)/Math.max(1,maps);
+  const roleBaseline=state.role==='igl'?(state.iglArchetype==='brain'?.85:state.iglArchetype==='fragging'?.96:state.iglArchetype==='awp-caller'?1.10:1.00):state.role==='support'?.96:state.role==='awper'?1.10:1.05;
+  const dataScore=Math.min(20,Math.max(0,(rating-roleBaseline)*50)+Math.min(8,maps/20));
+  const longevity=Math.min(5,state.history.length/4);
+  const reputation=Math.min(5,state.integrity/40+state.fame/40);
+  let score=Math.round(championship+honorScore+dataScore+longevity+reputation);
+  if(majorWins===0&&bestTop>20)score=Math.min(72,score);
+  const tier:CareerScore['tier']=score>=92?'传奇':score>=82?'名人堂':score>=70?'世界级':score>=55?'一线':score>=35?'职业级':'求生';
+  const next=majorWins===0?'Major冠军':bestTop>20?'年度TOP20':mvps===0?'大型赛事MVP':score<92?'更厚的高级赛事荣誉':'守住传奇地位';
+  return {score,tier,next};
 };
 
 export const careerTitle = (state: CareerState) => {
@@ -656,13 +1015,21 @@ export const emergencyProgress = (state: CareerState) => {
 
 const validPhases: CareerPhase[] = ['ready','season','emergency','report','awards','choice','retired'];
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+const mapsForLegacyResult=(result:TournamentResult)=>result.maps??Math.max(result.matches,Math.round(result.matches*(result.tier==='Major'?2.7:result.tier==='T1'?2.4:2.1)));
+const migrateCareer=(raw:unknown):unknown=>{
+  if(!raw||typeof raw!=='object')return raw;
+  const value=raw as CareerState&{version:number};
+  if(value.version!==7&&value.version!==8)return raw;
+  const migrateResult=(result:TournamentResult):TournamentResult=>({...result,maps:mapsForLegacyResult(result),mapWins:result.mapWins??Math.max(result.wins,Math.round(mapsForLegacyResult(result)*result.wins/Math.max(1,result.matches)))});
+  return {...value,version:CAREER_VERSION,rulesVersion:CAREER_RULES_VERSION,iglArchetype:value.role==='igl'?(value.iglArchetype??'brain'):undefined,hiddenFlags:value.hiddenFlags??{},pendingConsequences:value.pendingConsequences??[],employmentStatus:value.employmentStatus??'signed',noOfferWindows:value.noOfferWindows??0,seasonProgress:value.seasonProgress?{...value.seasonProgress,results:value.seasonProgress.results.map(migrateResult)}:undefined,history:value.history.map(record=>({...record,tournaments:record.tournaments.map(migrateResult)}))};
+};
 const isValidCareer = (state: unknown): state is CareerState => {
   if (!state || typeof state !== 'object') return false;
   const value = state as Partial<CareerState>;
-  return value.version === CAREER_VERSION && value.rulesVersion === CAREER_RULES_VERSION && value.dataVersion === CAREER_DATA_VERSION && typeof value.name === 'string' && ['a','b','rotator'].includes(value.defensiveSite as string) && isFiniteNumber(value.positionFamiliarity) && typeof value.teamId === 'string' && typeof value.team === 'string' && typeof value.origin === 'object' && typeof value.role === 'string' && (value.status === 'active' || value.status === 'retired') && validPhases.includes(value.phase as CareerPhase) && isFiniteNumber(value.seed) && isFiniteNumber(value.age) && isFiniteNumber(value.careerYear) && isFiniteNumber(value.season) && isFiniteNumber(value.ability) && isFiniteNumber(value.connections) && isFiniteNumber(value.integrity) && isFiniteNumber(value.fame) && isFiniteNumber(value.health) && isFiniteNumber(value.globalRank) && isFiniteNumber(value.regionRank) && typeof value.stats === 'object' && value.stats !== null && isFiniteNumber(value.teamForm) && isFiniteNumber(value.rosterStability) && isFiniteNumber(value.internationalAdaptation) && typeof value.cncsRevival === 'boolean' && typeof value.vrsActive === 'boolean' && Array.isArray(value.roster) && value.roster.length === 5 && Array.isArray(value.history) && Array.isArray(value.honors) && Array.isArray(value.top20History) && Array.isArray(value.pendingEmergencies) && Array.isArray(value.resolvedEmergencies) && Array.isArray(value.log);
+  return value.version === CAREER_VERSION && value.rulesVersion === CAREER_RULES_VERSION && value.dataVersion === CAREER_DATA_VERSION && typeof value.name === 'string' && ['a','b','rotator'].includes(value.defensiveSite as string) && isFiniteNumber(value.positionFamiliarity) && typeof value.teamId === 'string' && typeof value.team === 'string' && typeof value.origin === 'object' && typeof value.role === 'string' && (value.status === 'active' || value.status === 'retired') && validPhases.includes(value.phase as CareerPhase) && isFiniteNumber(value.seed) && isFiniteNumber(value.age) && isFiniteNumber(value.careerYear) && isFiniteNumber(value.season) && isFiniteNumber(value.ability) && isFiniteNumber(value.connections) && isFiniteNumber(value.integrity) && isFiniteNumber(value.fame) && isFiniteNumber(value.health) && isFiniteNumber(value.globalRank) && isFiniteNumber(value.regionRank) && typeof value.stats === 'object' && value.stats !== null && isFiniteNumber(value.teamForm) && isFiniteNumber(value.rosterStability) && isFiniteNumber(value.internationalAdaptation) && typeof value.cncsRevival === 'boolean' && typeof value.vrsActive === 'boolean' && Array.isArray(value.roster) && value.roster.length === 5 && Array.isArray(value.history) && Array.isArray(value.honors) && Array.isArray(value.top20History) && Array.isArray(value.pendingEmergencies) && Array.isArray(value.resolvedEmergencies) && Array.isArray(value.log) && ['none','awper-training','igl-assistant'].includes(value.rolePreparation as string) && isFiniteNumber(value.roleChangeCooldown) && isFiniteNumber(value.roleChangeCount) && isFiniteNumber(value.bootcampCount) && isFiniteNumber(value.highPressureChokingRisk) && typeof value.hiddenFlags==='object' && value.hiddenFlags!==null && Array.isArray(value.pendingConsequences) && (value.employmentStatus==='signed'||value.employmentStatus==='free-agent') && isFiniteNumber(value.noOfferWindows);
 };
 export const loadCareer = (): CareerState | null => {
-  try { const stored = localStorage.getItem(CAREER_SAVE_KEY); if (!stored) return null; const state: unknown = JSON.parse(stored); return isValidCareer(state) ? state : null; } catch { return null; }
+  try { const stored = localStorage.getItem(CAREER_SAVE_KEY); if (!stored) return null; const state=migrateCareer(JSON.parse(stored)); return isValidCareer(state) ? state : null; } catch { return null; }
 };
 export const saveCareer = (state: CareerState) => localStorage.setItem(CAREER_SAVE_KEY, JSON.stringify(state));
 export const clearCareer = () => localStorage.removeItem(CAREER_SAVE_KEY);

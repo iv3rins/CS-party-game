@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ChevronRight, FastForward, Play, RotateCcw, ShieldCheck, Trophy, X, Zap } from 'lucide-react';
-import { advanceTournament, CareerState, CareerTrophy, clearCareer, continueFromAwards, continueFromReport, continueTournament, createCareer, emergencyProgress, getCareerSummary, loadCareer, ORIGINS, OriginId, Pace, Role, resolveCareerChoice, resolveEmergency, retireCareer, saveCareer, seasonLabel, startSeason } from '../../careerEngine';
+import { advanceTournament, CareerState, CareerTrophy, clearCareer, continueFromAwards, continueFromReport, createCareer, Decision, emergencyProgress, getCurrentCareerScore, getCareerSummary, IglArchetype, loadCareer, ORIGINS, OriginId, OutcomePreview, Pace, previewDecisionOutcome, Role, resolveCareerChoice, resolveEmergency, retireCareer, saveCareer, seasonLabel, startSeason, StatChange } from '../../careerEngine';
 import { platform } from '../../platform';
 import { RoleIcon } from '../../shared/icons';
 
@@ -27,8 +27,14 @@ const paceOptions: Array<{ id: Pace; name: string; freq: string; note: string }>
   { id: 'fast', name: '快进', freq: '每年年末选择', note: '没有突发事件，上半年直接进入下半年，年末做一次年度大选择。' },
 ];
 const paceLabels: Record<Pace, string> = { hardcore: '硬核 / 突发事件开启', standard: '普通 / 每休赛期', fast: '快进 / 每年年末' };
+const iglOptions:Array<{id:IglArchetype;name:string;note:string}>=[
+  {id:'brain',name:'大脑指挥',note:'常态0.80-0.88，强化BO3/BO5下限。'},
+  {id:'fragging',name:'枪男指挥',note:'常态0.90-1.00，保留输出但团队增益较小。'},
+  {id:'awp-caller',name:'指挥狙',note:'常态约1.10，状态好时上限高，低迷时拖累明显。'},
+];
 const siteLabels = { a:'主守 A 区', b:'主守 B 区', rotator:'游走补位' } as const;
 const trackLabels = { ability: '能力', connections: '关系', integrity: '清白', fame: '名气' } as const;
+const changeLabels:Partial<Record<keyof StatChange,string>>={ability:'能力',connections:'关系',integrity:'清白',fame:'名气',health:'健康',earnings:'收入',teamForm:'战队状态',rosterStability:'阵容稳定',positionFamiliarity:'位置熟练',internationalAdaptation:'国际适应',highPressureChokingRisk:'高压风险'};
 type WizardStep = 0 | 1 | 2 | 3;
 const wizardTitles: Record<WizardStep, string> = { 0: '选择难度', 1: '填写姓名', 2: '选择出身', 3: '选择定位' };
 const wizardLabels: Record<WizardStep, string> = { 0: '难度', 1: '姓名', 2: '出身', 3: '定位' };
@@ -63,6 +69,7 @@ function Entry({ onStart }: { onStart: (state: CareerState) => void }) {
   const [name, setName] = useState('');
   const [originId, setOriginId] = useState<OriginId>('northeast');
   const [role, setRole] = useState<Role>('entry');
+  const [iglArchetype,setIglArchetype]=useState<IglArchetype>('brain');
   const origin = ORIGINS.find(item => item.id === originId)!;
   const canAdvanceFromName = name.trim().length > 0;
 
@@ -141,7 +148,8 @@ function Entry({ onStart }: { onStart: (state: CareerState) => void }) {
             </button>
           ))}
         </div>
-        <button className="career-primary" onClick={() => onStart(createCareer({ seed: '', name, pace, originId, role }))}>
+        {role==='igl'&&<fieldset><legend>指挥类型</legend><div className="pace-cards">{iglOptions.map(item=><button key={item.id} className={`pace-card ${iglArchetype===item.id?'selected':''}`} onClick={()=>setIglArchetype(item.id)}><span className="pace-name">{item.name}</span><span className="pace-note">{item.note}</span></button>)}</div><p className="panel-copy">王朝指挥无法直接选择。只有顶级阵容在长期争冠中，才有极低概率完成隐藏进化。</p></fieldset>}
+        <button className="career-primary" onClick={() => onStart(createCareer({ seed: '', name, pace, originId, role, iglArchetype }))}>
           建立档案，开始生涯 <ChevronRight />
         </button>
       </div>
@@ -189,25 +197,86 @@ function Delta({ label, value, suffix = '' }: { label: string; value: number; su
 
 function TournamentFlow({ state, setState }:{state:CareerState;setState:(next:CareerState)=>void}){
   const progress=state.seasonProgress!;
-  const [revealing,setRevealing]=useState(progress.awaitingContinue);
+  const [revealing,setRevealing]=useState(false);
   const timer=useRef<number|undefined>(undefined);
   const latest=progress.results.at(-1);
   useEffect(()=>{
-    window.clearTimeout(timer.current);
-    if(progress.awaitingContinue){setRevealing(true);timer.current=window.setTimeout(()=>setRevealing(false),1400);}else setRevealing(false);
+    if(state.phase==='season'&&progress.nextIndex<progress.tournamentIds.length){
+      const autoTimer=window.setTimeout(()=>setState(advanceTournament(state)),800);
+      return()=>window.clearTimeout(autoTimer);
+    }
+  },[state.phase,progress.nextIndex,progress.tournamentIds.length]);
+  useEffect(()=>{
+    if(latest){
+      setRevealing(true);
+      timer.current=window.setTimeout(()=>setRevealing(false),1400);
+    }
     return()=>window.clearTimeout(timer.current);
-  },[progress.awaitingContinue,progress.results.length]);
-  const continueLabel=progress.nextIndex>=progress.tournamentIds.length?'生成赛季报告':'继续下一项赛事';
+  },[progress.results.length]);
   return <article className="tournament-flow-panel">
     <div className="flow-heading"><div><p className="eyebrow">LIVE TOURNAMENT CALENDAR</p><h3>赛季进行中</h3><span>{progress.results.length} / {progress.tournamentIds.length} 项赛事已完成</span></div><strong>{Math.round(progress.results.length/Math.max(1,progress.tournamentIds.length)*100)}<small>%</small></strong></div>
     <div className="flow-progress"><i style={{width:`${progress.results.length/Math.max(1,progress.tournamentIds.length)*100}%`}}/></div>
     {state.lastEventResult&&<div className="event-result-receipt"><b>赛间记录</b><span>{state.lastEventResult}</span></div>}
     <div className="live-tournament-list" aria-live="polite">
-      {progress.results.map((item,index)=><div key={item.id} className={`live-tournament-row ${index===progress.results.length-1&&progress.awaitingContinue?'is-revealing':''}`}><span className={`tier tier-${item.tier.toLowerCase()}`}>{item.tier}</span><div><b>{item.name}</b><small>{item.organizer} · {item.invitationReason}</small></div><strong>{item.placement}</strong><span>{item.wins}/{item.matches}</span><em>{item.rating}</em></div>)}
-      {progress.nextIndex<progress.tournamentIds.length&&!progress.awaitingContinue&&<div className="next-tournament-slot"><span>{String(progress.nextIndex+1).padStart(2,'0')}</span><b>下一项赛事等待结算</b></div>}
+      {progress.results.map((item,index)=><div key={item.id} className={`live-tournament-row ${index===progress.results.length-1&&revealing?'is-revealing':''}`}><span className={`tier tier-${item.tier.toLowerCase()}`}>{item.tier}</span><div><b>{item.name}</b><small>{item.organizer} · {item.invitationReason}</small></div><strong>{item.placement}</strong><span>{item.wins}/{item.matches}</span><em>{item.rating}</em></div>)}
+      {progress.nextIndex<progress.tournamentIds.length&&<div className="next-tournament-slot"><span>{String(progress.nextIndex+1).padStart(2,'0')}</span><b>下一项赛事模拟中...</b></div>}
     </div>
-    {!progress.awaitingContinue?<button className="career-primary" onClick={()=>setState(advanceTournament(state))}><Play/>{progress.nextIndex>=progress.tournamentIds.length?'生成赛季报告':progress.results.length?'进行下一项赛事':'进行首项赛事'}</button>:revealing?<button className="flow-skip" onClick={()=>setRevealing(false)}><FastForward/>跳过动画</button>:<button className="career-primary" onClick={()=>setState(continueTournament(state))}>{continueLabel}<ChevronRight/></button>}
+    {revealing&&<button className="flow-skip" onClick={()=>setRevealing(false)}><FastForward/>跳过动画</button>}
   </article>;
+}
+
+const SLOT_CELL_WIDTH=190;
+const SLOT_GAP=8;
+const SLOT_PADDING=12;
+const buildSlotTickets=(outcomes:NonNullable<Decision['options'][number]['outcomes']>,winnerId:string)=>{
+  const total=outcomes.reduce((sum,outcome)=>sum+outcome.probability,0);
+  const tickets=Array.from({length:48},(_,index)=>{
+    const point=((index*61)%100+.5)/100*total;
+    let cumulative=0;
+    return outcomes.find(outcome=>{cumulative+=outcome.probability;return point<cumulative;})??outcomes.at(-1)!;
+  });
+  const winnerIndex=43;
+  const winner=outcomes.find(outcome=>outcome.id===winnerId)??outcomes[0];
+  tickets[winnerIndex]=winner;
+  return {tickets,winnerIndex};
+};
+
+function OutcomeDecision({state,decision,onCommit}:{state:CareerState;decision:Decision;onCommit:(optionId:string,preview:OutcomePreview)=>void}){
+  const [selected,setSelected]=useState<string|null>(null);
+  const [preview,setPreview]=useState<OutcomePreview|null>(null);
+  const [stage,setStage]=useState<'choices'|'rolling'|'revealed'>('choices');
+  const [trackX,setTrackX]=useState(0);
+  const timer=useRef<number|undefined>(undefined);
+  const frame=useRef<number|undefined>(undefined);
+  const windowRef=useRef<HTMLDivElement|null>(null);
+  const option=decision.options.find(item=>item.id===selected);
+  const slotData=preview&&option?.outcomes?.length?buildSlotTickets(option.outcomes,preview.outcomeId):null;
+  const targetX=slotData&&windowRef.current?windowRef.current.clientWidth/2-SLOT_PADDING-slotData.winnerIndex*(SLOT_CELL_WIDTH+SLOT_GAP)-SLOT_CELL_WIDTH/2:0;
+  useEffect(()=>()=>{window.clearTimeout(timer.current);window.cancelAnimationFrame(frame.current??0);},[]);
+  useEffect(()=>{
+    if(stage!=='rolling'||!slotData||!windowRef.current)return;
+    setTrackX(0);
+    frame.current=window.requestAnimationFrame(()=>{frame.current=window.requestAnimationFrame(()=>setTrackX(windowRef.current!.clientWidth/2-SLOT_PADDING-slotData.winnerIndex*(SLOT_CELL_WIDTH+SLOT_GAP)-SLOT_CELL_WIDTH/2));});
+  },[stage,selected,preview?.outcomeId]);
+  const choose=(optionId:string)=>{
+    const next=previewDecisionOutcome(state,decision,optionId);
+    if(!next)return;
+    setSelected(optionId);setPreview(next);setStage('rolling');setTrackX(0);
+    timer.current=window.setTimeout(()=>setStage('revealed'),2500);
+  };
+  const reveal=()=>{
+    window.clearTimeout(timer.current);window.cancelAnimationFrame(frame.current??0);
+    if(slotData&&windowRef.current)setTrackX(windowRef.current.clientWidth/2-SLOT_PADDING-slotData.winnerIndex*(SLOT_CELL_WIDTH+SLOT_GAP)-SLOT_CELL_WIDTH/2);
+    setStage('revealed');
+  };
+  if(stage==='choices')return <div className="decision-options probability-options">{decision.options.map(item=><button key={item.id} onClick={()=>choose(item.id)}><span>{item.label}</span><small>{item.detail}</small><em>{item.outcomes?.some(outcome=>outcome.delayed)?'含隐性长期风险':''}</em><ChevronRight/></button>)}</div>;
+  return <div className={`outcome-slot ${stage}`} aria-live="polite">
+    <div className="outcome-slot-head"><b>{stage==='rolling'?'结果判定中':'结果已确定'}</b><span>票池按概率分布 · 中线为最终结果</span></div>
+    <div className="outcome-slot-window" ref={windowRef}><i className="slot-marker" aria-hidden="true"/>
+      <div className="outcome-slot-track" style={{transform:`translate3d(${stage==='rolling'?trackX:targetX}px,0,0)`,transition:stage==='rolling'?'transform 2.5s cubic-bezier(.08,.72,.12,1)':'none'}}>{slotData?.tickets.map((outcome,index)=><div key={`${outcome.id}-${index}`} className={stage==='revealed'&&index===slotData.winnerIndex?'selected':''}><strong>{outcome.probability}%</strong><span>{outcome.delayed?'存在长期风险':outcome.label}</span></div>)}</div>
+    </div>
+    {stage==='rolling'?<button className="flow-skip" onClick={reveal}><FastForward/>跳过动画</button>:preview&&<div className="outcome-reveal"><h4>{preview.outcomeLabel}</h4><div className="outcome-deltas">{Object.entries(preview.changes).filter(([key,value])=>typeof value==='number'&&value!==0&&changeLabels[key as keyof StatChange]).map(([key,value])=><span key={key}>{changeLabels[key as keyof StatChange]} {Number(value)>0?'+':''}{String(value)}</span>)}</div>{preview.delayedRisk&&<p>隐性后果：{preview.delayedRisk}</p>}<button className="career-primary" onClick={()=>onCommit(selected!,preview)}>继续<ChevronRight/></button></div>}
+  </div>;
 }
 
 function ActiveCareer({ state, setState, onRestart }: { state: CareerState; setState: (next: CareerState) => void; onRestart: () => void }) {
@@ -216,6 +285,7 @@ function ActiveCareer({ state, setState, onRestart }: { state: CareerState; setS
   const report = state.history.at(-1);
   const decision = state.decision;
   const continueLabel = state.postReportEvent ? '处理赛后事件' : state.pace === 'fast' && state.half === 'first' ? '进入下半年赛季' : state.pace === 'fast' ? '进入年度选择' : '进入休赛期';
+  const careerScore=getCurrentCareerScore(state);
 
   return <main className="career-dossier">
     <header className="career-bar">
@@ -224,13 +294,7 @@ function ActiveCareer({ state, setState, onRestart }: { state: CareerState; setS
       <span className="seed-tag">SEED / {state.seed.toString(16).toUpperCase()}</span>
       <button aria-label="重新开始生涯" title="重新开始生涯" onClick={onRestart}><RotateCcw /></button>
     </header>
-    <div className="dossier-grid">
-      <aside className="career-identity">
-        <p className="eyebrow">PLAYER / 01</p><RoleIcon role={state.role} className="identity-role-icon" />
-        <h1>{state.name}<br/><em>{role.name}</em></h1>
-        <dl><div><dt>年龄</dt><dd>{state.age}</dd></div><div><dt>战队</dt><dd>{state.team}</dd></div><div><dt>定位</dt><dd>{siteLabels[state.defensiveSite]}</dd></div><div><dt>防区熟悉</dt><dd>{state.positionFamiliarity >= 75 ? '默契' : state.positionFamiliarity >= 55 ? '稳定' : '适应中'}</dd></div><div><dt>赛场</dt><dd>{state.tier}</dd></div><div><dt>模拟 VRS</dt><dd>全球 #{state.globalRank} / 区域 #{state.regionRank}</dd></div><div><dt>月薪</dt><dd>{state.salary} 万</dd></div><div><dt>战队状态</dt><dd>{state.teamForm} / 100</dd></div><div><dt>阵容稳定</dt><dd>{state.rosterStability} / 100</dd></div>{state.cncsRevival&&<div><dt>CNCS</dt><dd>复兴进行中</dd></div>}</dl>
-        <div className="career-timeline"><span>16</span><i style={{ height: `${Math.min(100, ((state.age - 16) / 18) * 100)}%` }} /><span>{state.age > 30 ? `${state.age}↓` : '∞'}</span></div>
-      </aside>
+    <div className="dossier-grid compact-career-grid">
       <section className="career-main">
         <div className="season-head"><div><p className="eyebrow">SEASON {String(state.season).padStart(2, '0')} / AGE {state.age}</p><h2>{seasonLabel(state)}</h2></div><span className={`pace-badge ${state.pace}`}>{paceLabels[state.pace]}</span></div>
 
@@ -238,17 +302,17 @@ function ActiveCareer({ state, setState, onRestart }: { state: CareerState; setS
 
         {state.phase === 'season' && state.seasonProgress && <TournamentFlow state={state} setState={setState}/>} 
 
-        {state.phase === 'emergency' && decision && <article className="decision-panel emergency"><div className="emergency-badge"><Zap />{state.eventResume === 'continue-season' ? `${decision.category} · 赛事后事件` : `${emergencyProgress(state)} · 职业突发事件`}</div><div className="decision-number">{state.eventResume === 'continue-season' ? 'POST' : String(state.resolvedEmergencies.length + 1).padStart(2, '0')}</div><p className="eyebrow">{state.eventResume === 'continue-season' ? 'AFTER TOURNAMENT' : 'SEASON INTERRUPTED'}</p><h3>{decision.title}</h3><p>{decision.briefing}</p>{state.eventResume !== 'continue-season' && <div className="season-progress"><i style={{ width: emergencyProgress(state) === '赛季初' ? '25%' : emergencyProgress(state) === '赛季末' ? '82%' : '52%' }} /></div>}<div className="decision-options">{decision.options.map(option => <button key={option.id} onClick={() => setState(resolveEmergency(state, option.id))}><span>{option.label}</span><small>{option.detail}</small><ChevronRight /></button>)}</div></article>}
+        {state.phase === 'emergency' && decision && <article className="decision-panel emergency"><div className="emergency-badge"><Zap />{state.eventResume === 'continue-season' ? `${decision.category} · 赛事内突发` : `${emergencyProgress(state)} · 职业突发事件`}</div><div className="decision-number">{state.eventResume === 'continue-season' ? 'LIVE' : String(state.resolvedEmergencies.length + 1).padStart(2, '0')}</div><p className="eyebrow">{state.eventResume === 'continue-season' ? 'TOURNAMENT INTERRUPTED' : 'SEASON INTERRUPTED'}</p><h3>{decision.title}</h3><p>{decision.briefing}</p>{state.eventResume !== 'continue-season' && <div className="season-progress"><i style={{ width: emergencyProgress(state) === '赛季初' ? '25%' : emergencyProgress(state) === '赛季末' ? '82%' : '52%' }} /></div>}<OutcomeDecision key={decision.id} state={state} decision={decision} onCommit={(optionId,preview)=>setState(resolveEmergency(state,optionId,preview))}/></article>}
 
         {state.phase === 'report' && report && <><article className="season-report-panel"><div className="report-heading"><div><p className="eyebrow">SEASON REPORT / COMPLETE</p><h3>{report.placement}</h3><span>{report.note}</span></div><strong>{report.winRate}<small>% 胜率</small></strong></div><div className="ranking-summary"><span>模拟 VRS 全球排名 <b>#{report.globalRank}</b></span><span>区域排名 <b>#{report.regionRank}</b></span><span>积分变化 <b className={report.rankingDelta >= 0 ? 'up' : 'down'}>{report.rankingDelta >= 0 ? '+' : ''}{report.rankingDelta}</b></span></div><div className="report-core"><div><span>Rating</span><b>{report.rating}</b></div><div><span>K/D</span><b>{report.kd}</b></div><div><span>ADR</span><b>{report.adr}</b></div><div><span>场次</span><b>{report.matches}</b></div><div><span>个人奖金</span><b>{report.playerPrize.toFixed(1)} 万</b></div></div><div className="report-deltas"><Delta label="能力" value={report.deltas.ability}/><Delta label="关系" value={report.deltas.connections}/><Delta label="清白" value={report.deltas.integrity}/><Delta label="名气" value={report.deltas.fame}/><Delta label="健康" value={report.deltas.health}/><Delta label="收入" value={report.deltas.earnings} suffix=" 万"/></div><div className="report-actions"><button className="career-primary" onClick={() => setState(continueFromReport(state))}>{continueLabel}<ChevronRight /></button><button className="report-retire" onClick={() => setRetirementOpen(true)}>申请退役</button></div></article><section className="tournament-report"><div className="section-label"><p className="eyebrow">TOURNAMENT CALENDAR</p><span>{report.tournaments.length} 项赛事</span></div>{report.tournaments.map(item => <details className={`tournament-row ${item.upset ? `has-upset upset-${item.upset.kind}` : ''}`} key={item.id}><summary><div><span className={`tier tier-${item.tier.toLowerCase()}`}>{item.tier}</span><b>{item.name}</b><small>{item.invitationReason} · {item.organizer}</small></div><span>{item.upset ? item.upset.kind==='positive'?'爆冷获胜':'爆冷出局' : item.placement}</span><span>{item.wins}/{item.matches}</span><strong>{item.rating}</strong><em>队 {item.teamPrize} / 个人 {item.playerPrize.toFixed(1)} 万</em></summary>{item.upset&&<div className="upset-detail"><b>对手：{item.upset.opponent}（当时世界 #{item.upset.opponentRank}）</b><span>{item.upset.format} · 比分 {item.upset.score}</span><span>爆冷概率 {item.upset.probability}%</span><span>模拟 VRS {item.upset.rankingImpact>0?'+':''}{item.upset.rankingImpact}</span></div>}</details>)}</section></>}
 
         {state.phase === 'awards' && <AwardsPanel state={state} onContinue={() => setState(continueFromAwards(state))}/>} 
 
-        {state.phase === 'choice' && decision && <article className="decision-panel career-choice"><div className="decision-number">{state.choiceKind === 'annual' ? 'YR' : 'OFF'}</div><p className="eyebrow">{state.choiceKind === 'annual' ? 'ANNUAL DECISION' : 'OFFSEASON DECISION'}</p><h3>{decision.title}</h3><p>{decision.briefing}</p><div className="decision-options">{decision.options.map(option => <button key={option.id} onClick={() => setState(resolveCareerChoice(state, option.id))}><span>{option.label}</span><small>{option.detail}</small><ChevronRight /></button>)}</div></article>}
+        {state.phase === 'choice' && decision && <article className="decision-panel career-choice"><div className="decision-number">{state.choiceKind === 'annual' ? 'YR' : 'OFF'}</div><p className="eyebrow">{state.choiceKind === 'annual' ? 'ANNUAL DECISION' : 'OFFSEASON DECISION'}</p><h3>{decision.title}</h3><p>{decision.briefing}</p><OutcomeDecision key={decision.id} state={state} decision={decision} onCommit={(optionId,preview)=>setState(resolveCareerChoice(state,optionId,preview))}/></article>}
 
         <section className="season-history"><div className="section-label"><p className="eyebrow">SEASON ARCHIVE</p><span>完整生涯 · {state.history.length} 份报告</span></div>{state.history.length ? [...state.history].reverse().map(item => <div className="season-row" key={item.season}><span>S{String(item.season).padStart(2, '0')}</span><b>第 {item.careerYear} 年{item.half === 'first' ? '上半年' : '下半年'}</b><small>{item.placement} · {item.winRate}% 胜率</small><strong>{item.rating}</strong></div>) : <p className="empty-history">点击“开始赛季”生成第一份报告。</p>}</section>
       </section>
-      <aside className="career-status"><div className="status-head"><p className="eyebrow">FOUR TRACKS</p><ShieldCheck/><span>档案状态 / 有效</span></div><Track name={trackLabels.ability} value={state.ability} tone="ability"/><Track name={trackLabels.connections} value={state.connections} tone="connections"/><Track name={trackLabels.integrity} value={state.integrity} tone="integrity"/><Track name={trackLabels.fame} value={state.fame} tone="fame"/><section className="team-form-panel"><p className="eyebrow">TEAM FORM</p><div><span>战队状态</span><b>{state.teamForm}</b></div><i><em style={{width:`${state.teamForm}%`}}/></i></section><section className="contract-panel"><p className="eyebrow">CURRENT ROSTER / STATIC SNAPSHOT</p><h3>{state.team}</h3><div className="roster-list">{state.roster.map(player => <div className={player.isPlayer ? 'active-player' : ''} key={`${player.nick}-${player.role}`}><b>{player.nick}</b><span>{player.role}{player.isPlayer ? ' / 你' : ''}</span></div>)}</div><dl><div><dt>健康状态</dt><dd>{state.health} / 100</dd></div><div><dt>生涯收入</dt><dd>{Math.round(state.stats.earnings)} 万</dd></div><div><dt>工资 / 奖金 / 签字费</dt><dd>{Math.round(state.stats.salaryIncome)} / {Math.round(state.stats.prizeIncome)} / {Math.round(state.stats.signingIncome)}</dd></div><div><dt>最近转会费</dt><dd>{state.lastTransferFee ? `${state.lastTransferFee} 万（俱乐部）` : '无'}</dd></div></dl></section><section className="honor-cabinet"><p className="eyebrow">HONORS</p>{state.honors.length ? state.honors.slice(-5).reverse().map(honor => <span key={honor.id}><b>{honor.kind}</b>{honor.tournamentName}</span>) : <small>荣誉柜还是空的</small>}</section><section className="field-log"><p className="eyebrow">FIELD LOG</p>{state.log.slice(0,4).map((item,index) => <span key={`${item}-${index}`}>{item}</span>)}</section></aside>
+      <aside className="career-status compact-status"><section className="player-summary"><RoleIcon role={state.role}/><div><p className="eyebrow">PLAYER DOSSIER</p><h3>{state.name}</h3><span>{state.age}岁 · {role.name} · {state.team}</span></div></section><section className="career-score"><div><span>目前生涯评分</span><b>{careerScore.score}<small>/100</small></b></div><strong>{careerScore.tier}</strong><p>下一目标：{careerScore.next}</p></section><dl className="career-glance"><div><dt>赛场</dt><dd>{state.tier}</dd></div><div><dt>世界排名</dt><dd>#{state.globalRank}</dd></div><div><dt>当前Rating</dt><dd>{state.history.at(-1)?.rating??state.stats.rating}</dd></div><div><dt>健康</dt><dd>{state.health}</dd></div><div><dt>合同</dt><dd>{state.employmentStatus==='signed'?state.team:'自由人'}</dd></div></dl><Track name={trackLabels.ability} value={state.ability} tone="ability"/><details className="status-details"><summary>阵容与状态</summary><div className="roster-list">{state.roster.map(player => <div className={player.isPlayer ? 'active-player' : ''} key={`${player.nick}-${player.role}`}><b>{player.nick}</b><span>{player.role}{player.isPlayer ? ' / 你' : ''}</span></div>)}</div><p>战队状态 {state.teamForm} · 阵容稳定 {state.rosterStability} · 国际适应 {state.internationalAdaptation}</p></details><details className="status-details"><summary>收入与荣誉</summary><p>生涯收入 {Math.round(state.stats.earnings)} 万 · 月薪 {state.salary} 万</p><div className="honor-cabinet">{state.honors.length ? state.honors.slice(-5).reverse().map(honor => <span key={honor.id}><b>{honor.kind}</b>{honor.tournamentName}</span>) : <small>荣誉柜还是空的</small>}</div></details><details className="status-details"><summary>最近事件</summary><div className="field-log">{state.log.slice(0,5).map((item,index) => <span key={`${item}-${index}`}>{item}</span>)}</div></details></aside>
     </div>
     {retirementOpen && <div className="retirement-backdrop" role="presentation" onClick={() => setRetirementOpen(false)}><section className="retirement-dialog" role="dialog" aria-modal="true" aria-labelledby="retirement-title" onClick={event => event.stopPropagation()}><p className="eyebrow">RETIREMENT DECISION</p><h2 id="retirement-title">结束这段职业生涯？</h2><p>退役后将立即生成最终履历。取消后仍会停留在本赛季报告。</p><div><button onClick={() => setRetirementOpen(false)}>返回赛季报告</button><button className="confirm-retirement" onClick={() => setState(retireCareer(state))}>确认退役</button></div></section></div>}
   </main>;
