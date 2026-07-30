@@ -80,7 +80,7 @@ build_server() {
     npm prune --omit=dev --no-audit --no-fund
   "
   
-  [[ -d "$server_dir/dist" ]] || fail "后端构建失败，未生成 dist 目录"
+  [[ -f "$server_dir/dist/server/src/main.js" ]] || fail "后端构建失败，未生成入口文件"
 }
 
 publish_server_release() {
