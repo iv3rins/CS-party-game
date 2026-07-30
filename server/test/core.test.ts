@@ -20,6 +20,7 @@ describe('seeded RNG and runtime',()=>{
 });
 
 describe('queue and rooms',()=>{
+  it('cleans stale activity before allowing a new queue entry',async()=>{const repo=new MemoryRepository(),queues=new QueueService(repo);await repo.claimActivity({principalId:'a',kind:'match',referenceId:'missing-match'});await queues.join(account('a'),'casual');expect(await repo.getActivity('a')).toMatchObject({kind:'queue'});});
   it('rejects ranked guests and enforces one active activity',async()=>{const repo=new MemoryRepository(),queues=new QueueService(repo);await rejection(queues.join(guest('g'),'ranked'),'REGISTERED_REQUIRED');await queues.join(account('a'),'casual');await rejection(new RoomService(repo).create(account('a')),'ACTIVE_ACTIVITY');});
   it('cleans a stale queue activity after the queue row is gone',async()=>{const repo=new MemoryRepository(),queues=new QueueService(repo);const entry=await queues.join(account('a'),'casual');await repo.deleteQueue('a');expect(await queues.current('a')).toEqual({status:'idle'});const room=await new RoomService(repo).create(account('a'));expect(room.members[0].principal.id).toBe('a');});
   it('expands ranked matching range by 50 every 10 seconds',async()=>{let now=new Date(0);const repo=new MemoryRepository(),queues=new QueueService(repo,()=>now);const entry=await queues.join(account('a'),'ranked');expect(queues.searchRange(entry)).toBe(100);now=new Date(9_999);expect(queues.searchRange(entry)).toBe(100);now=new Date(10_000);expect(queues.searchRange(entry)).toBe(150);now=new Date(30_000);expect(queues.searchRange(entry)).toBe(250);});
@@ -35,7 +36,7 @@ describe('queue and rooms',()=>{
 });
 
 describe('private projections',()=>{
-  it('only exposes the subscriber shop and private economy',()=>{const runtime=new MatchRuntime(match());const player=runtime.projection('a');const opponent=runtime.projection('b');expect(player.shops.player).toHaveLength(5);expect(player.shops.ai).toHaveLength(0);expect(player.state.aiMoney).toBe(0);expect(opponent.shops.ai).toHaveLength(5);expect(opponent.shops.player).toHaveLength(0);expect(opponent.state.playerMoney).toBe(0);});
+  it('only exposes the subscriber shop and private economy',()=>{const runtime=new MatchRuntime(match(),new MemoryRepository());const player=runtime.projection('a');const opponent=runtime.projection('b');expect(player.shops.player).toHaveLength(5);expect(player.shops.ai).toHaveLength(0);expect(player.state.aiMoney).toBe(0);expect(opponent.shops.ai).toHaveLength(5);expect(opponent.shops.player).toHaveLength(0);expect(opponent.state.playerMoney).toBe(0);});
 });
 
 describe('ranked settlement',()=>{
