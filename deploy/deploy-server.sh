@@ -124,7 +124,38 @@ EOF
 
 install_systemd_service() {
   log "安装 systemd 服务"
-  cp "$SOURCE_DIR/deploy/cs-push-server.service" "$SYSTEMD_SERVICE"
+  local node_path
+  node_path=$(which node)
+  [[ -z "$node_path" ]] && fail "找不到 Node.js 可执行文件"
+  
+  # Generate service file with actual node path
+  cat > "$SYSTEMD_SERVICE" <<EOF
+[Unit]
+Description=CS Party Arena Backend Server
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=$DEPLOY_USER
+WorkingDirectory=$CURRENT_SERVER_LINK
+EnvironmentFile=$SERVER_ENV_FILE
+ExecStart=$node_path $CURRENT_SERVER_LINK/dist/server/src/main.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=$DEPLOY_ROOT
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  
   systemctl daemon-reload
   systemctl enable cs-push-server
   systemctl restart cs-push-server
