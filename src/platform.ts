@@ -6,7 +6,7 @@ export const CAREER_SEASON_ID = 'career-v1';
 export type GameAvailability = 'available' | 'coming-soon' | 'maintenance';
 export type RoomVisibility = 'public' | 'private';
 export type RoomStatus = 'waiting' | 'ready' | 'started' | 'closed';
-export type QueueStatus = 'searching' | 'matched' | 'cancelled' | 'expired';
+export type QueueStatus = 'searching' | 'matched' | 'accepted' | 'playing' | 'cancelled' | 'expired';
 
 export interface Account {
   accountId: string;
@@ -119,6 +119,9 @@ export interface QueueTicket {
   queuedAt: string;
   estimatedWaitSeconds: number;
   matchedRoomId?: string;
+  matchId?: string;
+  side?: 'ct' | 't';
+  readyDeadline?: string;
   match?: MatchSession;
 }
 
@@ -201,9 +204,11 @@ export interface PlatformAdapter {
   joinQueue(input: { gameId: string; seasonId: string }): Promise<QueueTicket>;
   getQueueStatus(queueId: string): Promise<QueueTicket>;
   cancelQueue(queueId: string): Promise<QueueTicket>;
+  acceptMatch(matchId: string): Promise<QueueTicket>;
   listRooms(input: { gameId: string; visibility?: RoomVisibility }): Promise<GameRoom[]>;
   createRoom(input: { gameId: string; seasonId: string; config: RoomConfig }): Promise<GameRoom>;
   joinRoom(input: { roomId?: string; inviteCode?: string }): Promise<GameRoom>;
+  getRoomStatus(roomId: string): Promise<{ room: GameRoom; matchId?: string; side?: 'ct' | 't' }>;
   leaveRoom(roomId: string): Promise<void>;
   setRoomReady(input: { roomId: string; ready: boolean }): Promise<GameRoom>;
   startRoom(roomId: string): Promise<MatchSession>;
@@ -383,97 +388,20 @@ export class LocalPlatformAdapter implements PlatformAdapter {
 
   async joinQueue(input: { gameId: string; seasonId: string }): Promise<QueueTicket> {
     const game = await this.getGame(input.gameId);
-    if (game.availability !== 'available') throw new Error(`${game.name} 尚未部署`);
     if (game.maxPlayers < 2) throw new Error(`${game.name} 是单人游戏，无需匹配`);
-    
-    // 在线匹配: 调用后端 API
-    try {
-      const response = await fetch('/api/queues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ gameId: input.gameId, seasonId: input.seasonId, mode: 'casual' }),
-      });
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: '网络错误' }));
-        throw new Error(error.message || '加入队列失败');
-      }
-      const data = await response.json();
-      const ticket: QueueTicket = {
-        ...input,
-        queueId: data.id || crypto.randomUUID(),
-        status: 'searching',
-        queuedAt: new Date().toISOString(),
-        estimatedWaitSeconds: 10,
-      };
-      this.queues.set(ticket.queueId, ticket);
-      return clone(ticket);
-    } catch (error) {
-      // 如果后端不可用，回退到本地模拟
-      console.warn('在线匹配不可用，使用本地模拟:', error);
-      const ticket: QueueTicket = {
-        ...input,
-        queueId: crypto.randomUUID(),
-        status: 'searching',
-        queuedAt: new Date().toISOString(),
-        estimatedWaitSeconds: 6,
-      };
-      this.queues.set(ticket.queueId, ticket);
-      return clone(ticket);
-    }
+    throw new Error('真人匹配需要在线平台服务');
   }
 
-  async getQueueStatus(queueId: string): Promise<QueueTicket> {
-    const ticket = this.queues.get(queueId);
-    if (!ticket) throw new Error('匹配队列不存在');
-    
-    // 尝试轮询后端匹配状态
-    try {
-      const response = await fetch('/api/queues/current', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        // 如果后端返回 ready_check 或 matched，更新 ticket
-        if (data.status === 'matched' || data.matchId) {
-          ticket.status = 'matched';
-          ticket.matchedRoomId = data.matchId;
-          // 保存 matchId 和 side 供跳转使用
-          (ticket as any).onlineMatchId = data.matchId;
-          (ticket as any).mySide = data.side;
-        }
-        return clone(ticket);
-      }
-    } catch (error) {
-      console.warn('轮询匹配状态失败，使用本地模拟:', error);
-    }
-    
-    // 本地模拟逻辑（后端不可用时回退）
-    if (ticket.status === 'searching' && Date.now() - Date.parse(ticket.queuedAt) >= ticket.estimatedWaitSeconds * 1000) {
-      ticket.status = 'matched';
-      ticket.match = await this.startMatch({ gameId: ticket.gameId, seasonId: ticket.seasonId });
-      ticket.matchedRoomId = `match-${ticket.match.matchId}`;
-    }
-    return clone(ticket);
+  async getQueueStatus(_queueId: string): Promise<QueueTicket> {
+    throw new Error('真人匹配需要在线平台服务');
   }
 
-  async cancelQueue(queueId: string): Promise<QueueTicket> {
-    const ticket = this.queues.get(queueId);
-    if (!ticket) throw new Error('匹配队列不存在');
-    
-    // 调用后端取消 API
-    try {
-      await fetch('/api/queues/current', {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-    } catch (error) {
-      console.warn('取消队列 API 调用失败:', error);
-    }
-    
-    if (ticket.status === 'searching') ticket.status = 'cancelled';
-    return clone(ticket);
+  async cancelQueue(_queueId: string): Promise<QueueTicket> {
+    throw new Error('真人匹配需要在线平台服务');
+  }
+
+  async acceptMatch(_matchId: string): Promise<QueueTicket> {
+    throw new Error('本地适配器不支持真人匹配确认');
   }
 
   async listRooms(input: { gameId: string; visibility?: RoomVisibility }): Promise<GameRoom[]> {
@@ -517,6 +445,12 @@ export class LocalPlatformAdapter implements PlatformAdapter {
     return clone(room);
   }
 
+  async getRoomStatus(roomId: string): Promise<{ room: GameRoom; matchId?: string; side?: 'ct' | 't' }> {
+    const room = this.rooms.get(roomId);
+    if (!room) throw new Error('房间不存在');
+    return { room: clone(room) };
+  }
+
   async leaveRoom(roomId: string): Promise<void> {
     const room = this.rooms.get(roomId);
     if (!room) return;
@@ -557,4 +491,109 @@ export class LocalPlatformAdapter implements PlatformAdapter {
   }
 }
 
-export const platform: PlatformAdapter = new LocalPlatformAdapter();
+type ServerPrincipal = { id: string; accountId: string | null; username: string | null; guest: boolean };
+type ServerRoom = { id: string; inviteCode: string; ownerPrincipalId: string; status: 'open' | 'started'; members: Array<{ principal: ServerPrincipal; ready: boolean; joinedAt: string }> };
+type ServerQueueState = { status: 'idle' | 'searching' | 'ready_check' | 'playing'; queueId?: string; joinedAt?: string; estimatedWaitSeconds?: number; matchId?: string; accepted?: boolean; deadline?: string; side?: 'ct' | 't' };
+
+export class OnlinePlatformAdapter extends LocalPlatformAdapter {
+  private serverPrincipal: ServerPrincipal | null = null;
+  private roomConfigs = new Map<string, RoomConfig>();
+
+  async getAccount(): Promise<Account> {
+    const principal = await this.ensureServerSession();
+    return { accountId: principal.id, displayName: principal.username ?? `游客-${principal.id.slice(0, 4)}`, isGuest: principal.guest, globalLevel: 1, avatarSeed: principal.id };
+  }
+
+  private async request<T>(path: string, init?: RequestInit): Promise<T> {
+    const response = await fetch(path, { credentials: 'include', ...init, headers: { 'Content-Type': 'application/json', ...init?.headers } });
+    if (!response.ok) {
+      const failure = await response.json().catch(() => ({ message: `服务器请求失败 (${response.status})` })) as { message?: string };
+      throw new Error(failure.message || `服务器请求失败 (${response.status})`);
+    }
+    return response.json() as Promise<T>;
+  }
+
+  private async ensureServerSession() {
+    if (this.serverPrincipal) return this.serverPrincipal;
+    const current = await fetch('/api/auth/me', { credentials: 'include' });
+    if (current.ok) this.serverPrincipal = await current.json() as ServerPrincipal;
+    else if (current.status === 401) this.serverPrincipal = await this.request<ServerPrincipal>('/api/auth/guest', { method: 'POST', body: '{}' });
+    else throw new Error(`无法连接多人服务 (${current.status})`);
+    return this.serverPrincipal;
+  }
+
+  private queueTicket(state: ServerQueueState, fallbackId = ''): QueueTicket {
+    if (state.status === 'idle') return { queueId: fallbackId, gameId: GAME_ID, seasonId: SEASON_ID, status: 'cancelled', queuedAt: new Date().toISOString(), estimatedWaitSeconds: 10 };
+    const status: QueueStatus = state.status === 'ready_check' ? (state.accepted ? 'accepted' : 'matched') : state.status;
+    return { queueId: state.queueId ?? fallbackId, gameId: GAME_ID, seasonId: SEASON_ID, status, queuedAt: state.joinedAt ?? new Date().toISOString(), estimatedWaitSeconds: state.estimatedWaitSeconds ?? 10, matchId: state.matchId, matchedRoomId: state.matchId, side: state.side, readyDeadline: state.deadline };
+  }
+
+  private room(room: ServerRoom): GameRoom {
+    const config = this.roomConfigs.get(room.id) ?? { name: 'CS推推私人房间', visibility: 'private', roundSeconds: 180, allowSpectators: false };
+    return { roomId: room.id, inviteCode: room.inviteCode, gameId: GAME_ID, seasonId: SEASON_ID, config, status: room.status === 'started' ? 'started' : room.members.length === 2 && room.members.every(member => member.ready) ? 'ready' : 'waiting', hostAccountId: room.ownerPrincipalId, members: room.members.map(member => ({ accountId: member.principal.id, displayName: member.principal.username ?? `玩家-${member.principal.id.slice(0, 4)}`, ready: member.ready, isHost: member.principal.id === room.ownerPrincipalId })), spectatorCount: 0, createdAt: room.members[0]?.joinedAt ?? new Date().toISOString() };
+  }
+
+  async joinQueue(input: { gameId: string; seasonId: string }): Promise<QueueTicket> {
+    const game = await this.getGame(input.gameId);
+    if (game.maxPlayers < 2) throw new Error(`${game.name} 是单人游戏，无需匹配`);
+    await this.ensureServerSession();
+    return this.queueTicket(await this.request<ServerQueueState>('/api/queues', { method: 'POST', body: JSON.stringify({ ...input, mode: 'casual' }) }));
+  }
+
+  async getQueueStatus(queueId: string): Promise<QueueTicket> {
+    await this.ensureServerSession();
+    return this.queueTicket(await this.request<ServerQueueState>('/api/queues/current'), queueId);
+  }
+
+  async cancelQueue(queueId: string): Promise<QueueTicket> {
+    await this.ensureServerSession();
+    await this.request<{ ok: boolean }>('/api/queues/current', { method: 'DELETE' });
+    return { queueId, gameId: GAME_ID, seasonId: SEASON_ID, status: 'cancelled', queuedAt: new Date().toISOString(), estimatedWaitSeconds: 10 };
+  }
+
+  async acceptMatch(matchId: string): Promise<QueueTicket> {
+    await this.ensureServerSession();
+    return this.queueTicket(await this.request<ServerQueueState>(`/api/matches/${encodeURIComponent(matchId)}/accept`, { method: 'POST', body: '{}' }));
+  }
+
+  async listRooms(_input: { gameId: string; visibility?: RoomVisibility }): Promise<GameRoom[]> { return []; }
+
+  async createRoom(input: { gameId: string; seasonId: string; config: RoomConfig }): Promise<GameRoom> {
+    const game = await this.getGame(input.gameId);
+    if (game.maxPlayers < 2) throw new Error(`${game.name} 是单人游戏，不能创建房间`);
+    await this.ensureServerSession();
+    const room = await this.request<ServerRoom>('/api/rooms', { method: 'POST', body: JSON.stringify({ gameId: input.gameId, seasonId: input.seasonId }) });
+    this.roomConfigs.set(room.id, { ...input.config, visibility: 'private', roundSeconds: 180, allowSpectators: false });
+    return this.room(room);
+  }
+
+  async joinRoom(input: { roomId?: string; inviteCode?: string }): Promise<GameRoom> {
+    await this.ensureServerSession();
+    if (!input.inviteCode) throw new Error('请输入六位房间码');
+    return this.room(await this.request<ServerRoom>('/api/rooms/join', { method: 'POST', body: JSON.stringify({ inviteCode: input.inviteCode }) }));
+  }
+
+  async getRoomStatus(roomId: string): Promise<{ room: GameRoom; matchId?: string; side?: 'ct' | 't' }> {
+    await this.ensureServerSession();
+    const state = await this.request<{ room: ServerRoom; match?: { matchId: string; side: 'ct' | 't' } }>(`/api/rooms/${encodeURIComponent(roomId)}`);
+    return { room: this.room(state.room), matchId: state.match?.matchId, side: state.match?.side };
+  }
+
+  async leaveRoom(roomId: string): Promise<void> {
+    await this.ensureServerSession();
+    await this.request<ServerRoom>(`/api/rooms/${encodeURIComponent(roomId)}/leave`, { method: 'POST', body: '{}' });
+  }
+
+  async setRoomReady(input: { roomId: string; ready: boolean }): Promise<GameRoom> {
+    await this.ensureServerSession();
+    return this.room(await this.request<ServerRoom>(`/api/rooms/${encodeURIComponent(input.roomId)}/ready`, { method: 'PATCH', body: JSON.stringify({ ready: input.ready }) }));
+  }
+
+  async startRoom(roomId: string): Promise<MatchSession> {
+    await this.ensureServerSession();
+    const state = await this.request<{ matchId: string; side: 'ct' | 't' }>(`/api/rooms/${encodeURIComponent(roomId)}/start`, { method: 'POST', body: '{}' });
+    return { matchId: state.matchId, gameId: GAME_ID, seasonId: SEASON_ID, opponentElo: 1000, startedAt: new Date().toISOString() };
+  }
+}
+
+export const platform: PlatformAdapter = new OnlinePlatformAdapter();

@@ -2,6 +2,7 @@ import type { GameState, ProductKind, Side } from './engine.js';
 
 export type OnlineSnapshot = {
   sequence: number;
+  yourSide: 'ct' | 't';
   state: GameState;
   shops: Record<Side, ProductKind[]>;
   connected: Record<Side, boolean>;
@@ -19,7 +20,7 @@ export type MatchCommand =
 
 export type ServerMessage =
   | { type: 'session.ready'; accountId: string }
-  | { type: 'match.snapshot'; sequence: number; match: OnlineSnapshot }
+  | { type: 'match.snapshot'; sequence: number; yourSide: 'ct' | 't'; match: Omit<OnlineSnapshot, 'yourSide'> }
   | { type: 'command.accepted'; commandId: string; sequence: number }
   | { type: 'command.rejected'; commandId: string; code: string; message: string }
   | { type: 'match.finished'; result: { matchId: string; outcome: 'ct' | 't' | 'draw'; reason: string; finishedAt: string } }
@@ -60,8 +61,9 @@ export class OnlineMatchClient {
 
   private handleMessage(message: ServerMessage) {
     if (message.type === 'match.snapshot') {
-      this.snapshot = message.match;
-      this.emit('snapshot', message.match);
+      const snapshot = { ...message.match, yourSide: message.yourSide };
+      this.snapshot = snapshot;
+      this.emit('snapshot', snapshot);
     } else if (message.type === 'command.accepted') {
       this.pendingCommands.set(message.commandId, { status: 'accepted' });
       this.emit('commandStatus', message.commandId, 'accepted');

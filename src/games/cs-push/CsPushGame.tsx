@@ -154,23 +154,25 @@ function App({ matchId, mySide }: CsPushGameProps) {
       setToast(`连接失败: ${error.message}`);
     });
     onlineClient.onSnapshot(snapshot => {
+      const serverSide: Side = snapshot.yourSide === 'ct' ? 'player' : 'ai';
+      const isCt = snapshot.yourSide === 'ct';
       const mapped: GameState = {
         ...snapshot.state,
-        playerBase: mySide === 'ct' ? snapshot.state.playerBase : snapshot.state.aiBase,
-        aiBase: mySide === 'ct' ? snapshot.state.aiBase : snapshot.state.playerBase,
-        playerMoney: mySide === 'ct' ? snapshot.state.playerMoney : snapshot.state.aiMoney,
-        aiMoney: mySide === 'ct' ? snapshot.state.aiMoney : snapshot.state.playerMoney,
-        playerItems: mySide === 'ct' ? snapshot.state.playerItems : snapshot.state.aiItems,
-        aiItems: mySide === 'ct' ? snapshot.state.aiItems : snapshot.state.playerItems,
-        playerDefuseCharges: mySide === 'ct' ? snapshot.state.playerDefuseCharges : snapshot.state.aiDefuseCharges,
-        aiDefuseCharges: mySide === 'ct' ? snapshot.state.aiDefuseCharges : snapshot.state.playerDefuseCharges,
+        playerBase: isCt ? snapshot.state.playerBase : snapshot.state.aiBase,
+        aiBase: isCt ? snapshot.state.aiBase : snapshot.state.playerBase,
+        playerMoney: isCt ? snapshot.state.playerMoney : snapshot.state.aiMoney,
+        aiMoney: isCt ? snapshot.state.aiMoney : snapshot.state.playerMoney,
+        playerItems: isCt ? snapshot.state.playerItems : snapshot.state.aiItems,
+        aiItems: isCt ? snapshot.state.aiItems : snapshot.state.playerItems,
+        playerDefuseCharges: isCt ? snapshot.state.playerDefuseCharges : snapshot.state.aiDefuseCharges,
+        aiDefuseCharges: isCt ? snapshot.state.aiDefuseCharges : snapshot.state.playerDefuseCharges,
         lanes: snapshot.state.lanes.map(lane => ({
           ...lane,
-          player: mySide === 'ct' ? lane.player : lane.ai,
-          ai: mySide === 'ct' ? lane.ai : lane.player,
+          player: isCt ? lane.player : lane.ai,
+          ai: isCt ? lane.ai : lane.player,
         })),
       };
-      setBattle(prev => ({ ...prev, game: mapped, shop: snapshot.shops[mySide as Side] }));
+      setBattle(prev => ({ ...prev, game: mapped, shop: snapshot.shops[serverSide] }));
     });
     onlineClient.onCommandStatus((commandId, status, error) => {
       if (status === 'accepted') {

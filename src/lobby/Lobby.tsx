@@ -164,13 +164,34 @@ function Lobby() {
   }, []);
 
   useEffect(() => {
-    if (!queue || queue.status !== 'searching') return;
+    if (!queue || !['searching', 'matched', 'accepted'].includes(queue.status)) return;
     const timer = window.setInterval(async () => {
-      try { setQueue(await platform.getQueueStatus(queue.queueId)); }
-      catch (caught) { setError(caught instanceof Error ? caught.message : '匹配状态读取失败'); }
-    }, 500);
+      try {
+        const next = await platform.getQueueStatus(queue.queueId);
+        setQueue(next);
+        if (next.status === 'playing' && next.matchId && next.side) {
+          window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${next.gameId}?matchId=${encodeURIComponent(next.matchId)}&side=${next.side}` } }));
+          setQueue(null);
+        }
+      } catch (caught) { setError(caught instanceof Error ? caught.message : '匹配状态读取失败'); }
+    }, 750);
     return () => window.clearInterval(timer);
   }, [queue]);
+
+  useEffect(() => {
+    if (modal !== 'room' || !room) return;
+    const timer = window.setInterval(async () => {
+      try {
+        const next = await platform.getRoomStatus(room.roomId);
+        setRoom(next.room);
+        if (next.matchId && next.side) {
+          window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${room.gameId}?matchId=${encodeURIComponent(next.matchId)}&side=${next.side}` } }));
+          setModal(null); setRoom(null);
+        }
+      } catch (caught) { setError(caught instanceof Error ? caught.message : '房间状态读取失败'); }
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [modal, room?.roomId]);
 
   const selectGame = async (game: GameManifest) => {
     setSelectedGameId(game.gameId); setQueue(null); setRoom(null); setError('');
@@ -178,21 +199,18 @@ function Lobby() {
   };
   const enterGame = async () => { 
     try { 
-      // 如果是在线匹配成功，跳转到在线对局
-      if (queue && queue.status === 'matched' && (queue as any).onlineMatchId) {
-        const matchId = (queue as any).onlineMatchId;
-        const side = (queue as any).mySide || 'ct';
-        window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${selectedGame.gameId}?matchId=${matchId}&side=${side}` } }));
+      if (queue?.status === 'playing' && queue.matchId && queue.side) {
+        window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${selectedGame.gameId}?matchId=${encodeURIComponent(queue.matchId)}&side=${queue.side}` } }));
         setQueue(null);
         return;
       }
-      // 否则正常启动游戏（本地模式）
       await platform.launchGame(selectedGame.gameId); 
     } catch (caught) { 
       setError(caught instanceof Error ? caught.message : '无法进入游戏'); 
     } 
   };
-  const startQueue = async () => { try { setQueue(await platform.joinQueue({ gameId: selectedGame.gameId, seasonId: selectedGame.seasonId })); } catch (caught) { setError(caught instanceof Error ? caught.message : '无法开始匹配'); } };
+  const startQueue = async () => { try { setError(''); setQueue(await platform.joinQueue({ gameId: selectedGame.gameId, seasonId: selectedGame.seasonId })); } catch (caught) { setError(caught instanceof Error ? caught.message : '无法连接真人匹配服务'); } };
+  const acceptQueue = async () => { if (!queue?.matchId) return; try { setQueue(await platform.acceptMatch(queue.matchId)); } catch (caught) { setError(caught instanceof Error ? caught.message : '接受匹配失败'); } };
   const createRoom = async () => { try { const next = await platform.createRoom({ gameId: selectedGame.gameId, seasonId: selectedGame.seasonId, config: { name: roomName, visibility, roundSeconds: 180, allowSpectators } }); setRoom(next); setModal('room'); } catch (caught) { setError(caught instanceof Error ? caught.message : '创建房间失败'); } };
   const joinRoom = async () => { try { const next = await platform.joinRoom({ inviteCode: inviteCode.trim() }); setRoom(next); setModal('room'); setInviteCode(''); } catch (caught) { setError(caught instanceof Error ? caught.message : '加入房间失败'); } };
   const leaveRoom = async () => { if (!room) return; await platform.leaveRoom(room.roomId); setRoom(null); setModal(null); };
@@ -232,11 +250,11 @@ function Lobby() {
     </div>
 
     {error && <div className="lobby-error" role="alert">{error}<button aria-label="关闭" onClick={() => setError('')}><X /></button></div>}
-    {queue && <div className="modal-backdrop"><section className="queue-modal" role="dialog" aria-modal="true">{queue.status === 'searching' ? <><span className="queue-spinner" /><small>MATCHMAKING</small><h2>正在匹配</h2><p>正在为您寻找合适的对手，预计等待约 {queue.estimatedWaitSeconds} 秒。</p><div className="queue-bar"><i /></div><button onClick={async () => setQueue(await platform.cancelQueue(queue.queueId))}>取消匹配</button></> : queue.status === 'matched' ? <><h2>对手已找到</h2><button className="lobby-main-command" onClick={() => void enterGame()}>进入对局</button></> : <><h2>匹配已取消</h2><button onClick={() => setQueue(null)}>返回大厅</button></>}</section></div>}
+    {queue && <div className="modal-backdrop"><section className="queue-modal" role="dialog" aria-modal="true">{queue.status === 'searching' ? <><span className="queue-spinner" /><small>ONLINE MATCHMAKING</small><h2>正在寻找真人对手</h2><p>匹配只会在另一位在线玩家加入后完成，不会生成 AI 对手。</p><div className="queue-bar"><i /></div><button onClick={async () => setQueue(await platform.cancelQueue(queue.queueId))}>取消匹配</button></> : queue.status === 'matched' ? <><small>READY CHECK</small><h2>真人对手已找到</h2><p>请在 10 秒内确认接受，双方确认后进入对局。</p><button className="match-accept-button" onClick={() => void acceptQueue()}>接受匹配</button></> : queue.status === 'accepted' ? <><span className="queue-spinner" /><small>READY CHECK</small><h2>已接受匹配</h2><p>正在等待对手确认。</p></> : queue.status === 'playing' ? <><span className="queue-spinner" /><h2>正在进入对局</h2></> : <><h2>匹配已取消</h2><button onClick={() => setQueue(null)}>返回大厅</button></>}</section></div>}
     {modal === 'rules' && <div className="modal-backdrop"><section className="room-modal rules-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => setModal(null)}><X /></button><small>{selectedGame.name.toUpperCase()}</small><h2>游戏规则</h2>{multiplayer ? <ul><li>购买枪械和战术道具，部署到五条赛道。</li><li>连续接触的武器形成推力链，突破底线造成伤害。</li><li>三分钟后进入突然死亡，率先击破基地获胜。</li></ul> : <ul><li>选择出身、位置和节奏，开始职业生涯。</li><li>每个赛季模拟训练、比赛、合同与市场评价。</li><li>关键选择会长期影响能力、关系、清白和名气。</li></ul>}</section></div>}
-    {modal === 'create' && <div className="modal-backdrop"><section className="room-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => setModal(null)}><X /></button><small>LOCAL ROOM PREVIEW</small><h2>创建本地房间</h2><p className="local-room-warning">房间仅保存在当前页面内存中，刷新后会消失，其他设备无法加入。</p><label>房间名称<input value={roomName} onChange={event => setRoomName(event.target.value)} placeholder="今晚开黑" maxLength={30} /></label><div className="segmented"><button className={visibility === 'public' ? 'selected' : ''} onClick={() => setVisibility('public')}>公开</button><button className={visibility === 'private' ? 'selected' : ''} onClick={() => setVisibility('private')}>私密</button></div><label className="check-row"><input type="checkbox" checked={allowSpectators} onChange={event => setAllowSpectators(event.target.checked)} />允许观战</label><button className="lobby-main-command" onClick={() => void createRoom()}>创建</button></section></div>}
-    {modal === 'join' && <div className="modal-backdrop"><section className="room-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => setModal(null)}><X /></button><small>LOCAL ROOM PREVIEW</small><h2>加入本地房间</h2><p className="local-room-warning">仅能加入当前浏览器会话中创建的房间。</p><label>六位房间码<input value={inviteCode} onChange={event => setInviteCode(event.target.value.toUpperCase())} maxLength={6} /></label><button className="lobby-main-command" disabled={inviteCode.trim().length !== 6} onClick={() => void joinRoom()}>加入</button></section></div>}
-    {modal === 'room' && room && <div className="modal-backdrop"><section className="room-modal waiting-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => void leaveRoom()}><X /></button><h2>{room.config.name}</h2><div className="invite-code"><span><small>房间码</small><strong>{room.inviteCode}</strong></span><button onClick={() => void navigator.clipboard?.writeText(`${location.origin}/lobby?room=${room.inviteCode}`)}>复制链接</button></div><div className="member-list">{room.members.map(member => <div key={member.accountId}><OperatorAvatar accountId={member.accountId} /><span>{member.displayName}{member.isHost && <small>房主</small>}</span>{member.accountId === account?.accountId && !member.isHost ? <button onClick={() => void platform.setRoomReady({ roomId: room.roomId, ready: !member.ready }).then(setRoom)}>{member.ready ? '取消准备' : '准备'}</button> : <b>{member.ready ? '已准备' : '等待准备'}</b>}</div>)}</div><div className="waiting-actions"><button onClick={() => void leaveRoom()}>离开</button>{room.hostAccountId === account?.accountId && <button className="lobby-main-command" disabled={room.members.length < selectedGame.minPlayers || !room.members.every(member => member.ready)} onClick={async () => { try { await platform.startRoom(room.roomId); await enterGame(); } catch (caught) { setError(caught instanceof Error ? caught.message : '无法开始'); } }}>开始游戏</button>}</div></section></div>}
+    {modal === 'create' && <div className="modal-backdrop"><section className="room-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => setModal(null)}><X /></button><small>PRIVATE ONLINE ROOM</small><h2>创建私人房间</h2><p>创建后会生成六位房间码，可由另一台设备加入。首版固定为双人休闲对局。</p><label>房间名称<input value={roomName} onChange={event => setRoomName(event.target.value)} placeholder="今晚开黑" maxLength={30} /></label><button className="lobby-main-command" onClick={() => void createRoom()}>创建房间</button></section></div>}
+    {modal === 'join' && <div className="modal-backdrop"><section className="room-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => setModal(null)}><X /></button><small>PRIVATE ONLINE ROOM</small><h2>加入私人房间</h2><p>输入房主分享的六位房间码，加入同一场真人对局。</p><label>六位房间码<input value={inviteCode} inputMode="numeric" onChange={event => setInviteCode(event.target.value.replace(/\D/g, '').slice(0, 6))} maxLength={6} /></label><button className="lobby-main-command" disabled={inviteCode.trim().length !== 6} onClick={() => void joinRoom()}>加入房间</button></section></div>}
+    {modal === 'room' && room && <div className="modal-backdrop"><section className="room-modal waiting-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="关闭" onClick={() => void leaveRoom()}><X /></button><h2>{room.config.name}</h2><div className="invite-code"><span><small>房间码</small><strong>{room.inviteCode}</strong></span><button onClick={() => void navigator.clipboard?.writeText(`${location.origin}/lobby?room=${room.inviteCode}`)}>复制链接</button></div><div className="member-list">{room.members.map(member => <div key={member.accountId}><OperatorAvatar accountId={member.accountId} /><span>{member.displayName}{member.isHost && <small>房主</small>}</span>{member.accountId === account?.accountId && !member.isHost ? <button onClick={() => void platform.setRoomReady({ roomId: room.roomId, ready: !member.ready }).then(setRoom)}>{member.ready ? '取消准备' : '准备'}</button> : <b>{member.ready ? '已准备' : '等待准备'}</b>}</div>)}</div><div className="waiting-actions"><button onClick={() => void leaveRoom()}>离开</button>{room.hostAccountId === account?.accountId && <button className="lobby-main-command" disabled={room.members.length < selectedGame.minPlayers || !room.members.every(member => member.ready)} onClick={async () => { try { const session = await platform.startRoom(room.roomId); const state = await platform.getRoomStatus(room.roomId); if (!state.side) throw new Error('服务器未返回阵营'); window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${room.gameId}?matchId=${encodeURIComponent(session.matchId)}&side=${state.side}` } })); setModal(null); setRoom(null); } catch (caught) { setError(caught instanceof Error ? caught.message : '无法开始'); } }}>开始游戏</button>}</div></section></div>}
     {modal === 'account' && <div className="drawer-backdrop" onClick={() => setModal(null)}><aside className="account-drawer" onClick={event => event.stopPropagation()}><button className="modal-close" aria-label="关闭" onClick={() => setModal(null)}><X /></button><OperatorAvatar accountId={account?.accountId ?? 'guest'} className="drawer-avatar" /><h2>{account?.displayName ?? '游客'}</h2><small>{signedIn ? '账号已登录 · 多人数据将被记录' : '访客模式 · 多人数据不会记录'}</small>{!signedIn ? <div className="drawer-section login-section"><label className="drawer-label"><Shield />账号名称<input value={bindName} onChange={event => setBindName(event.target.value)} maxLength={18} /></label><button className="drawer-action primary" onClick={() => void bindAccount()}><LogIn />注册 / 登录</button></div> : <div className="drawer-section"><label className="drawer-label"><UserRound />昵称<input value={account?.displayName ?? ''} onChange={event => void platform.updateDisplayName(event.target.value).then(setAccount)} maxLength={18} /></label></div>}<div className="drawer-section"><label className="drawer-label">主音量<input type="range" min="0" max="1" step=".05" value={preferences.masterVolume} onChange={event => void platform.updatePreferences({ masterVolume: Number(event.target.value) }).then(setPreferences)} /></label></div><button className="drawer-action" onClick={() => { resetTutorial(); setModal(null); }}>重置新手教程</button></aside></div>}
   </main>;
 }

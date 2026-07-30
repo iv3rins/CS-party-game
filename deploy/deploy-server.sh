@@ -9,10 +9,10 @@ CURRENT_SERVER_LINK="$DEPLOY_ROOT/current-server"
 SERVER_ENV_FILE="$DEPLOY_ROOT/server.env"
 SYSTEMD_SERVICE="/etc/systemd/system/cs-push-server.service"
 NGINX_BACKEND_SNIPPET="/etc/nginx/snippets/cs-party-backend.conf"
-DATABASE_NAME="${DATABASE_NAME:-cs_push}"
-DATABASE_USER="${DATABASE_USER:-cs_push_user}"
+DATABASE_NAME="${DATABASE_NAME:-cspa_main}"
+DATABASE_USER="${DATABASE_USER:-cspa_app}"
 KEEP_RELEASES=3
-DOMAIN="${DOMAIN:-game.n1komajor.top}"
+DOMAIN="${DOMAIN:-game.n1k0major.top}"
 
 log() { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
 fail() { printf '\n\033[1;31mERROR: %s\033[0m\n' "$*" >&2; exit 1; }
@@ -75,8 +75,9 @@ build_server() {
   sudo -u "$DEPLOY_USER" bash -lc "
     set -Eeuo pipefail
     cd '$server_dir'
-    npm ci --omit=dev --no-audit --no-fund
+    npm ci --no-audit --no-fund
     npm run build
+    npm prune --omit=dev --no-audit --no-fund
   "
   
   [[ -d "$server_dir/dist" ]] || fail "后端构建失败，未生成 dist 目录"
