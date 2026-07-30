@@ -69,7 +69,38 @@ export class PostgresRepository implements Repository {
   async deleteProposal(matchId: string) { await this.pool.query('DELETE FROM match_proposals WHERE match_id=$1',[matchId]); }
   private proposal(row: Record<string, unknown>): PersistedProposal { return { matchId: String(row.match_id), entries: row.entries as QueueEntry[], accepted: (row.accepted as string[]) ?? [], deadline: new Date(String(row.deadline)), version: Number(row.version), retainedGroupId: row.retained_group_id ? String(row.retained_group_id) : undefined }; }
   async saveRoom(room: Room, expectedVersion?: number) {
-    const client = await this.pool.connect(); try { await client.query('BEGIN'); const result = await client.query(expectedVersion === undefined ? 'INSERT INTO rooms(id,invite_code,owner_principal_id,status,room_type,version) VALUES($1,$2,$3,$4,$5,1) ON CONFLICT(id) DO UPDATE SET status=excluded.status,owner_principal_id=excluded.owner_principal_id,room_type=excluded.room_type,version=rooms.version+1' : 'UPDATE rooms SET status=$4,owner_principal_id=$3,room_type=$5,version=version+1 WHERE id=$1 AND version=$2',[room.id,expectedVersion === undefined ? room.inviteCode : expectedVersion,room.ownerPrincipalId,room.status,room.type ?? 'Private']); if (!result.rowCount) { await client.query('ROLLBACK'); return false; } await client.query('DELETE FROM room_members WHERE room_id=$1',[room.id]); for (const member of room.members) await client.query('INSERT INTO room_members(room_id,principal_id,account_id,username,guest,ready,joined_at) VALUES($1,$2,$3,$4,$5,$6,$7)',[room.id,member.principal.id,member.principal.accountId,member.principal.username,member.principal.guest,member.ready,member.joinedAt]); await client.query('COMMIT'); return true; } catch(error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const result = await client.query(expectedVersion === undefined
+        ? 'INSERT INTO rooms(id,invite_code,owner_principal_id,status,room_type,version) VALUES($1,$2,$3,$4,$5,1) ON CONFLICT(id) DO UPDATE SET status=excluded.status,owner_principal_id=excluded.owner_principal_id,room_type=excluded.room_type,version=rooms.version+1'
+        : 'UPDATE rooms SET status=$4,owner_principal_id=$3,room_type=$5,version=version+1 WHERE id=$1 AND version=$2',
+        [room.id, expectedVersion === undefined ? room.inviteCode : expectedVersion, room.ownerPrincipalId, room.status, room.type ?? 'Private']);
+      if (!result.rowCount) { await client.query('ROLLBACK'); return false; }
+
+      // 房间开始后成员记录会保留用于审计，但成员不能永久占用全局 principal 唯一键。
+      // 只有没有活动锁的已结束房间才允许清理，进行中的房间不会被误删。
+      const principalIds = room.members.map(member => member.principal.id);
+      if (principalIds.length) {
+        await client.query(`DELETE FROM room_members old_members
+          USING rooms old_rooms
+          WHERE old_members.room_id=old_rooms.id
+            AND old_members.room_id<>$1
+            AND old_members.principal_id = ANY($2::uuid[])
+            AND (old_rooms.status<>'open' OR NOT EXISTS (
+              SELECT 1 FROM active_activities stale_activity
+              WHERE stale_activity.principal_id=old_members.principal_id
+            ))
+            AND NOT EXISTS (
+              SELECT 1 FROM active_activities activity
+              WHERE activity.principal_id=old_members.principal_id
+            )`, [room.id, principalIds]);
+      }
+      await client.query('DELETE FROM room_members WHERE room_id=$1',[room.id]);
+      for (const member of room.members) await client.query('INSERT INTO room_members(room_id,principal_id,account_id,username,guest,ready,joined_at) VALUES($1,$2,$3,$4,$5,$6,$7)',[room.id,member.principal.id,member.principal.accountId,member.principal.username,member.principal.guest,member.ready,member.joinedAt]);
+      await client.query('COMMIT');
+      return true;
+    } catch(error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
   }
   async getRoom(roomId: string) { return this.loadRoom('r.id=$1', roomId); }
   async appendChatMessage(message: ChatMessage) { await this.pool.query('INSERT INTO room_chat(id,room_id,principal_id,text,created_at) VALUES($1,$2,$3,$4,$5)',[message.id,message.roomId,message.principalId,message.text,message.createdAt]); }
