@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { advanceTournament, becomeStreamer, continueFromReport, createCareer, getCurrentCareerScore, previewDecisionOutcome, resolveCareerChoice, resolveEmergency, startSeason } from './careerEngine';
-import { CAREER_EVENT_CATALOG, EVENT_CATALOG_SIZE } from './careerEventCatalog';
+import { CAREER_EVENT_CATALOG, DREAM_EVENT_CATALOG, EVENT_CATALOG_SIZE } from './careerEventCatalog';
 
 const create = (seed: string, role: 'entry' | 'igl' = 'entry') => createCareer({ seed, name: 'Spec', pace: 'hardcore', originId: 'overseas', role, iglArchetype: role === 'igl' ? 'brain' : undefined });
 
@@ -93,6 +93,23 @@ describe('career weighted event contracts', () => {
     expect(streamer).toMatchObject({employmentStatus:'streamer',phase:'choice'});
     expect(streamer.decision?.options.map(option=>option.id)).toEqual(['stream-focus','stream-train','stream-tryout']);
     expect(streamer.decision).toEqual(becomeStreamer(state).decision);
+  });
+
+  it('protects the first rookie season from severe opening emergencies and guarantees growth', () => {
+    const initial=createCareer({seed:'rookie-protection',name:'Rookie',pace:'hardcore',originId:'academy',role:'entry'});
+    let state=startSeason(initial);
+    expect(state.decision?.category).not.toBe('伤病健康');
+    while(state.phase!=='report'){
+      if(state.phase==='emergency'&&state.decision)state=resolveEmergency(state,state.decision.options[0].id);
+      else state=advanceTournament(state);
+    }
+    expect(state.ability).toBeGreaterThanOrEqual(initial.ability+2);
+  });
+
+  it('ships thirty-six fictional dream events without historical source metadata', () => {
+    expect(DREAM_EVENT_CATALOG).toHaveLength(36);
+    expect(DREAM_EVENT_CATALOG.every(event=>!JSON.stringify(event).includes('hltv.org'))).toBe(true);
+    expect(new Set(DREAM_EVENT_CATALOG.map(event=>event.catalogId)).size).toBe(36);
   });
 
   it('settles only one tournament per engine step and records maps', () => {

@@ -435,7 +435,51 @@ export const CAREER_EVENT_CATALOG: CareerEventDefinition[] = (Object.keys(scenar
   });
 });
 
-export const eligibleCatalogEvents = (state: CareerState, kind: Decision['kind'], timing?: Decision['timing']) => CAREER_EVENT_CATALOG.filter(event => {
+const dreamScenarios: CareerEventDefinition[] = [
+  {catalogId:'dream-academy-breakout',category:'合同转会',kind:'offseason',title:'青训报告被多支队伍转发',briefing:'一位虚构的地区青训教练把你的比赛报告递给了更高层级俱乐部。你还没有冠军，但最近 Rating 已经让市场重新估价。',options:[{id:'academy-show',label:'接受公开试训',detail:'可能跨级进入更高舞台，但短期首发保障不足',changes:{fame:6,connections:-2,ability:3}},{id:'academy-stay',label:'留下完成当前赛季',detail:'保持首发与训练量，报价热度可能延后',changes:{teamForm:5,ability:2,connections:3}}]},
+  {catalogId:'dream-international-mix',category:'合同转会',kind:'offseason',title:'国际纵队缺一名关键拼图',briefing:'一支虚构的跨赛区阵容正在重组，教练认为你的定位可以补上最后一块拼图。语言和风格磨合会决定这次机会是真正跃升还是短暂试训。',options:[{id:'international-trial',label:'接受短期国际试训',detail:'国际适应与赛事上限提高，前期关系和健康承压',changes:{internationalAdaptation:12,fame:8,connections:-5,health:-3}},{id:'international-defer',label:'等当前队伍再打一个赛季',detail:'保持稳定，未来仍可能收到正式邀请',changes:{teamForm:4,connections:4,internationalAdaptation:3}}]},
+  {catalogId:'dream-sixth-man',category:'退役转型',kind:'offseason',title:'替补席上的临时首发',briefing:'虚构的一线队在大赛前失去首发选手，教练临时把你推到最重要的位置。你只有几天准备时间。',options:[{id:'sixth-step-up',label:'接受临时首发',detail:'高压下证明自己，可能打开一线市场',changes:{ability:5,fame:8,health:-4,connections:2}},{id:'sixth-safe',label:'要求完整训练周期',detail:'减少失误风险，但可能错过唯一窗口',changes:{health:4,ability:2,connections:-1}}]},
+  {catalogId:'dream-version-read',category:'训练状态',kind:'offseason',title:'新版本让你的长处突然变得稀缺',briefing:'虚构赛事版本更新后，队伍急需你擅长的防区与残局处理。分析师认为这是短暂但真实的职业窗口。',options:[{id:'version-master',label:'围绕版本专项训练',detail:'能力与报价提高，健康和休息时间下降',changes:{ability:6,fame:5,health:-4}},{id:'version-balance',label:'维持全面训练',detail:'错过部分热度，但不让版本变化绑架职业方向',changes:{ability:2,health:3,connections:2}}]},
+  {catalogId:'dream-free-agent-return',category:'退役转型',kind:'offseason',title:'旧队核心邀请你回归',briefing:'你曾经离开的虚构老队正在重建，新的管理层愿意围绕熟悉的核心重新设计体系。',options:[{id:'return-core',label:'回到熟悉的核心',detail:'关系和队伍默契明显提高，冠军上限取决于重建质量',changes:{connections:8,teamForm:6,rosterStability:5,fame:4}},{id:'return-demand',label:'要求明确的竞技承诺',detail:'保留更高上限，但谈判失败会消耗关系',changes:{ability:4,fame:5,connections:-4}}]},
+  {catalogId:'dream-duo',category:'队内体系',kind:'offseason',title:'明星队友点名邀请你组队',briefing:'一名虚构的高名气选手在采访中称赞你的团队价值，并希望下一赛季与你成为固定搭档。',options:[{id:'duo-accept',label:'主动推动双核心计划',detail:'关系、名气和转会热度提高，阵容压力也会增加',changes:{connections:8,fame:7,rosterStability:-3}},{id:'duo-team',label:'先完成当前队伍目标',detail:'保护现有阵容，明星搭档机会暂时保留',changes:{teamForm:5,rosterStability:4,connections:3}}]},
+];
+const dreamVariants: Array<[string,string,string,string,string,string]> = [
+  ['新人爆发','地区赛录像被更高层级教练反复观看','接受针对性试训','能力 +5 / 名气 +6 / 健康 -3','先完成当前赛季','能力 +2 / 关系 +4'],
+  ['新人爆发','你在弱队连续打出高 Rating，评论员开始称你为黑马','主动承担核心火力','能力 +6 / 名气 +8 / 关系 -3','保护团队体系','战队状态 +5 / 关系 +3'],
+  ['新人爆发','一次关键残局让你的名字出现在豪门内部报告','公开展示个人打法','名气 +9 / 关系 -4 / 高压风险 +3','保持低调训练','能力 +3 / 清白 +2'],
+  ['新人爆发','青训教练建议你跳过一个中间层级直接参加高水平试训','接受跨级挑战','能力 +4 / 名气 +7 / 健康 -4','按原计划成长','能力 +3 / 关系 +3'],
+  ['新人爆发','第一份长约摆在桌上，管理层愿意围绕你培养阵容','接受培养长约','关系 +7 / 能力 +3 / 名气 -2','要求短约保留自由','名气 +4 / 关系 -3'],
+  ['替补逆袭','主力临时缺席，你只有一张地图证明自己','顶上最关键的位置','能力 +7 / 名气 +8 / 健康 -5','先要求完整热身','健康 +3 / 能力 +2'],
+  ['替补逆袭','替补席的训练数据比首发更稳定，教练开始重新排位','主动竞争首发','能力 +5 / 关系 -4 / 名气 +5','继续做好替补职责','关系 +7 / 能力 +2'],
+  ['替补逆袭','淘汰赛临时换人，你和指挥只剩十分钟统一口令','接受临场指挥','能力 +4 / 关系 +6 / 健康 -2','坚持熟悉战术','稳定 +5 / 名气 -1'],
+  ['替补逆袭','你的替补录像被另一支队伍看中，邀请你参加短期训练营','参加训练营','名气 +6 / 能力 +4 / 资产 -3','留队争取位置','关系 +5 / 能力 +2'],
+  ['替补逆袭','一场意外胜利让你获得了“最可靠替补”的市场标签','接受轮换定位','关系 +8 / 名气 +4 / 能力 +2','要求立即首发','能力 +5 / 关系 -7'],
+  ['国际试训','海外教练提出一周语言与战术融合训练','投入适应训练','国际适应 +12 / 能力 +3 / 健康 -3','先解决合同细节','清白 +3 / 关系 +2'],
+  ['国际试训','跨赛区阵容缺少一名能补位的自由人，你的录像刚好符合需求','接受轮换试训','名气 +8 / 国际适应 +8 / 关系 -5','等待首发承诺','关系 +4 / 名气 +2'],
+  ['国际试训','第一次国际采访被大量转发，队伍希望你成为沟通窗口','承担公开沟通','名气 +8 / 关系 +5 / 健康 -2','让翻译处理','国际适应 +4 / 名气 +1'],
+  ['国际试训','签证和搬迁费用超过预期，但窗口可能只有一次','自费完成迁移','资产 -8 / 国际适应 +10 / 名气 +4','暂缓出国','资产 +3 / 国际适应 +2'],
+  ['国际试训','海外阵容愿意为你的定位改一套战术','接受体系重做','能力 +5 / 关系 -4 / 国际适应 +8','保留原有打法','能力 +2 / 名气 +5'],
+  ['明星搭档','高名气队友公开称赞你的补枪和团队价值','推动固定搭档','关系 +9 / 名气 +7 / 阵容稳定 -3','保持职业距离','清白 +3 / 关系 +3'],
+  ['明星搭档','赞助商希望把你们包装成新一代双核心','接受商业合作','名气 +10 / 资产 +8 / 能力 -3','坚持竞技优先','能力 +5 / 名气 -2'],
+  ['明星搭档','搭档提出一起转会，但现队可能失去三人核心','共同寻找新队','名气 +6 / 关系 +7 / 阵容稳定 -4','留队保护核心','关系 +5 / 战队状态 +5'],
+  ['明星搭档','你们在决赛中形成特殊默契，强队开始评估整套组合','接受整组试训','能力 +5 / 名气 +8 / 健康 -3','先赢下当前赛季','战队状态 +7 / 关系 +4'],
+  ['明星搭档','搭档状态下滑，媒体要求你公开评价未来计划','保护队友','关系 +8 / 名气 -2 / 清白 +2','公开讨论竞争','名气 +6 / 关系 -6'],
+  ['版本受益','新地图机制让你长期训练的防区成为主流','公开分享研究','关系 +5 / 名气 +6 / 能力 +3','保留战术秘密','能力 +5 / 清白 -2'],
+  ['版本受益','队伍临时找不到适应新地图的指挥，你被要求承担更多决策','接过临时指挥','战术能力 +5 / 关系 +7 / 健康 -3','坚持原定位','能力 +3 / 名气 +2'],
+  ['版本受益','新版本赛事奖金增加，俱乐部愿意为版本专家加薪','要求长期加薪','资产 +10 / 关系 -4 / 名气 +4','接受训练资源','能力 +6 / 资产 +4'],
+  ['版本受益','你在版本转换期保持稳定，成为少数没有掉出排名的选手','维持稳定节奏','能力 +4 / 健康 +3 / 名气 +5','冒险追求极限数据','能力 +7 / 健康 -6'],
+  ['版本受益','对手开始专门研究你的版本打法，优势窗口正在缩短','快速转型第二套体系','能力 +5 / 位置熟练 -4 / 关系 +4','继续强化单一优势','能力 +3 / 名气 +5'],
+  ['老队重组','老队经理提出重新召回当年核心成员','参与重组','关系 +10 / 战队状态 +6 / 资产 -4','拒绝怀旧计划','能力 +4 / 名气 +3'],
+  ['老队重组','旧队友从不同赛区回归，队伍缺少最后一名稳定选手','承担连接角色','关系 +8 / 阵容稳定 +7 / 能力 -2','只做个人准备','能力 +5 / 关系 -3'],
+  ['老队重组','俱乐部愿意把训练资源交给你们这批老队员','接受核心管理权','关系 +6 / 能力 +4 / 健康 -3','只签选手合同','名气 +4 / 清白 +2'],
+  ['老队重组','重组队伍第一次公开赛爆冷进入决赛，市场重新关注你','继续共同冲刺','名气 +9 / 能力 +5 / 健康 -4','趁热寻找强队','名气 +7 / 关系 -5'],
+  ['老队重组','老队重组失败在即，最后一个转会窗口出现了救援方案','邀请年轻选手补强','关系 +6 / 阵容稳定 +8 / 资产 -5','接受外部报价','能力 +4 / 名气 +8'],
+];
+const makeDreamVariant=([route,titleA,optionA,detailA,optionB,detailB]:[string,string,string,string,string,string],index:number):CareerEventDefinition=>({catalogId:`dream-variant-${index+1}`,category:'合同转会',kind:'offseason',title:titleA,briefing:`${route}进入新的节点。这是虚构职业生态中的低概率机会，成功会打开更强市场，失败也只会留下可恢复的代价。`,options:[{id:`dream-${index+1}-a`,label:optionA,detail:detailA,changes:{ability:detailA.includes('能力 +')?3:1,fame:detailA.includes('名气 +')?4:1,connections:detailA.includes('关系 +')?3:0}},{id:`dream-${index+1}-b`,label:optionB,detail:detailB,changes:{ability:detailB.includes('能力 +')?2:1,connections:detailB.includes('关系 +')?3:1}}]});
+const DREAM_VARIANTS=dreamVariants.map(makeDreamVariant);
+export const DREAM_EVENT_CATALOG = [...dreamScenarios,...DREAM_VARIANTS];
+
+export const eligibleCatalogEvents = (state: CareerState, kind: Decision['kind'], timing?: Decision['timing']) => [...CAREER_EVENT_CATALOG,...DREAM_EVENT_CATALOG].filter(event => {
   if (event.kind !== kind) return false;
   if (timing && event.timing && event.timing !== timing) return false;
   if (event.minAge !== undefined && state.age < event.minAge) return false;
