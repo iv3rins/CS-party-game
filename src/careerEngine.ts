@@ -1,4 +1,4 @@
-import { CAREER_DATA_VERSION, CAREER_TEAMS, CareerTeam, DATA_SNAPSHOT_NOTE, HonorClass, PlayerRole, TeamRegion, TOURNAMENTS, TournamentTier } from './careerData';
+import { CAREER_DATA_VERSION, CAREER_TEAMS, CareerTeam, DATA_SNAPSHOT_NOTE, HonorClass, MAJOR_CITIES, MAJOR_ORGANIZERS, PlayerRole, TeamRegion, TOURNAMENTS, TournamentTier } from './careerData';
 import { CAREER_QUOTES, QuoteTag } from './careerQuotes';
 import { CAREER_EVENT_CATALOG, eligibleCatalogEvents } from './careerEventCatalog';
 
@@ -32,7 +32,7 @@ export interface StatSnapshot { ability: number; connections: number; integrity:
 export interface StatDeltas extends StatSnapshot {}
 export interface ContextRatings { major: number; elite: number; playoffs: number; arena: number; bigMatches: number; finals: number; elimination: number; vsTop5: number; vsTop10: number; vsTop20: number; }
 export interface UpsetRecord { kind: 'positive' | 'negative'; opponent: string; opponentRank: number; format: string; score: string; probability: number; rankingImpact: number; }
-export interface TournamentResult { id: string; tournamentId: string; name: string; organizer: string; tier: TournamentTier; honorClass: HonorClass; invited: boolean; invitationReason: string; placement: string; matches: number; wins: number; maps: number; mapWins: number; teamPrize: number; playerPrize: number; salaryPaid: number; rating: number; rankingDelta: number; context: ContextRatings; upset?: UpsetRecord; expectedPlacement?: string; hasCriticalEvent?: boolean; criticalEventId?: string; }
+export interface TournamentResult { id: string; tournamentId: string; name: string; organizer: string; city?: string; tier: TournamentTier; honorClass: HonorClass; invited: boolean; qualified?: boolean; invitationReason: string; placement: string; matches: number; wins: number; maps: number; mapWins: number; teamPrize: number; playerPrize: number; salaryPaid: number; rating: number; rankingDelta: number; context: ContextRatings; qualifierOpponent?: string; qualifierScore?: string; qualifierStage?: string; upset?: UpsetRecord; expectedPlacement?: string; hasCriticalEvent?: boolean; criticalEventId?: string; }
 export interface HonorAward { id: string; season: number; tournamentName: string; kind: 'MVP' | 'EVP' | 'VP' | '冠军'; honorClass: HonorClass; }
 export interface Top20Entry { rank: number; playerId: string; nick: string; team: string; score: number; isPlayer: boolean; }
 export interface AnnualTop20 { calendarYear: number; careerYear: number; eligible: boolean; playerRank?: number; entries: Top20Entry[]; review?: string; generatedQuote?: string; t1Maps?: number; nominationChance?: number; }
@@ -563,24 +563,38 @@ const dynastyEvolutionFor=(state:CareerState,results:TournamentResult[])=>{
   if(eliteDeepRuns<2&&eliteTitles<1)return false;
   return seeded(state,`dynasty-evolution:${state.careerYear}:${state.half}`)()<.002;
 };
+const tournamentCityPool=['北京','上海','成都','杭州','广州','新加坡','首尔','东京','伦敦','巴黎','柏林','里斯本','马德里','纽约','洛杉矶','悉尼','墨尔本'];
+const hostedTournament=(state:CareerState,tournament:typeof TOURNAMENTS[number],index:number)=>{
+  const city=tournament.city??tournamentCityPool[Math.floor(seeded(state,`event-city:${tournament.id}:${index}`)()*tournamentCityPool.length)];
+  const type=tournament.tier==='unranked'?'公开赛':tournament.tier==='T2'?(/邀请|亚洲/.test(tournament.name)?'邀请赛':'挑战赛'):tournament.honorClass==='super-elite'?'大师赛':tournament.honorClass==='elite'?'精英赛':'冠军赛';
+  return {...tournament,city,name:`${tournament.organizer} ${city} ${type}`};
+};
+const majorForSeason=(state:CareerState)=>{
+  const slot=(state.careerYear-1)*2+(state.half==='second'?1:0);
+  const previousCity=state.history.at(-1)?.tournaments.find(result=>result.tier==='Major')?.city;
+  let cityIndex=Math.floor(seeded(state,`major-city:${slot}`)()*MAJOR_CITIES.length);
+  if(previousCity&&MAJOR_CITIES[cityIndex]===previousCity)cityIndex=(cityIndex+1)%MAJOR_CITIES.length;
+  let organizerIndex=Math.floor(seeded(state,`major-organizer:${slot}`)()*MAJOR_ORGANIZERS.length);
+  const recentOrganizers=state.history.slice(-2).map(record=>record.tournaments.find(result=>result.tier==='Major')?.organizer).filter(Boolean);
+  if(recentOrganizers.length===2&&recentOrganizers[0]===recentOrganizers[1]&&MAJOR_ORGANIZERS[organizerIndex]===recentOrganizers[0])organizerIndex=(organizerIndex+1)%MAJOR_ORGANIZERS.length;
+  const organizer=MAJOR_ORGANIZERS[organizerIndex];
+  const city=MAJOR_CITIES[cityIndex];
+  return {id:`major-${state.careerYear}-${state.half}`,name:`${organizer} ${city} Major`,organizer,city,tier:'Major' as const,honorClass:'major' as const,format:'BO3/BO5' as const};
+};
 const tournamentCalendarFor = (state: CareerState) => {
   const count=5+Math.floor(seeded(state,'calendar-count')()*4);
-  const majors=TOURNAMENTS.filter(tournament=>tournament.tier==='Major');
-  const yearMajorOffset=seeded(state,`major-year:${state.careerYear}`)()<.5?0:1;
-  const majorIndex=(state.careerYear*2+(state.half==='second'?1:0)+yearMajorOffset)%majors.length;
-  const major=majors[majorIndex];
+  const major=majorForSeason(state);
   const ordered=TOURNAMENTS
     .filter(tournament=>tournament.tier!=='Major'&&(!tournament.region||tournament.region===state.region))
     .map(tournament=>({tournament,order:seeded(state,`calendar-order:${tournament.id}`)()}))
     .sort((a,b)=>a.order-b.order)
-    .map(item=>item.tournament);
+    .map((item,index)=>hostedTournament(state,item.tournament,index));
   const entered=ordered.filter(tournament=>invitationFor(state,tournament).invited);
   const fallback=ordered.filter(tournament=>tournament.tier==='unranked'||tournament.tier==='T2');
   const unique=[...new Map([...entered,...fallback].map(tournament=>[tournament.id,tournament])).values()];
-  const majorEntry=invitationFor(state,major);
-  const reserve=majorEntry.invited?1:0;
+  const reserve=1;
   const picked=unique.slice(0,count-reserve);
-  if(majorEntry.invited)picked.splice(Math.min(picked.length,Math.floor(picked.length*.65)),0,major);
+  picked.splice(Math.min(picked.length,Math.floor(picked.length*.65)),0,major);
   while(picked.length<Math.min(5,count)){
     const replacement=ordered.find(tournament=>!picked.some(item=>item.id===tournament.id));
     if(!replacement)break;
@@ -610,6 +624,12 @@ const upsetFor = (state: CareerState, tournament: typeof TOURNAMENTS[number]) =>
 const simulateTournament = (state: CareerState, tournament: typeof TOURNAMENTS[number], salaryPaid: number): TournamentResult => {
   const rng = seeded(state, `tournament:${tournament.id}`);
   const invitation = invitationFor(state,tournament);
+  if(tournament.tier==='Major'&&!invitation.invited){
+    const opponentPool=CAREER_TEAMS.filter(team=>team.region===state.region&&team.id!==state.teamId);
+    const opponent=opponentPool[Math.floor(seeded(state,`major-qualifier-opponent:${tournament.id}`)()*opponentPool.length)]??CAREER_TEAMS[0];
+    const score=seeded(state,`major-qualifier-score:${tournament.id}`)()<.5?'1:2':'0:2';
+    return {id:`s${state.season}-${tournament.id}`,tournamentId:tournament.id,name:tournament.name,organizer:tournament.organizer,city:tournament.city,tier:tournament.tier,honorClass:tournament.honorClass,invited:true,qualified:false,invitationReason:invitation.reason,placement:'预选出局',matches:0,wins:0,maps:0,mapWins:0,teamPrize:0,playerPrize:0,salaryPaid,rating:0,rankingDelta:0,context:{major:0,elite:0,playoffs:0,arena:0,bigMatches:0,finals:0,elimination:0,vsTop5:0,vsTop10:0,vsTop20:0},qualifierStage:`${state.region==='Asia'?'亚洲':state.region==='Europe'?'欧洲':'美洲'}封闭预选败者组决赛`,qualifierOpponent:opponent.name,qualifierScore:score};
+  }
   const pressure = honorWeight[tournament.honorClass] * 2.4;
   const dataBonus = tournament.tier === 'unranked' ? .14 : tournament.tier === 'T2' ? .1 : tournament.tier === 'Major' ? -.03 : 0;
   const slumpChance = Math.min(.32, .1 + Math.max(0, 60 - state.health) / 180 + Math.max(0, state.age - 30) * .025);
@@ -653,7 +673,7 @@ const simulateTournament = (state: CareerState, tournament: typeof TOURNAMENTS[n
   const criticalMomentRoll=seeded(state,`critical:${tournament.id}`)();
   const criticalTriggerRate=state.pace==='fast'?(tournament.tier==='Major'&&['冠军','亚军'].includes(adjustedPlacement)?.08:0):tournament.tier==='Major'?(state.pace==='hardcore'?.15:.08):isLargeOrHigher(tournament.honorClass)?(state.pace==='hardcore'?.10:.06):0;
   const hasCriticalEvent=isCriticalMatch&&criticalMomentRoll<criticalTriggerRate;
-  return { id: `s${state.season}-${tournament.id}`, tournamentId: tournament.id, name: tournament.name, organizer: tournament.organizer, tier: tournament.tier, honorClass: tournament.honorClass, invited: invitation.invited, invitationReason: state.vrsActive ? invitation.reason : tournament.tier === 'unranked' ? '未入榜期间参加非排名赛' : invitation.reason, placement:adjustedPlacement, matches, wins, maps, mapWins, teamPrize, playerPrize, salaryPaid, rating, rankingDelta, context:contextRatingsFor(state,tournament,rating), upset:upsetRecord, expectedPlacement:hasCriticalEvent?adjustedPlacement:undefined, hasCriticalEvent, criticalEventId:hasCriticalEvent?`critical-${state.season}-${tournament.id}`:undefined };
+  return { id: `s${state.season}-${tournament.id}`, tournamentId: tournament.id, name: tournament.name, organizer: tournament.organizer, city:tournament.city, tier: tournament.tier, honorClass: tournament.honorClass, invited: true, qualified:true, invitationReason: state.vrsActive ? invitation.reason : tournament.tier === 'unranked' ? '未入榜期间参加非排名赛' : invitation.reason, placement:adjustedPlacement, matches, wins, maps, mapWins, teamPrize, playerPrize, salaryPaid, rating, rankingDelta, context:contextRatingsFor(state,tournament,rating), upset:upsetRecord, expectedPlacement:hasCriticalEvent?adjustedPlacement:undefined, hasCriticalEvent, criticalEventId:hasCriticalEvent?`critical-${state.season}-${tournament.id}`:undefined };
 };
 const honorsForResults = (state: CareerState, results: TournamentResult[]): HonorAward[] => results.flatMap(result => {
   const awards: HonorAward[] = [];
@@ -811,7 +831,7 @@ const finishSeason = (state: CareerState): CareerState => {
   const kd = Number((.76 + ability / 310 + rng() * .17).toFixed(2));
   const adr = Math.round(49 + ability * .57 + rng() * 8);
   const winRate = Math.round(wins / Math.max(1, matches) * 100);
-  const best = [...tournaments].sort((a, b) => honorWeight[b.honorClass] - honorWeight[a.honorClass] || ['冠军','亚军','四强','八强','小组赛出局','首轮出局'].indexOf(a.placement) - ['冠军','亚军','四强','八强','小组赛出局','首轮出局'].indexOf(b.placement))[0];
+  const best = [...tournaments].filter(result=>result.qualified!==false).sort((a, b) => honorWeight[b.honorClass] - honorWeight[a.honorClass] || ['冠军','亚军','四强','八强','小组赛出局','首轮出局'].indexOf(a.placement) - ['冠军','亚军','四强','八强','小组赛出局','首轮出局'].indexOf(b.placement))[0];
   const rebuildPoints = state.vrsActive ? state.rebuildPoints : Math.max(0, state.rebuildPoints + Math.max(0, rankingDelta));
   const projectedRank=state.vrsActive?state.globalRank-Math.round(rankingDelta/16):100-Math.floor((rebuildPoints-120)/10);
   const projectedPoints=state.vrsActive?state.rankingPoints+rankingDelta:rebuildPoints;
@@ -837,7 +857,7 @@ const finishSeason = (state: CareerState): CareerState => {
   const crisisLog=cncsRevival&&!state.cncsRevival?'CNCS 复兴线启动：中国战队获得持续国际邀请与赞助':negativeUpsetStreak>=3?'连续爆冷触发换人或解散风险':negativeUpsetStreak>=2?'连续爆冷引发队内危机':'';
   const dynastyEvolution=dynastyEvolutionFor(state,tournaments);
   const dynastyLog=dynastyEvolution?'隐藏进化：顶级阵容完成长期磨合，你成为王朝指挥':'';
-  const t1Matches=tournaments.filter(result=>result.tier==='T1'||result.tier==='Major').reduce((sum,result)=>sum+result.matches,0);
+  const t1Matches=tournaments.filter(result=>(result.tier==='T1'||result.tier==='Major')&&result.qualified!==false).reduce((sum,result)=>sum+result.matches,0);
   const growthRoll=seeded(state,'t1-growth')();
   const growthChance=Math.min(0.35,t1Matches*0.008);
   const hasGrowth=t1Matches>=5&&nextAge<=25&&growthRoll<growthChance;
@@ -899,7 +919,7 @@ export const advanceTournament = (state:CareerState):CareerState => {
   const progress=state.seasonProgress;
   const tournamentId=progress.tournamentIds[progress.nextIndex];
   if(!tournamentId)return finishSeason(state);
-  const tournament=TOURNAMENTS.find(item=>item.id===tournamentId);
+  const tournament=TOURNAMENTS.find(item=>item.id===tournamentId)??(tournamentId.startsWith(`major-${state.careerYear}-${state.half}`)?majorForSeason(state):undefined);
   if(!tournament)return finishSeason(state);
   const result=simulateTournament(state,tournament,progress.salaryPerTournament);
   const nextProgress={...progress,nextIndex:progress.nextIndex+1,results:[...progress.results,result]};
@@ -1101,7 +1121,7 @@ export const getCareerSummary = (state: CareerState): CareerSummary => {
     const personalHonor = item.record.honors.find(honor => honor.tournamentName === item.name && (honor.kind === 'MVP' || honor.kind === 'EVP'))?.kind as 'MVP' | 'EVP' | undefined;
     return { id: item.id, name: item.name, calendarYear: 2025 + item.record.careerYear, season: item.record.season, honorClass: item.honorClass, tier: item.tier, format: TOURNAMENTS.find(definition => definition.id === item.tournamentId)?.format ?? 'BO3', rating: item.rating, teamPrize:item.teamPrize, playerPrize:item.playerPrize, personalHonor };
   });
-  const majors = allResults.filter(item => item.tier === 'Major');
+  const majors = allResults.filter(item => item.tier === 'Major'&&item.qualified!==false);
   const bestMajor = majors.map(item => item.placement).sort((a,b) => placementOrder.indexOf(a) - placementOrder.indexOf(b))[0] ?? '未参赛';
   const bestTop = Math.min(...state.top20History.map(item => item.playerRank ?? 99), 99);
   const legacyScore = trophies.reduce((sum, trophy) => sum + honorWeight[trophy.honorClass] * 9, 0) + state.stats.mvps * 12 + state.honors.filter(honor => honor.kind === 'EVP').length * 5 + (bestTop <= 1 ? 50 : bestTop <= 5 ? 35 : bestTop <= 10 ? 20 : bestTop <= 20 ? 10 : 0);

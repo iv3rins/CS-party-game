@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { advanceTournament, becomeStreamer, continueFromReport, createCareer, getCurrentCareerScore, previewDecisionOutcome, resolveCareerChoice, resolveEmergency, startSeason } from './careerEngine';
 import { CAREER_EVENT_CATALOG, DREAM_EVENT_CATALOG, EVENT_CATALOG_SIZE } from './careerEventCatalog';
+import { MAJOR_CITIES } from './careerData';
 
 const create = (seed: string, role: 'entry' | 'igl' = 'entry') => createCareer({ seed, name: 'Spec', pace: 'hardcore', originId: 'overseas', role, iglArchetype: role === 'igl' ? 'brain' : undefined });
 
@@ -110,6 +111,17 @@ describe('career weighted event contracts', () => {
     expect(DREAM_EVENT_CATALOG).toHaveLength(36);
     expect(DREAM_EVENT_CATALOG.every(event=>!JSON.stringify(event).includes('hltv.org'))).toBe(true);
     expect(new Set(DREAM_EVENT_CATALOG.map(event=>event.catalogId)).size).toBe(36);
+  });
+
+  it('schedules one named Major every half and preserves missed qualifiers', () => {
+    const settle=(initial:ReturnType<typeof create>)=>{let state=startSeason(initial);while(state.phase!=='report'){if(state.phase==='emergency'&&state.decision)state=resolveEmergency(state,state.decision.options[0].id);else state=advanceTournament(state);}return state;};
+    let state=settle({...create('major-calendar'),globalRank:100,regionRank:50,teamForm:20});
+    const first=state.history[0].tournaments.filter(result=>result.tier==='Major');
+    expect(first).toHaveLength(1);
+    expect(first[0].name).toMatch(/^(PJL|ESI|遮天电竞|BURST|NovaLadder) .+ Major$/);
+    expect(MAJOR_CITIES).toContain(first[0].city);
+    if(first[0].qualified===false)expect(first[0]).toMatchObject({placement:'预选出局',matches:0,teamPrize:0,playerPrize:0});
+    if(first[0].qualified===false){expect(first[0].qualifierStage).toBeTruthy();expect(first[0].qualifierOpponent).toBeTruthy();expect(first[0].qualifierScore).toMatch(/^[01]:2$/);}
   });
 
   it('settles only one tournament per engine step and records maps', () => {

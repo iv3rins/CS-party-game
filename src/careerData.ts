@@ -6,7 +6,7 @@ export interface RosterPlayer { id: string; nick: string; role: PlayerRole; }
 export interface CareerTeam { id: string; name: string; region: TeamRegion; baseRank: number; strength: number; roster: RosterPlayer[]; }
 export type TournamentTier = 'unranked' | 'T2' | 'T1' | 'Major';
 export type HonorClass = 'medium' | 'large' | 'elite' | 'super-elite' | 'major';
-export interface TournamentDefinition { id: string; name: string; organizer: string; tier: TournamentTier; honorClass: HonorClass; format: 'BO1/BO3' | 'BO3' | 'BO3/BO5'; region?: TeamRegion; }
+export interface TournamentDefinition { id: string; name: string; organizer: string; tier: TournamentTier; honorClass: HonorClass; format: 'BO1/BO3' | 'BO3' | 'BO3/BO5'; region?: TeamRegion; city?: string; }
 
 const roleOrder: PlayerRole[] = ['igl', 'awper', 'entry', 'rifler', 'support'];
 const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -50,6 +50,12 @@ const fictionalTeams: CareerTeam[] = remainingRanks.slice(0,Math.max(0,100-realT
 });
 export const CAREER_TEAMS: CareerTeam[] = [...realTeams, ...fictionalTeams].sort((a,b)=>a.baseRank-b.baseRank);
 
+export const MAJOR_CITIES = [
+  '北京','上海','广州','深圳','成都','杭州','重庆','南京','西安','武汉','苏州','青岛','长沙','厦门','天津',
+  '中国香港','中国澳门','中国台北','伦敦','巴黎','柏林','科隆','哥本哈根','斯德哥尔摩','卡托维兹','布加勒斯特','里斯本','马德里','纽约','洛杉矶','达拉斯','里约热内卢','圣保罗','新加坡','首尔','东京','悉尼','墨尔本'
+] as const;
+export const MAJOR_ORGANIZERS = ['PJL','ESI','遮天电竞','BURST','NovaLadder'] as const;
+
 export const TOURNAMENTS: TournamentDefinition[] = [
   { id:'esi-katowice', name:'EIM 卡托维兹站', organizer:'ESI', tier:'T1', honorClass:'super-elite', format:'BO3/BO5' },
   { id:'esi-cologne', name:'EIM 科隆站', organizer:'ESI', tier:'T1', honorClass:'super-elite', format:'BO3/BO5' },
@@ -64,9 +70,9 @@ export const TOURNAMENTS: TournamentDefinition[] = [
   { id:'sky-east', name:'遮天东境邀请赛', organizer:'遮天电竞', tier:'T2', honorClass:'medium', format:'BO3', region:'Asia' },
   { id:'sky-asia', name:'遮天亚洲冠军杯', organizer:'遮天电竞', tier:'T1', honorClass:'elite', format:'BO3/BO5', region:'Asia' },
   { id:'gwc', name:'GWC 世界电竞杯', organizer:'Global Wave', tier:'T1', honorClass:'large', format:'BO3/BO5' },
-  { id:'major-pjl', name:'PJL 哥本哈根 Major', organizer:'PJL', tier:'Major', honorClass:'major', format:'BO3/BO5' },
-  { id:'major-esi', name:'ESI 科隆 Major', organizer:'ESI', tier:'Major', honorClass:'major', format:'BO3/BO5' },
-  { id:'major-sky', name:'遮天上海 Major', organizer:'遮天电竞', tier:'Major', honorClass:'major', format:'BO3/BO5' },
+  { id:'major-pjl', name:'PJL Major', organizer:'PJL', tier:'Major', honorClass:'major', format:'BO3/BO5' },
+  { id:'major-esi', name:'ESI Major', organizer:'ESI', tier:'Major', honorClass:'major', format:'BO3/BO5' },
+  { id:'major-sky', name:'遮天电竞 Major', organizer:'遮天电竞', tier:'Major', honorClass:'major', format:'BO3/BO5' },
   { id:'regional-challenger', name:'区域挑战者联赛', organizer:'联合赛事委员会', tier:'T2', honorClass:'medium', format:'BO1/BO3' },
   { id:'open-circuit', name:'公开巡回赛', organizer:'联合赛事委员会', tier:'unranked', honorClass:'medium', format:'BO1/BO3' },
 ];
