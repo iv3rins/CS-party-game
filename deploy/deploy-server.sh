@@ -162,9 +162,15 @@ EOF
 
   # Update main site config to include backend snippet
   local nginx_site="/etc/nginx/sites-available/cs-party-game"
+  if [[ ! -f "$nginx_site" ]]; then
+    log "Nginx 站点配置不存在，请先运行前端部署脚本"
+    return 1
+  fi
+  
   if ! grep -q "cs-party-backend.conf" "$nginx_site"; then
     log "更新 Nginx 站点配置以包含后端路由"
-    sed -i '/include .*cs-party-game.conf;/a \    include /etc/nginx/snippets/cs-party-backend.conf;' "$nginx_site"
+    # Find the first server block and insert after server_name
+    sed -i '/server_name.*'"$DOMAIN"'/a\    include /etc/nginx/snippets/cs-party-backend.conf;' "$nginx_site"
   fi
   
   nginx -t
