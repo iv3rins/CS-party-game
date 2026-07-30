@@ -135,7 +135,7 @@ function GameStage({ game }: { game: GameManifest }) {
 
 function Lobby() {
   const [account, setAccount] = useState<Account | null>(null);
-  const [games, setGames] = useState<GameManifest[]>([]);
+  const [games, setGames] = useState<GameManifest[]>([gameManifest, careerGameManifest]);
   const [preferences, setPreferences] = useState<PlatformPreferences>({ soundEnabled: true, masterVolume: .55, language: 'zh-CN' });
   const [selectedGameId, setSelectedGameId] = useState(gameManifest.gameId);
   const [rating, setRating] = useState<Rating | null>(null);
@@ -158,12 +158,33 @@ function Lobby() {
   const signedIn = account ? !account.isGuest : false;
 
   useEffect(() => {
-    Promise.all([platform.getAccount(), platform.listGames(), platform.getPreferences()]).then(async ([nextAccount, nextGames, nextPreferences]) => {
-      const merged=[...new Map([...nextGames,careerGameManifest].map(game=>[game.gameId,game])).values()];
-      setAccount(nextAccount); setGames(merged); setPreferences(nextPreferences);
-      const initial = merged.find(game => game.gameId === selectedGameId) ?? merged[0];
-      if (initial) { setSelectedGameId(initial.gameId); if (initial.ranked && !nextAccount.isGuest) setRating(await platform.getRating(initial.gameId, initial.seasonId)); }
-    }).catch(() => setError('大厅数据载入失败，请刷新后重试。'));
+    let active = true;
+
+    void platform.listGames().then(nextGames => {
+      if (!active) return;
+      const merged = [...new Map([gameManifest, careerGameManifest, ...nextGames].map(game => [game.gameId, game])).values()];
+      setGames(merged);
+      if (!merged.some(game => game.gameId === selectedGameId)) setSelectedGameId(merged[0]?.gameId ?? gameManifest.gameId);
+    }).catch(() => {
+      // Static manifests keep game selection usable while the platform API is unavailable.
+    });
+
+    void platform.getPreferences().then(nextPreferences => {
+      if (active) setPreferences(nextPreferences);
+    }).catch(() => undefined);
+
+    void platform.getAccount().then(async nextAccount => {
+      if (!active) return;
+      setAccount(nextAccount);
+      if (!nextAccount.isGuest && gameManifest.ranked) {
+        const nextRating = await platform.getRating(gameManifest.gameId, gameManifest.seasonId).catch(() => null);
+        if (active) setRating(nextRating);
+      }
+    }).catch(() => {
+      if (active) setError('多人服务暂时不可用，仍可切换并进入单人游戏。');
+    });
+
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -198,7 +219,10 @@ function Lobby() {
 
   const selectGame = async (game: GameManifest) => {
     setSelectedGameId(game.gameId); setQueue(null); setRoom(null); setError('');
-    setRating(game.ranked && signedIn ? await platform.getRating(game.gameId, game.seasonId) : null);
+    const nextRating = game.ranked && signedIn
+      ? await platform.getRating(game.gameId, game.seasonId).catch(() => null)
+      : null;
+    setRating(nextRating);
   };
   const enterGame = async () => { 
     try { 
