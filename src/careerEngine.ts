@@ -2,6 +2,9 @@ import { CAREER_DATA_VERSION, CAREER_TEAMS, CareerTeam, DATA_SNAPSHOT_NOTE, Hono
 import { CAREER_QUOTES, QuoteTag } from './careerQuotes';
 import { CAREER_EVENT_CATALOG, eligibleCatalogEvents } from './careerEventCatalog';
 
+// Re-export types for components
+export type { TournamentTier, HonorClass } from './careerData';
+
 export const CAREER_SAVE_KEY = 'cspa:career:cs-career:v1';
 export const CAREER_VERSION = 12;
 export const CAREER_RULES_VERSION = 'career-aps-dynasty-burnout-v12';

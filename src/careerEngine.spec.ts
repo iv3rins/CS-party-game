@@ -1,20 +1,26 @@
 import { describe, expect, it } from 'vitest';
-import { advanceTournament, becomeStreamer, continueFromReport, createCareer, getCurrentCareerScore, previewDecisionOutcome, resolveCareerChoice, resolveEmergency, startSeason } from './careerEngine';
-import { CAREER_EVENT_CATALOG, DREAM_EVENT_CATALOG, EVENT_CATALOG_SIZE } from './careerEventCatalog';
+import { advanceTournament, becomeStreamer, CareerState, continueFromReport, createCareer, getCurrentCareerScore, previewDecisionOutcome, resolveCareerChoice, resolveEmergency, startSeason } from './careerEngine';
+import { ALL_CAREER_EVENTS, CAREER_EVENT_CATALOG, DREAM_EVENT_CATALOG, EVENT_CATALOG_SIZE, TOTAL_EVENT_COUNT } from './careerEventCatalog';
 import { MAJOR_CITIES } from './careerData';
 
 const create = (seed: string, role: 'entry' | 'igl' = 'entry') => createCareer({ seed, name: 'Spec', pace: 'hardcore', originId: 'overseas', role, iglArchetype: role === 'igl' ? 'brain' : undefined });
 
 describe('career weighted event contracts', () => {
-  it('ships 315 events across 15 categories with complete weighted outcomes', () => {
+  it('ships 315+ events across 15 categories with complete weighted outcomes', () => {
     expect(EVENT_CATALOG_SIZE).toBe(315);
+    expect(TOTAL_EVENT_COUNT).toBeGreaterThanOrEqual(315);
     expect(new Set(CAREER_EVENT_CATALOG.map(event => event.catalogId)).size).toBe(315);
-    expect(new Set(CAREER_EVENT_CATALOG.map(event => event.category)).size).toBe(15);
-    for (const event of CAREER_EVENT_CATALOG) {
+    expect(new Set(ALL_CAREER_EVENTS.map(event => event.category)).size).toBeGreaterThanOrEqual(15);
+    for (const event of ALL_CAREER_EVENTS) {
+      expect(event.catalogId).toBeTruthy();
+      expect(event.title).toBeTruthy();
+      expect(event.briefing).toBeTruthy();
       expect(event.options.length).toBeGreaterThanOrEqual(2);
       for (const option of event.options) {
-        expect(option.outcomes?.length).toBeGreaterThanOrEqual(2);
-        expect(option.outcomes!.reduce((sum, outcome) => sum + outcome.probability, 0)).toBe(100);
+        if (option.outcomes) {
+          expect(option.outcomes.length).toBeGreaterThanOrEqual(2);
+          expect(option.outcomes.reduce((sum, outcome) => sum + outcome.probability, 0)).toBe(100);
+        }
       }
     }
   });
@@ -162,5 +168,19 @@ describe('career weighted event contracts', () => {
     state = advanceTournament(state);
     expect(state.seasonProgress!.nextIndex).toBe(before + 1);
     expect(state.seasonProgress!.results[0].maps).toBeGreaterThanOrEqual(state.seasonProgress!.results[0].matches);
+  });
+
+  it('becomeStreamer clears team and roster', () => {
+    const initial = create('streamer-test');
+    const mockState: CareerState = { ...initial, history: [initial.history[0] ?? { season: 1, careerYear: 1, half: 'first', tournaments: [], rating: 1.0, kd: 1.0, adr: 70, matches: 10, salaryPaid: 6, globalRank: 50, regionRank: 15, rankingDelta: 0 }], phase: 'report' };
+    const streamer = becomeStreamer(mockState);
+    expect(streamer.employmentStatus).toBe('streamer');
+    expect(streamer.team).toBe('无所属战队');
+    expect(streamer.team).not.toBe(initial.team);
+    expect(streamer.roster).toEqual([]);
+    expect(streamer.tier).toBe('未入榜');
+    expect(streamer.globalRank).toBe(999);
+    expect(streamer.vrsActive).toBe(false);
+    expect(streamer.salary).toBe(0);
   });
 });

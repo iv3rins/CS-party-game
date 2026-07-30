@@ -3,6 +3,10 @@ import { ArrowLeft, ChevronRight, FastForward, Play, RotateCcw, ShieldCheck, Tro
 import { advanceTournament, becomeStreamer, CareerState, CareerTrophy, clearCareer, continueFromAwards, continueFromReport, createCareer, Decision, emergencyProgress, getCurrentCareerScore, getCareerSummary, IglArchetype, loadCareer, ORIGINS, OriginId, OutcomePreview, Pace, previewDecisionOutcome, Role, resolveCareerChoice, resolveEmergency, retireCareer, saveCareer, seasonLabel, startSeason, StatChange } from '../../careerEngine';
 import { platform } from '../../platform';
 import { RoleIcon } from '../../shared/icons';
+import { MVPCelebration } from '../../components/career/MVPCelebration';
+import { InlineTournamentBadge } from '../../components/career/TournamentBadge';
+import '../../styles/mvp-celebration.css';
+import '../../styles/tournament-badges.css';
 
 const ORIGIN_TRAITS: Record<OriginId, string[]> = {
   northeast: ['身体对抗强', '线下经验足', '心理稳健'],
@@ -289,13 +293,34 @@ function OutcomeDecision({state,decision,onCommit}:{state:CareerState;decision:D
 
 function ActiveCareer({ state, setState, onRestart }: { state: CareerState; setState: (next: CareerState) => void; onRestart: () => void }) {
   const [retirementOpen, setRetirementOpen] = useState(false);
+  const [mvpCelebration, setMvpCelebration] = useState<{ tournament: any; honor: any } | null>(null);
   const role = roles.find(item => item.id === state.role)!;
   const report = state.history.at(-1);
   const decision = state.decision;
   const continueLabel = state.postReportEvent ? '处理赛后事件' : state.pace === 'fast' && state.half === 'first' ? '进入下半年赛季' : state.pace === 'fast' ? '进入年度选择' : '进入休赛期';
   const careerScore=getCurrentCareerScore(state);
 
+  // 检查是否有新获得的 MVP/EVP 荣誉
+  useEffect(() => {
+    if (state.phase === 'report' && report) {
+      const lastHonor = state.honors.at(-1);
+      if (lastHonor && (lastHonor.kind === 'MVP' || lastHonor.kind === 'EVP')) {
+        const tournament = report.tournaments.find(t => t.name === lastHonor.tournamentName);
+        if (tournament && !mvpCelebration) {
+          setMvpCelebration({ tournament, honor: lastHonor });
+        }
+      }
+    }
+  }, [state.phase, report, state.honors, mvpCelebration]);
+
   return <main className="career-dossier">
+    {mvpCelebration && (
+      <MVPCelebration
+        tournament={mvpCelebration.tournament}
+        honor={mvpCelebration.honor}
+        onContinue={() => setMvpCelebration(null)}
+      />
+    )}
     <header className="career-bar">
       <button aria-label="返回大厅" title="返回大厅" onClick={() => platform.leaveToLobby()}><ArrowLeft /></button>
       <div><p className="eyebrow">CS CAREER / {state.phase.toUpperCase()}</p><strong>{state.name} · {role.name}</strong></div>
