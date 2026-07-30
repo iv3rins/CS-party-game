@@ -59,6 +59,22 @@ export class QueueService {
   async accept(matchId:string,principalId:string){let check=this.readyChecks.get(matchId);if(!check){const persisted=await this.repository.getProposal(matchId);if(persisted){check={matchId:persisted.matchId,entries:persisted.entries.map(entry=>({...entry,joinedAt:new Date(entry.joinedAt)})) as [QueueEntry,QueueEntry],accepted:new Set(persisted.accepted),deadline:new Date(persisted.deadline),version:persisted.version,retainedGroupId:persisted.retainedGroupId};this.readyChecks.set(matchId,check);}}if(!check||this.now().getTime()>=check.deadline.getTime())throw new ServiceError('READY_EXPIRED','匹配确认已过期');if(!check.entries.some(entry=>entry.principal.id===principalId))throw new ServiceError('NOT_PARTICIPANT','不是该匹配参与者');if (check.accepted.has(principalId)) return this.current(principalId);check.accepted.add(principalId);check.version+=1;await this.repository.saveProposal({matchId,entries:check.entries,accepted:[...check.accepted],deadline:check.deadline,version:check.version,retainedGroupId:check.retainedGroupId});if(check.accepted.size<2)return this.current(principalId);this.readyChecks.delete(matchId);await this.repository.deleteProposal(matchId);const [first,second]=check.entries;const swap=Number.parseInt(createHash('sha256').update(matchId).digest('hex').slice(0, 2), 16)%2===1;const participants: MatchRecord['participants']=swap?[{principal:first.principal,side:'t'},{principal:second.principal,side:'ct'}]:[{principal:first.principal,side:'ct'},{principal:second.principal,side:'t'}];const match:MatchRecord={id:matchId,mode:first.mode,status:'playing',seed:createHash('sha256').update(`${matchId}:cs-push-v2`).digest('hex'),rulesVersion:'cs-push-v2',participants};await this.repository.saveMatch(match);for(const entry of check.entries){await this.repository.releaseActivity(entry.principal.id,matchId);await this.repository.claimActivity({principalId:entry.principal.id,kind:'match',referenceId:matchId});}return this.current(principalId);}
   async expireReadyChecks(){const due=await this.repository.listDueProposals(this.now());for(const persisted of due)if(!this.readyChecks.has(persisted.matchId)){this.readyChecks.set(persisted.matchId,{matchId:persisted.matchId,entries:persisted.entries as [QueueEntry,QueueEntry],accepted:new Set(persisted.accepted),deadline:persisted.deadline,version:persisted.version,retainedGroupId:persisted.retainedGroupId});}for(const [id,check] of this.readyChecks)if(this.now().getTime()>=check.deadline.getTime()){this.readyChecks.delete(id);await this.repository.deleteProposal(id);for(const entry of check.entries){await this.repository.releaseActivity(entry.principal.id,id);if(check.accepted.has(entry.principal.id))await this.join(entry.principal,entry.mode);}}}
   async matchAll(){await this.match('casual');await this.match('ranked');}
+  async rematch(matchId:string, principalId:string){
+    const previous=await this.repository.getMatch(matchId);
+    if(!previous||previous.status!=='finished')throw new ServiceError('REMATCH_UNAVAILABLE','当前对局尚未结束或已失效');
+    if(!previous.participants.some(participant=>participant.principal.id===principalId))throw new ServiceError('NOT_PARTICIPANT','不是该对局参与者');
+    const nextId=randomUUID();
+    const swap=Number.parseInt(createHash('sha256').update(`${nextId}:side`).digest('hex').slice(0,2),16)%2===1;
+    const [first,second]=previous.participants;
+    const participants:MatchRecord['participants']=swap?[{principal:first.principal,side:'t'},{principal:second.principal,side:'ct'}]:[{principal:first.principal,side:'ct'},{principal:second.principal,side:'t'}];
+    const next:MatchRecord={id:nextId,mode:previous.mode,status:'playing',seed:createHash('sha256').update(`${nextId}:cs-push-v2`).digest('hex'),rulesVersion:'cs-push-v2',participants};
+    for(const participant of participants){
+      await this.repository.releaseActivity(participant.principal.id);
+      if(!await this.repository.claimActivity({principalId:participant.principal.id,kind:'match',referenceId:nextId}))throw new ServiceError('ACTIVE_ACTIVITY','玩家仍有进行中的活动');
+    }
+    await this.repository.saveMatch(next);
+    return next;
+  }
 }
 
 export class RoomService {

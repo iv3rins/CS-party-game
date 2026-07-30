@@ -156,6 +156,10 @@ function App({ matchId, mySide }: CsPushGameProps) {
     onlineClient.onSnapshot(snapshot => {
       const serverSide: Side = snapshot.yourSide === 'ct' ? 'player' : 'ai';
       const isCt = snapshot.yourSide === 'ct';
+      // 服务端始终使用固定世界坐标：CT 从左向右，T 从右向左。
+      // T 视角除了交换阵营数据，还必须镜像横坐标，否则双方会看到相反的推进方向。
+      const orientUnit = <T extends { position: number }>(unit: T): T => isCt ? unit : { ...unit, position: 100 - unit.position };
+      const orientPosition = (position: number) => isCt ? position : 100 - position;
       const mapped: GameState = {
         ...snapshot.state,
         playerBase: isCt ? snapshot.state.playerBase : snapshot.state.aiBase,
@@ -166,10 +170,11 @@ function App({ matchId, mySide }: CsPushGameProps) {
         aiItems: isCt ? snapshot.state.aiItems : snapshot.state.playerItems,
         playerDefuseCharges: isCt ? snapshot.state.playerDefuseCharges : snapshot.state.aiDefuseCharges,
         aiDefuseCharges: isCt ? snapshot.state.aiDefuseCharges : snapshot.state.playerDefuseCharges,
+        excellentPositions: snapshot.state.excellentPositions.map(position => ({ ...position, position: orientPosition(position.position) as 38 | 62 })),
         lanes: snapshot.state.lanes.map(lane => ({
           ...lane,
-          player: isCt ? lane.player : lane.ai,
-          ai: isCt ? lane.ai : lane.player,
+          player: (isCt ? lane.player : lane.ai).map(orientUnit),
+          ai: (isCt ? lane.ai : lane.player).map(orientUnit),
         })),
       };
       setBattle(prev => ({ ...prev, game: mapped, shop: snapshot.shops[serverSide] }));
@@ -333,6 +338,16 @@ function App({ matchId, mySide }: CsPushGameProps) {
 
   const closeTutorial = () => { markTutorialSeen(); setTutorialOpen(false); };
   const restart = () => { submitted.current = false; match.current = null; platform.startMatch({ gameId: GAME_ID, seasonId: SEASON_ID }).then(session => { match.current = session; }); setBattle({ game: createInitialState(randomPositions()), shop: makeShop() }); setSelected(null); };
+  const rematch = async () => {
+    if (!onlineClient || !matchId) return;
+    try {
+      const next = await onlineClient.rematch();
+      onlineClient.disconnect();
+      window.dispatchEvent(new CustomEvent('cspa:navigate', { detail: { path: `/games/${GAME_ID}?matchId=${encodeURIComponent(next.matchId)}&side=${next.side}` } }));
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : '暂时无法再来一局');
+    }
+  };
   const phase = game.elapsed < 180 ? '常规时间' : '突然死亡 · 2X';
   const result = game.status === 'player-win' ? '任务完成' : game.status === 'ai-win' ? '防线失守' : '势均力敌';
 
@@ -406,7 +421,7 @@ function App({ matchId, mySide }: CsPushGameProps) {
     </section>
 
     {tutorialOpen && <div className="tutorial-overlay" role="dialog" aria-modal="true" aria-label="CS推推新手教程">{spotlight && <div className="tutorial-cutout" style={{ top: spotlight.top, left: spotlight.left, width: spotlight.width, height: spotlight.height }} />}<section className="tutorial-card"><div className="tutorial-card-head"><span>CS推推 / 新手行动</span><strong>{tutorialStep + 1} / {tutorialSteps.length}</strong></div><h2>{currentTutorial.title}</h2><p>{currentTutorial.body}</p><TutorialContent step={currentTutorial} /><div className="tutorial-actions"><button className="tutorial-skip" onClick={closeTutorial}>跳过教程</button><span>{tutorialStep > 0 && <button onClick={() => setTutorialStep(step => step - 1)}>上一步</button>}<button className="tutorial-next" onClick={() => tutorialStep === tutorialSteps.length - 1 ? closeTutorial() : setTutorialStep(step => step + 1)}>{tutorialStep === tutorialSteps.length - 1 ? '开始对局' : '下一步'}</button></span></div></section></div>}
-    {game.status !== 'playing' && <div className="result-overlay"><div className="result-panel"><span>MATCH COMPLETE</span><h2>{result}</h2><p>CT {Math.ceil(game.playerBase)} — {Math.ceil(game.aiBase)} T</p>{!onlineMode && <div className="elo-result"><small>CS推推 · 独立天梯</small><strong>{getRankTier(rating?.elo ?? 1000).name} · {rating?.elo ?? 1000} ELO</strong></div>}{onlineMode ? <button onClick={() => platform.leaveToLobby()}><UiIcon name="back"/>返回大厅</button> : <button onClick={restart}><UiIcon name="restart"/>再次行动</button>}</div></div>}
+    {game.status !== 'playing' && <div className="result-overlay"><div className="result-panel"><span>MATCH COMPLETE</span><h2>{result}</h2><p>CT {Math.ceil(game.playerBase)} — {Math.ceil(game.aiBase)} T</p>{!onlineMode && <div className="elo-result"><small>CS推推 · 独立天梯</small><strong>{getRankTier(rating?.elo ?? 1000).name} · {rating?.elo ?? 1000} ELO</strong></div>}{onlineMode ? <div className="result-actions"><button onClick={() => void rematch()}><UiIcon name="restart"/>再来一局</button><button onClick={() => platform.leaveToLobby()}><UiIcon name="back"/>返回大厅</button></div> : <button onClick={restart}><UiIcon name="restart"/>再次行动</button>}</div></div>}
   </main>;
 }
 

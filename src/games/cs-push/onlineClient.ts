@@ -90,6 +90,13 @@ export class OnlineMatchClient {
     return this.pendingCommands.get(commandId)?.status;
   }
 
+  async rematch(): Promise<{ matchId: string; side: 'ct' | 't' }> {
+    const response = await fetch(`/api/matches/${encodeURIComponent(this.matchId)}/rematch`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const result = await response.json() as { matchId?: string; side?: 'ct' | 't'; message?: string };
+    if (!response.ok || !result.matchId || !result.side) throw new Error(result.message || '暂时无法再来一局');
+    return { matchId: result.matchId, side: result.side };
+  }
+
   getSnapshot(): OnlineSnapshot | null {
     return this.snapshot;
   }
