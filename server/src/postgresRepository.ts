@@ -9,7 +9,34 @@ const principalFromRow = (row: Record<string, unknown>): Principal => ({ id: Str
 export class PostgresRepository implements Repository {
   readonly pool: Pool;
   constructor(connectionString: string) { this.pool = new Pool({ connectionString }); }
-  async migrate(sql: string) { await this.pool.query(sql); }
+  async migrate(name: string, sql: string) {
+    await this.pool.query('CREATE TABLE IF NOT EXISTS schema_migrations (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())');
+    const applied = await this.pool.query('SELECT 1 FROM schema_migrations WHERE name=$1', [name]);
+    if (applied.rowCount) return;
+
+    // 兼容在迁移记录表加入前已经初始化过的旧数据库：
+    // 001 是完整初始 schema，只要 accounts 已存在，就把它登记为已完成。
+    if (name === '001_initial.sql') {
+      const existing = await this.pool.query("SELECT to_regclass('public.accounts') AS table_name");
+      if (existing.rows[0]?.table_name) {
+        await this.pool.query('INSERT INTO schema_migrations(name) VALUES($1) ON CONFLICT DO NOTHING', [name]);
+        return;
+      }
+    }
+
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(sql);
+      await client.query('INSERT INTO schema_migrations(name) VALUES($1)', [name]);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
   async createAccount(username: string, usernameNormalized: string, passwordHash: string) {
     const id = randomUUID();
     const { rows } = await this.pool.query('INSERT INTO accounts(id,username,username_normalized,password_hash) VALUES($1,$2,$3,$4) RETURNING *', [id, username, usernameNormalized, passwordHash]);

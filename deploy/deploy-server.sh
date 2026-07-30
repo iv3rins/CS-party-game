@@ -81,11 +81,15 @@ build_server() {
   log "构建后端服务"
   local server_dir="$SOURCE_DIR/server"
   [[ -d "$server_dir" ]] || fail "后端目录不存在: $server_dir"
+  # 旧版本可能曾由 root 创建 node_modules，先交还给构建用户，避免 npm ci 的 EACCES。
+  if [[ -d "$server_dir/node_modules" ]]; then
+    chown -R "$DEPLOY_USER:$DEPLOY_USER" "$server_dir/node_modules"
+  fi
   
   sudo -u "$DEPLOY_USER" bash -lc "
     set -Eeuo pipefail
     cd '$server_dir'
-    npm ci --no-audit --no-fund
+    npm ci --include=dev --no-audit --no-fund
     npm run build
     npm prune --omit=dev --no-audit --no-fund
   "
