@@ -35,7 +35,7 @@
     "dynamicOptions": {
       "offer": {
         "label": "接受 {{team}} · {{role}}",
-        "detail": "模拟 VRS #{{rank}} / {{tier}} / {{salary}} 万/月 / {{years}} 年 / 签字费 {{signingBonus}} 万",
+        "detail": "模拟VRS#{{rank}}/{{tier}}/{{salary}}万/月/{{years}}年/签字费{…",
         "result": "触发原因：{{reason}}；代价：{{cost}}"
       }
     }
@@ -161,7 +161,7 @@
     "kind": "offseason",
     "category": "退役转型",
     "title": "主播待业窗口",
-    "briefing": "半年预计直播收入 {{income}} 万、生活成本 {{livingCost}} 万。当前可用资产 {{assets}} 万，职业报价基础概率 {{offerChance}}%。",
+    "briefing": "半年预计直播收入{{income}}万、生活成本{{livingCost}}万。",
     "options": [
       {
         "id": "stream-focus",
@@ -252,7 +252,7 @@
     "timing": "post-report",
     "category": "队内体系",
     "title": "王朝危机：更衣室炸弹",
-    "briefing": "明星队友 {{starNick}}（能力 {{starAbility}} / 名气 {{starFame}}）要求更多战术特权。你与他的关系冲突已经影响冠军阵容。",
+    "briefing": "明星队友{{starNick}}（能力{{starAbility}}/名气{{starFame}}）要求更多战术特权。",
     "options": [
       {
         "id": "ego-suppress",

@@ -7,7 +7,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "Major四强赛1v3残局失利",
-    "briefing": "22岁，Major半决赛决胜图14:13领先。你作为最后一人面对敌方三人的回防，C4只剩8秒引爆。只要拿下这一分就拿到赛点，但对手三人都在包点附近。这是你职业生涯第一次打进Major四强。",
+    "briefing": "22岁，Major半决赛决胜图14:13领先。你作为最后一人面对敌方三人的回防，C4只剩8秒引爆。只要拿下这一分就拿到赛点，但对手三人都在包点附近。",
     "tags": [
       "worldline:wl-one-step-away:first-near-miss",
       "Major",
@@ -401,7 +401,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "决赛加时赛关键失误被做成集锦",
-    "briefing": "23岁，EIM总决赛决胜图30:30进入第31局加时。你是队伍的狙击手，在香蕉道拿到一个常规首杀后放松警惕被反闪反杀。这个失误被直播镜头反复回放，对手借势连拿两分锁定冠军。赛后社交媒体上你的失误画面被做成了表情包。",
+    "briefing": "23岁，EIM总决赛决胜图30:30进入第31局加时。你是队伍的狙击手，在香蕉道拿到一个常规首杀后放松警惕被反闪反杀。",
     "tags": [
       "worldline:wl-one-step-away:repeated-heartbreak",
       "EIM",
@@ -582,7 +582,7 @@
     "kind": "field",
     "timing": "post-report",
     "title": "赛后采访被当面质问关键局表现",
-    "briefing": "24岁，连续第二次在Major淘汰赛关键局中表现失常。赛后记者直接问：'你连续两个Major都在关键局失误，你认为自己是关键局选手吗？'周围选手在偷笑，直播信号没有中断。",
+    "briefing": "24岁，连续第二次在Major淘汰赛关键局中表现失常。赛后记者直接问：'你连续两个Major都在关键局失误，你认为自己是关键局选手吗？",
     "tags": [
       "worldline:wl-one-step-away:repeated-heartbreak",
       "采访",
@@ -739,7 +739,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "深夜队友来到宿舍安慰",
-    "briefing": "25岁，又一次在重要比赛中失利。你关了灯躺在床上盯着天花板发呆已经两个小时。凌晨一点，房门被敲响了——是你的老搭档，他手里拎着两瓶啤酒和一张不完整的比赛录像复盘。他说：'我知道你还醒着，开门吧。'",
+    "briefing": "25岁，又一次在重要比赛中失利。你关了灯躺在床上盯着天花板发呆已经两个小时。凌晨一点，房门被敲响了——是你的老搭档，他手里拎着两瓶啤酒和一张不完整的比赛录像复…",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "队内",
@@ -893,7 +893,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "连续第三次止步Major四强",
-    "briefing": "26岁，又一个Major四强。你已经连续三个Major在半决赛被同一支队伍淘汰。赛后更衣室里一片死寂，教练把战术板摔在地上。有个新人选手小声说了一句：'我们下个Major再来'。没人接话。",
+    "briefing": "26岁，又一个Major四强。你已经连续三个Major在半决赛被同一支队伍淘汰。赛后更衣室里一片死寂，教练把战术板摔在地上。",
     "tags": [
       "worldline:wl-one-step-away:repeated-heartbreak",
       "Major",
@@ -1077,7 +1077,7 @@
     "kind": "field",
     "timing": "post-report",
     "title": "被国内媒体贴上无冠核心标签",
-    "briefing": "27岁，一个电竞自媒体发布了一篇深度长文《他很强，但他赢不了——中国CS最悲情的天才》。文章详细列举了你的个人数据——连续三年Rating1.15+、三次入选TOP20、零个冠军。",
+    "briefing": "27岁，一个电竞自媒体发布了一篇深度长文《他很强，但他赢不了——中国CS最悲情的天才》。",
     "tags": [
       "worldline:wl-one-step-away:repeated-heartbreak",
       "舆论",
@@ -1232,7 +1232,7 @@
     "kind": "offseason",
     "timing": "post-report",
     "title": "降薪加入争冠队伍却再拿亚军",
-    "briefing": "28岁，你拒绝了老东家开出的三年顶薪续约合同，降薪40%加入了一支已经有两名TOP20选手的争冠队伍。第一个赛季你们一路杀进Major决赛——然后在决胜局被对手让二追三翻盘。",
+    "briefing": "28岁，你拒绝了老东家开出的三年顶薪续约合同，降薪40%加入了一支已经有两名TOP20选手的争冠队伍。",
     "tags": [
       "worldline:wl-one-step-away:repeated-heartbreak",
       "转会",
@@ -1386,7 +1386,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "年轻队友拿到冠军而我坐在替补席",
-    "briefing": "29岁，伤病让你错过了两个月的比赛。年轻替补顶替你的位置后表现出色，帮助队伍拿到了你三年都没能拿到的冠军。夺冠合照上，你穿着便服站在最边缘的位置，屏幕上正在播放MVP采访——不是你，是那个顶替你位置的19岁少年。",
+    "briefing": "29岁，伤病让你错过了两个月的比赛。年轻替补顶替你的位置后表现出色，帮助队伍拿到了你三年都没能拿到的冠军。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "替补",
@@ -1563,7 +1563,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "教练私下建议你去看心理医生",
-    "briefing": "30岁，训练赛结束后教练把你单独留在了战术室里。他关上门犹豫了很久才开口：'我找运动心理学的朋友聊过你的情况……他说你可能需要专业帮助。这个不是说你不行，是说你太在意了。'你看到教练的眼神里是真正的关心，不是质疑。",
+    "briefing": "30岁，训练赛结束后教练把你单独留在了战术室里。他关上门犹豫了很久才开口：'我找运动心理学的朋友聊过你的情况……他说你可能需要专业帮助。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "教练",
@@ -1887,7 +1887,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "关键局肌肉记忆犹豫导致失误",
-    "briefing": "32岁，BURST小组赛出线战，比分14:13，你拿到一个熟悉的1v1残局。对手在沙二A大拉出的动作和你训练赛里见过的一模一样——你比对手快了0.2秒开火。但在扣下扳机的瞬间，你犹豫了。",
+    "briefing": "32岁，BURST小组赛出线战，比分14:13，你拿到一个熟悉的1v1残局。对手在沙二A大拉出的动作和你训练赛里见过的一模一样——你比对手快了0.2秒开火。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "BURST",
@@ -2006,7 +2006,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "睡觉前脑海里反复回放失误画面",
-    "briefing": "33岁，每次关灯躺下后，那些关键失误的画面就会自动播放——1v3空掉的狙击、加时赛的失误、采访时的沉默。你试过数羊、喝酒、安眠药，但那些画面总是准时在凌晨三点出现。",
+    "briefing": "33岁，每次关灯躺下后，那些关键失误的画面就会自动播放——1v3空掉的狙击、加时赛的失误、采访时的沉默。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "失眠",
@@ -2158,7 +2158,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "队友IGL开始不给你关键残局",
-    "briefing": "34岁，在最近的淘汰赛中，你注意到IGL在关键残局时开始把资源给年轻选手。最后一次暂停时你听到他在队伍语音里说'把包给XXX打残局'。你在这支队伍呆了三年，你第一次感到自己不被信任了。赛后你找到IGL单独谈话。",
+    "briefing": "34岁，在最近的淘汰赛中，你注意到IGL在关键残局时开始把资源给年轻选手。最后一次暂停时你听到他在队伍语音里说'把包给XXX打残局'。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "IGL",
@@ -2320,7 +2320,7 @@
     "kind": "offseason",
     "timing": "post-report",
     "title": "主动降级打低级别赛事重建信心",
-    "briefing": "35岁，你做了一个让所有人都意外的决定——拒绝了T1级别的报价，主动加入了一支T2队伍。记者问你原因，你说'我需要重新学习怎么赢。'新队伍的基地很小，训练室只有四台电脑，墙上有上一任选手留下的外卖单。",
+    "briefing": "35岁，你做了一个让所有人都意外的决定——拒绝了T1级别的报价，主动加入了一支T2队伍。记者问你原因，你说'我需要重新学习怎么赢。",
     "tags": [
       "worldline:wl-one-step-away:redemption-or-acceptance",
       "降级",
@@ -2618,7 +2618,7 @@
     "kind": "offseason",
     "timing": "post-report",
     "title": "放下个人数据执念转为体系辅助",
-    "briefing": "37岁，你找到教练说我想转型辅助。教练看了你三秒钟确认你不是在开玩笑——你的个人数据一直是队里前二。你说'我想用另一种方式赢。'那天下训练课后你第一次主动去练了闪光弹的投掷路线。年轻队友看到后露出了复杂的表情。",
+    "briefing": "37岁，你找到教练说我想转型辅助。教练看了你三秒钟确认你不是在开玩笑——你的个人数据一直是队里前二。你说'我想用另一种方式赢。",
     "tags": [
       "worldline:wl-one-step-away:redemption-or-acceptance",
       "辅助",
@@ -2749,7 +2749,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "最后一次以老将角色帮年轻人夺冠",
-    "briefing": "38岁，你以辅助位身份随一支年轻队伍杀入Major决赛。对手是当年那支三次击败你的队伍。决赛前夜你在酒店对着镜子看自己的脸——眼角的皱纹、花白的鬓角、平静的眼神。你不再是当年那个会在关键局手抖的少年了。",
+    "briefing": "38岁，你以辅助位身份随一支年轻队伍杀入Major决赛。对手是当年那支三次击败你的队伍。",
     "tags": [
       "worldline:wl-one-step-away:redemption-or-acceptance",
       "Major",
