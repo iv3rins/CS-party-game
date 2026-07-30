@@ -504,19 +504,33 @@ export class OnlinePlatformAdapter extends LocalPlatformAdapter {
     return { accountId: principal.id, displayName: principal.username ?? `游客-${principal.id.slice(0, 4)}`, isGuest: principal.guest, globalLevel: 1, avatarSeed: principal.id };
   }
 
+  private async parseJson<T>(response: Response): Promise<T> {
+    const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(response.ok
+        ? '多人服务路由未配置：服务器返回了网页而不是 JSON'
+        : `多人服务不可用 (${response.status})`);
+    }
+    try {
+      return await response.json() as T;
+    } catch {
+      throw new Error('多人服务返回了无效的 JSON 数据');
+    }
+  }
+
   private async request<T>(path: string, init?: RequestInit): Promise<T> {
     const response = await fetch(path, { credentials: 'include', ...init, headers: { 'Content-Type': 'application/json', ...init?.headers } });
     if (!response.ok) {
-      const failure = await response.json().catch(() => ({ message: `服务器请求失败 (${response.status})` })) as { message?: string };
+      const failure = await this.parseJson<{ message?: string }>(response).catch(() => ({ message: `服务器请求失败 (${response.status})` }));
       throw new Error(failure.message || `服务器请求失败 (${response.status})`);
     }
-    return response.json() as Promise<T>;
+    return this.parseJson<T>(response);
   }
 
   private async ensureServerSession() {
     if (this.serverPrincipal) return this.serverPrincipal;
     const current = await fetch('/api/auth/me', { credentials: 'include' });
-    if (current.ok) this.serverPrincipal = await current.json() as ServerPrincipal;
+    if (current.ok) this.serverPrincipal = await this.parseJson<ServerPrincipal>(current);
     else if (current.status === 401) this.serverPrincipal = await this.request<ServerPrincipal>('/api/auth/guest', { method: 'POST', body: '{}' });
     else throw new Error(`无法连接多人服务 (${current.status})`);
     return this.serverPrincipal;

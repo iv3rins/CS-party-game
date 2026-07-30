@@ -143,6 +143,7 @@ location /api/ {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header Cookie $http_cookie;
+    proxy_read_timeout 60s;
 }
 
 location /ws {
@@ -155,6 +156,7 @@ location /ws {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header Cookie $http_cookie;
+    proxy_read_timeout 300s;
 }
 EOF
 
@@ -173,11 +175,14 @@ health_check_backend() {
   log "健康检查后端 API"
   local max_attempts=10
   local attempt=1
-  
+  local body
+
   while ((attempt <= max_attempts)); do
-    if curl --fail --silent --max-time 5 "http://127.0.0.1:3001/api/health" >/dev/null 2>&1; then
-      log "后端健康检查通过"
-      return 0
+    if body=$(curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:3001/api/health") && grep -q '"status":"ok"' <<<"$body"; then
+      if body=$(curl --fail --silent --show-error --max-time 10 "https://$DOMAIN/api/health") && grep -q '"status":"ok"' <<<"$body"; then
+        log "后端本机及公网健康检查通过"
+        return 0
+      fi
     fi
     log "等待后端启动... ($attempt/$max_attempts)"
     sleep 2
