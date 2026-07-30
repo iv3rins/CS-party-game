@@ -91,17 +91,17 @@ cat /etc/nginx/snippets/cs-party-backend.conf
 grep -n "cs-party-backend.conf" /etc/nginx/sites-available/cs-party-game
 
 # 检查公网 API
-curl https://game.n1k0major.top/api/health
+curl https://game.n1komajor.top/api/health
 # 应该返回: {"status":"ok"}
 
 # 测试游客会话创建
-curl -i -X POST https://game.n1k0major.top/api/auth/guest
+curl -i -X POST https://game.n1komajor.top/api/auth/guest
 # 应该返回 200 和 JSON，包含 Set-Cookie
 ```
 
 ### 5. 浏览器验证
 
-1. 访问 `https://game.n1k0major.top/lobby`
+1. 访问 `https://game.n1komajor.top/lobby`
 2. 选择 **CS推推**
 3. 点击 **快速匹配** 或 **创建房间**
 4. 应该显示"正在匹配..."或房间创建成功，而不是报错

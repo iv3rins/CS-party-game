@@ -12,7 +12,7 @@ NGINX_BACKEND_SNIPPET="/etc/nginx/snippets/cs-party-backend.conf"
 DATABASE_NAME="${DATABASE_NAME:-cspa_main}"
 DATABASE_USER="${DATABASE_USER:-cspa_app}"
 KEEP_RELEASES=3
-DOMAIN="${DOMAIN:-game.n1k0major.top}"
+DOMAIN="${DOMAIN:-game.n1komajor.top}"
 
 log() { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
 fail() { printf '\n\033[1;31mERROR: %s\033[0m\n' "$*" >&2; exit 1; }

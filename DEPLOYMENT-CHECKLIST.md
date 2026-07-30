@@ -42,8 +42,8 @@ sudo -u cs-party-deploy bash deploy/deploy.sh
 ```
 
 验证：
-- https://game.n1k0major.top/lobby ✓
-- https://game.n1k0major.top/games/cs-push ✓
+- https://game.n1komajor.top/lobby ✓
+- https://game.n1komajor.top/games/cs-push ✓
 
 ### 第二步：PostgreSQL 安装（Debian 12）
 ```bash
@@ -150,20 +150,20 @@ sudo systemctl reload nginx
 
 ### 1. 后端健康检查
 ```bash
-curl -i https://game.n1k0major.top/api/health
+curl -i https://game.n1komajor.top/api/health
 # 预期: HTTP/1.1 200 OK
 # {"status":"ok"}
 ```
 
 ### 2. 游客会话创建
 ```bash
-curl -i -X POST https://game.n1k0major.top/api/auth/guest
+curl -i -X POST https://game.n1komajor.top/api/auth/guest
 # 预期: 返回 Set-Cookie 头
 ```
 
 ### 3. 注册测试账号
 ```bash
-curl -i -X POST https://game.n1k0major.top/api/auth/register \
+curl -i -X POST https://game.n1komajor.top/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"测试用户1","password":"test1234"}'
 # 预期: 200 OK，返回账号信息和 Cookie
@@ -174,7 +174,7 @@ curl -i -X POST https://game.n1k0major.top/api/auth/register \
 # 保存上一步返回的 Cookie
 COOKIE="cs_push_session=..."
 
-curl -i -X POST https://game.n1k0major.top/api/queues \
+curl -i -X POST https://game.n1komajor.top/api/queues \
   -H "Content-Type: application/json" \
   -H "Cookie: $COOKIE" \
   -d '{"gameId":"cs-push","seasonId":"season-v1","mode":"casual"}'
@@ -183,7 +183,7 @@ curl -i -X POST https://game.n1k0major.top/api/queues \
 
 ### 5. 前端真人匹配测试
 1. 打开两个浏览器窗口（或无痕模式）
-2. 两个窗口都访问 https://game.n1k0major.top/lobby
+2. 两个窗口都访问 https://game.n1komajor.top/lobby
 3. 窗口A：注册账号"玩家A"
 4. 窗口B：注册账号"玩家B"
 5. 两个窗口同时点击"快速匹配"
@@ -224,7 +224,7 @@ sudo systemctl status cs-push-server
 curl http://127.0.0.1:3001/api/health
 
 # 3. 测试 Nginx 代理
-curl -i https://game.n1k0major.top/api/health
+curl -i https://game.n1komajor.top/api/health
 
 # 4. 检查 Nginx 日志
 sudo tail -f /var/log/nginx/error.log
@@ -236,7 +236,7 @@ sudo tail -f /var/log/nginx/error.log
 sudo journalctl -u cs-push-server -f
 
 # 2. 确认队列 API 可用
-curl -X POST https://game.n1k0major.top/api/queues \
+curl -X POST https://game.n1komajor.top/api/queues \
   -H "Cookie: cs_push_session=..." \
   -H "Content-Type: application/json" \
   -d '{"gameId":"cs-push","seasonId":"season-v1","mode":"casual"}'
@@ -253,7 +253,7 @@ curl -i -N \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: test" \
-  https://game.n1k0major.top/ws
+  https://game.n1komajor.top/ws
 
 # 检查 Nginx WebSocket 配置
 grep -A 10 "location /ws" /etc/nginx/sites-enabled/*

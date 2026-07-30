@@ -1,7 +1,7 @@
 # CS推推在线版部署指南
 
 VPS: `64.90.30.38`  
-域名: `game.n1k0major.top`  
+域名: `game.n1komajor.top`  
 提交: `59aaecd`（或更新的 main HEAD）
 系统: Debian 12
 
@@ -19,9 +19,9 @@ sudo -u cs-party-deploy bash deploy/deploy.sh
 ```
 
 健康检查会验证：
-- https://game.n1k0major.top/lobby
-- https://game.n1k0major.top/games/cs-push
-- https://game.n1k0major.top/games/cs-career
+- https://game.n1komajor.top/lobby
+- https://game.n1komajor.top/games/cs-push
+- https://game.n1komajor.top/games/cs-career
 
 ---
 
@@ -158,14 +158,14 @@ sudo systemctl reload nginx
 
 ```bash
 # 后端健康检查
-curl -i https://game.n1k0major.top/api/health
+curl -i https://game.n1komajor.top/api/health
 
 # 预期响应: HTTP/1.1 200 OK
 # {"status":"ok"}
 
 # 前端健康检查（已有）
-curl -I https://game.n1k0major.top/lobby
-curl -I https://game.n1k0major.top/games/cs-push
+curl -I https://game.n1komajor.top/lobby
+curl -I https://game.n1komajor.top/games/cs-push
 ```
 
 ---
@@ -249,7 +249,7 @@ sudo -u cs-party-deploy npm run build
 sudo systemctl restart cs-push-server
 
 # 5. 健康检查
-curl -i https://game.n1k0major.top/api/health
+curl -i https://game.n1komajor.top/api/health
 ```
 
 ---
@@ -282,7 +282,7 @@ grep -A 10 "location /api/" /etc/nginx/sites-enabled/*
 curl http://127.0.0.1:3001/api/health
 
 # 4. 测试 Nginx 代理
-curl -i https://game.n1k0major.top/api/health
+curl -i https://game.n1komajor.top/api/health
 ```
 
 ### WebSocket 连接失败
@@ -297,7 +297,7 @@ curl -i -N \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: test" \
-  https://game.n1k0major.top/ws
+  https://game.n1komajor.top/ws
 ```
 
 ---
@@ -326,18 +326,18 @@ curl -i -N \
 ## 八、验证步骤
 
 ### 前端验证（本地 AI 模式）
-访问 https://game.n1k0major.top/games/cs-push 应能正常游玩单机版
+访问 https://game.n1komajor.top/games/cs-push 应能正常游玩单机版
 
 ### 后端 API 验证
 ```bash
 # 1. 健康检查
-curl https://game.n1k0major.top/api/health
+curl https://game.n1komajor.top/api/health
 
 # 2. 创建游客会话
-curl -i -X POST https://game.n1k0major.top/api/auth/guest
+curl -i -X POST https://game.n1komajor.top/api/auth/guest
 
 # 3. 注册账号
-curl -i -X POST https://game.n1k0major.top/api/auth/register \
+curl -i -X POST https://game.n1komajor.top/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"测试用户","password":"test1234"}'
 ```

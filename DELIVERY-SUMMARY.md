@@ -3,7 +3,7 @@
 提交: `ac59b06`  
 日期: 2026-07-29  
 VPS: `64.90.30.38`  
-域名: `game.n1k0major.top`
+域名: `game.n1komajor.top`
 
 ---
 
@@ -166,7 +166,7 @@ sudo -u cs-party-deploy bash deploy/deploy.sh
 5. 生成 /opt/cs-party-game/server.env
 6. 安装 systemd 服务
 7. 更新 Nginx 配置（/api 和 /ws）
-8. 健康检查：curl https://game.n1k0major.top/api/health
+8. 健康检查：curl https://game.n1komajor.top/api/health
 
 ---
 
@@ -227,17 +227,17 @@ npm run build # ✅ 成功
 ### VPS 验证（部署后执行）
 ```bash
 # 前端健康检查
-curl -I https://game.n1k0major.top/lobby
-curl -I https://game.n1k0major.top/games/cs-push
+curl -I https://game.n1komajor.top/lobby
+curl -I https://game.n1komajor.top/games/cs-push
 
 # 后端健康检查
-curl -i https://game.n1k0major.top/api/health
+curl -i https://game.n1komajor.top/api/health
 
 # 游客会话
-curl -i -X POST https://game.n1k0major.top/api/auth/guest
+curl -i -X POST https://game.n1komajor.top/api/auth/guest
 
 # 注册账号
-curl -i -X POST https://game.n1k0major.top/api/auth/register \
+curl -i -X POST https://game.n1komajor.top/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"测试用户","password":"test1234"}'
 ```
