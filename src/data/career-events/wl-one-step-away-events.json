@@ -739,7 +739,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "深夜队友来到宿舍安慰",
-    "briefing": "25岁，又一次在重要比赛中失利。你关了灯躺在床上盯着天花板发呆已经两个小时。凌晨一点，房门被敲响了——是你的老搭档，他手里拎着两瓶啤酒和一张不完整的比赛录像复…",
+    "briefing": "25岁，又一次输掉关键赛。凌晨一点，老搭档带着啤酒和一段未看完的录像来找你。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "队内",
@@ -1563,7 +1563,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "教练私下建议你去看心理医生",
-    "briefing": "30岁，训练赛结束后教练把你单独留在了战术室里。他关上门犹豫了很久才开口：'我找运动心理学的朋友聊过你的情况……他说你可能需要专业帮助。",
+    "briefing": "30岁，训练赛后教练单独留下你：运动心理学专家建议你接受专业帮助。",
     "tags": [
       "worldline:wl-one-step-away:mental-burden",
       "教练",

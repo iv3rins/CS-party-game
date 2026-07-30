@@ -35,7 +35,7 @@
     "dynamicOptions": {
       "offer": {
         "label": "接受 {{team}} · {{role}}",
-        "detail": "模拟VRS#{{rank}}/{{tier}}/{{salary}}万/月/{{years}}年/签字费{…",
+        "detail": "模拟VRS#{{rank}}/{{tier}}/{{salary}}万/月/{{years}}年/签字费{{signingBonus}}万",
         "result": "触发原因：{{reason}}；代价：{{cost}}"
       }
     }
