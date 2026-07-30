@@ -96,7 +96,7 @@
     },
     {
       "id": "professional-journey",
-      "name": "职业旅程",
+      "name": "职业选手",
       "priority": 0,
       "conditions": []
     },
@@ -323,7 +323,7 @@
     },
     {
       "id": "comeback-kid",
-      "name": "二世归来的少年",
+      "name": "涅槃少年",
       "priority": 400,
       "conditions": [
         {
@@ -340,7 +340,7 @@
     },
     {
       "id": "carry-machine",
-      "name": "Carry机器",
+      "name": "数据收割机",
       "priority": 380,
       "conditions": [
         {
@@ -391,7 +391,7 @@
     },
     {
       "id": "veteran-coach",
-      "name": "选手转教练",
+      "name": "选手教练",
       "priority": 320,
       "conditions": [
         {
@@ -510,7 +510,7 @@
     },
     {
       "id": "two-way-player",
-      "name": "全能选手",
+      "name": "双向核心",
       "priority": 180,
       "conditions": [
         {
@@ -578,7 +578,7 @@
     },
     {
       "id": "mr-consistent",
-      "name": "铁人",
+      "name": "稳定铁人",
       "priority": 100,
       "conditions": [
         {
@@ -595,7 +595,7 @@
     },
     {
       "id": "streamer-king",
-      "name": "直播皇帝",
+      "name": "直播王牌",
       "priority": 80,
       "conditions": [
         {

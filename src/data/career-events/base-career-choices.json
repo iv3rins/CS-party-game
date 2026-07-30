@@ -463,7 +463,7 @@
     "category": "合同转会",
     "kind": "annual",
     "title": "下一年的战队方向",
-    "briefing": "一整年结束后，你需要决定下一年留在熟悉体系，还是转会冲击更高目标。",
+    "briefing": "一整年结束后，需要决定下一年留在熟悉体系，还是转会冲击更高目标。",
     "source": {
       "type": "human-authored",
       "reviewStatus": "draft",

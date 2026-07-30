@@ -4,7 +4,7 @@
     "category": "合同转会",
     "kind": "offseason",
     "title": "青训报告被多支队伍转发",
-    "briefing": "一位虚构的地区青训教练把你的比赛报告递给了更高层级俱乐部。你还没有冠军，但最近 Rating 已经让市场重新估价。",
+    "briefing": "一位虚构的地区青训教练把你的比赛报告递给了更高层级俱乐部。你还没有冠军，但最近Rating已经让市场重新估价。",
     "options": [
       {
         "id": "academy-show",
@@ -19,7 +19,7 @@
       {
         "id": "academy-stay",
         "label": "留下完成当前赛季",
-        "detail": "保持首发与训练量，报价热度可能延后",
+        "detail": "保持首发与训练量，报价热度可能降温",
         "changes": {
           "teamForm": 5,
           "ability": 2,
@@ -56,7 +56,7 @@
       {
         "id": "international-defer",
         "label": "等当前队伍再打一个赛季",
-        "detail": "保持稳定，未来仍可能收到正式邀请",
+        "detail": "保持稳定，正式邀请仍有可能",
         "changes": {
           "teamForm": 4,
           "connections": 4,
@@ -228,7 +228,7 @@
       {
         "id": "dream-1-a",
         "label": "接受针对性试训",
-        "detail": "能力 +5 / 名气 +6 / 健康 -3",
+        "detail": "能力+5/名气+6/健康-3",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -238,7 +238,7 @@
       {
         "id": "dream-1-b",
         "label": "先完成当前赛季",
-        "detail": "能力 +2 / 关系 +4",
+        "detail": "能力+2/关系+4",
         "changes": {
           "ability": 2,
           "connections": 3
@@ -257,13 +257,13 @@
     "catalogId": "dream-variant-2",
     "category": "合同转会",
     "kind": "offseason",
-    "title": "你在弱队连续打出高 Rating，评论员开始称你为黑马",
+    "title": "你在弱队连续打出高Rating，评论员开始称你为黑马",
     "briefing": "新人爆发进入新的节点。这是虚构职业生态中的低概率机会，成功会打开更强市场，失败也只会留下可恢复的代价。",
     "options": [
       {
         "id": "dream-2-a",
         "label": "主动承担核心火力",
-        "detail": "能力 +6 / 名气 +8 / 关系 -3",
+        "detail": "能力+6/名气+8/关系-3",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -273,7 +273,7 @@
       {
         "id": "dream-2-b",
         "label": "保护团队体系",
-        "detail": "战队状态 +5 / 关系 +3",
+        "detail": "战队状态+5/关系+3",
         "changes": {
           "ability": 1,
           "connections": 3
@@ -298,7 +298,7 @@
       {
         "id": "dream-3-a",
         "label": "公开展示个人打法",
-        "detail": "名气 +9 / 关系 -4 / 高压风险 +3",
+        "detail": "名气+9/关系-4/高压风险+3",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -308,7 +308,7 @@
       {
         "id": "dream-3-b",
         "label": "保持低调训练",
-        "detail": "能力 +3 / 清白 +2",
+        "detail": "能力+3/清白+2",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -333,7 +333,7 @@
       {
         "id": "dream-4-a",
         "label": "接受跨级挑战",
-        "detail": "能力 +4 / 名气 +7 / 健康 -4",
+        "detail": "能力+4/名气+7/健康-4",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -343,7 +343,7 @@
       {
         "id": "dream-4-b",
         "label": "按原计划成长",
-        "detail": "能力 +3 / 关系 +3",
+        "detail": "能力+3/关系+3",
         "changes": {
           "ability": 2,
           "connections": 3
@@ -368,7 +368,7 @@
       {
         "id": "dream-5-a",
         "label": "接受培养长约",
-        "detail": "关系 +7 / 能力 +3 / 名气 -2",
+        "detail": "关系+7/能力+3/名气-2",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -378,7 +378,7 @@
       {
         "id": "dream-5-b",
         "label": "要求短约保留自由",
-        "detail": "名气 +4 / 关系 -3",
+        "detail": "名气+4/关系-3",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -403,7 +403,7 @@
       {
         "id": "dream-6-a",
         "label": "顶上最关键的位置",
-        "detail": "能力 +7 / 名气 +8 / 健康 -5",
+        "detail": "能力+7/名气+8/健康-5",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -413,7 +413,7 @@
       {
         "id": "dream-6-b",
         "label": "先要求完整热身",
-        "detail": "健康 +3 / 能力 +2",
+        "detail": "健康+3/能力+2",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -438,7 +438,7 @@
       {
         "id": "dream-7-a",
         "label": "主动竞争首发",
-        "detail": "能力 +5 / 关系 -4 / 名气 +5",
+        "detail": "能力+5/关系-4/名气+5",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -448,7 +448,7 @@
       {
         "id": "dream-7-b",
         "label": "继续做好替补职责",
-        "detail": "关系 +7 / 能力 +2",
+        "detail": "关系+7/能力+2",
         "changes": {
           "ability": 2,
           "connections": 3
@@ -473,7 +473,7 @@
       {
         "id": "dream-8-a",
         "label": "接受临场指挥",
-        "detail": "能力 +4 / 关系 +6 / 健康 -2",
+        "detail": "能力+4/关系+6/健康-2",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -483,7 +483,7 @@
       {
         "id": "dream-8-b",
         "label": "坚持熟悉战术",
-        "detail": "稳定 +5 / 名气 -1",
+        "detail": "稳定+5/名气-1",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -508,7 +508,7 @@
       {
         "id": "dream-9-a",
         "label": "参加训练营",
-        "detail": "名气 +6 / 能力 +4 / 资产 -3",
+        "detail": "名气+6/能力+4/资产-3",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -518,7 +518,7 @@
       {
         "id": "dream-9-b",
         "label": "留队争取位置",
-        "detail": "关系 +5 / 能力 +2",
+        "detail": "关系+5/能力+2",
         "changes": {
           "ability": 2,
           "connections": 3
@@ -543,7 +543,7 @@
       {
         "id": "dream-10-a",
         "label": "接受轮换定位",
-        "detail": "关系 +8 / 名气 +4 / 能力 +2",
+        "detail": "关系+8/名气+4/能力+2",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -553,7 +553,7 @@
       {
         "id": "dream-10-b",
         "label": "要求立即首发",
-        "detail": "能力 +5 / 关系 -7",
+        "detail": "能力+5/关系-7",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -578,7 +578,7 @@
       {
         "id": "dream-11-a",
         "label": "投入适应训练",
-        "detail": "国际适应 +12 / 能力 +3 / 健康 -3",
+        "detail": "国际适应+12/能力+3/健康-3",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -588,7 +588,7 @@
       {
         "id": "dream-11-b",
         "label": "先解决合同细节",
-        "detail": "清白 +3 / 关系 +2",
+        "detail": "清白+3/关系+2",
         "changes": {
           "ability": 1,
           "connections": 3
@@ -613,7 +613,7 @@
       {
         "id": "dream-12-a",
         "label": "接受轮换试训",
-        "detail": "名气 +8 / 国际适应 +8 / 关系 -5",
+        "detail": "名气+8/国际适应+8/关系-5",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -623,7 +623,7 @@
       {
         "id": "dream-12-b",
         "label": "等待首发承诺",
-        "detail": "关系 +4 / 名气 +2",
+        "detail": "关系+4/名气+2",
         "changes": {
           "ability": 1,
           "connections": 3
@@ -648,7 +648,7 @@
       {
         "id": "dream-13-a",
         "label": "承担公开沟通",
-        "detail": "名气 +8 / 关系 +5 / 健康 -2",
+        "detail": "名气+8/关系+5/健康-2",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -658,7 +658,7 @@
       {
         "id": "dream-13-b",
         "label": "让翻译处理",
-        "detail": "国际适应 +4 / 名气 +1",
+        "detail": "国际适应+4/名气+1",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -683,7 +683,7 @@
       {
         "id": "dream-14-a",
         "label": "自费完成迁移",
-        "detail": "资产 -8 / 国际适应 +10 / 名气 +4",
+        "detail": "资产-8/国际适应+10/名气+4",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -693,7 +693,7 @@
       {
         "id": "dream-14-b",
         "label": "暂缓出国",
-        "detail": "资产 +3 / 国际适应 +2",
+        "detail": "资产+3/国际适应+2",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -718,7 +718,7 @@
       {
         "id": "dream-15-a",
         "label": "接受体系重做",
-        "detail": "能力 +5 / 关系 -4 / 国际适应 +8",
+        "detail": "能力+5/关系-4/国际适应+8",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -728,7 +728,7 @@
       {
         "id": "dream-15-b",
         "label": "保留原有打法",
-        "detail": "能力 +2 / 名气 +5",
+        "detail": "能力+2/名气+5",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -753,7 +753,7 @@
       {
         "id": "dream-16-a",
         "label": "推动固定搭档",
-        "detail": "关系 +9 / 名气 +7 / 阵容稳定 -3",
+        "detail": "关系+9/名气+7/阵容稳定-3",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -763,7 +763,7 @@
       {
         "id": "dream-16-b",
         "label": "保持职业距离",
-        "detail": "清白 +3 / 关系 +3",
+        "detail": "清白+3/关系+3",
         "changes": {
           "ability": 1,
           "connections": 3
@@ -788,7 +788,7 @@
       {
         "id": "dream-17-a",
         "label": "接受商业合作",
-        "detail": "名气 +10 / 资产 +8 / 能力 -3",
+        "detail": "名气+10/资产+8/能力-3",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -798,7 +798,7 @@
       {
         "id": "dream-17-b",
         "label": "坚持竞技优先",
-        "detail": "能力 +5 / 名气 -2",
+        "detail": "能力+5/名气-2",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -823,7 +823,7 @@
       {
         "id": "dream-18-a",
         "label": "共同寻找新队",
-        "detail": "名气 +6 / 关系 +7 / 阵容稳定 -4",
+        "detail": "名气+6/关系+7/阵容稳定-4",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -833,7 +833,7 @@
       {
         "id": "dream-18-b",
         "label": "留队保护核心",
-        "detail": "关系 +5 / 战队状态 +5",
+        "detail": "关系+5/战队状态+5",
         "changes": {
           "ability": 1,
           "connections": 3
@@ -858,7 +858,7 @@
       {
         "id": "dream-19-a",
         "label": "接受整组试训",
-        "detail": "能力 +5 / 名气 +8 / 健康 -3",
+        "detail": "能力+5/名气+8/健康-3",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -868,7 +868,7 @@
       {
         "id": "dream-19-b",
         "label": "先赢下当前赛季",
-        "detail": "战队状态 +7 / 关系 +4",
+        "detail": "战队状态+7/关系+4",
         "changes": {
           "ability": 1,
           "connections": 3
@@ -893,7 +893,7 @@
       {
         "id": "dream-20-a",
         "label": "保护队友",
-        "detail": "关系 +8 / 名气 -2 / 清白 +2",
+        "detail": "关系+8/名气-2/清白+2",
         "changes": {
           "ability": 1,
           "fame": 1,
@@ -903,7 +903,7 @@
       {
         "id": "dream-20-b",
         "label": "公开讨论竞争",
-        "detail": "名气 +6 / 关系 -6",
+        "detail": "名气+6/关系-6",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -928,7 +928,7 @@
       {
         "id": "dream-21-a",
         "label": "公开分享研究",
-        "detail": "关系 +5 / 名气 +6 / 能力 +3",
+        "detail": "关系+5/名气+6/能力+3",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -938,7 +938,7 @@
       {
         "id": "dream-21-b",
         "label": "保留战术秘密",
-        "detail": "能力 +5 / 清白 -2",
+        "detail": "能力+5/清白-2",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -963,7 +963,7 @@
       {
         "id": "dream-22-a",
         "label": "接过临时指挥",
-        "detail": "战术能力 +5 / 关系 +7 / 健康 -3",
+        "detail": "战术能力+5/关系+7/健康-3",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -973,7 +973,7 @@
       {
         "id": "dream-22-b",
         "label": "坚持原定位",
-        "detail": "能力 +3 / 名气 +2",
+        "detail": "能力+3/名气+2",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -998,7 +998,7 @@
       {
         "id": "dream-23-a",
         "label": "要求长期加薪",
-        "detail": "资产 +10 / 关系 -4 / 名气 +4",
+        "detail": "资产+10/关系-4/名气+4",
         "changes": {
           "ability": 1,
           "fame": 4,
@@ -1008,7 +1008,7 @@
       {
         "id": "dream-23-b",
         "label": "接受训练资源",
-        "detail": "能力 +6 / 资产 +4",
+        "detail": "能力+6/资产+4",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -1033,7 +1033,7 @@
       {
         "id": "dream-24-a",
         "label": "维持稳定节奏",
-        "detail": "能力 +4 / 健康 +3 / 名气 +5",
+        "detail": "能力+4/健康+3/名气+5",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -1043,7 +1043,7 @@
       {
         "id": "dream-24-b",
         "label": "冒险追求极限数据",
-        "detail": "能力 +7 / 健康 -6",
+        "detail": "能力+7/健康-6",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -1068,7 +1068,7 @@
       {
         "id": "dream-25-a",
         "label": "快速转型第二套体系",
-        "detail": "能力 +5 / 位置熟练 -4 / 关系 +4",
+        "detail": "能力+5/位置熟练-4/关系+4",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -1078,7 +1078,7 @@
       {
         "id": "dream-25-b",
         "label": "继续强化单一优势",
-        "detail": "能力 +3 / 名气 +5",
+        "detail": "能力+3/名气+5",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -1103,7 +1103,7 @@
       {
         "id": "dream-26-a",
         "label": "参与重组",
-        "detail": "关系 +10 / 战队状态 +6 / 资产 -4",
+        "detail": "关系+10/战队状态+6/资产-4",
         "changes": {
           "ability": 1,
           "fame": 1,
@@ -1113,7 +1113,7 @@
       {
         "id": "dream-26-b",
         "label": "拒绝怀旧计划",
-        "detail": "能力 +4 / 名气 +3",
+        "detail": "能力+4/名气+3",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -1138,7 +1138,7 @@
       {
         "id": "dream-27-a",
         "label": "承担连接角色",
-        "detail": "关系 +8 / 阵容稳定 +7 / 能力 -2",
+        "detail": "关系+8/阵容稳定+7/能力-2",
         "changes": {
           "ability": 1,
           "fame": 1,
@@ -1148,7 +1148,7 @@
       {
         "id": "dream-27-b",
         "label": "只做个人准备",
-        "detail": "能力 +5 / 关系 -3",
+        "detail": "能力+5/关系-3",
         "changes": {
           "ability": 2,
           "connections": 1
@@ -1173,7 +1173,7 @@
       {
         "id": "dream-28-a",
         "label": "接受核心管理权",
-        "detail": "关系 +6 / 能力 +4 / 健康 -3",
+        "detail": "关系+6/能力+4/健康-3",
         "changes": {
           "ability": 3,
           "fame": 1,
@@ -1183,7 +1183,7 @@
       {
         "id": "dream-28-b",
         "label": "只签选手合同",
-        "detail": "名气 +4 / 清白 +2",
+        "detail": "名气+4/清白+2",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -1208,7 +1208,7 @@
       {
         "id": "dream-29-a",
         "label": "继续共同冲刺",
-        "detail": "名气 +9 / 能力 +5 / 健康 -4",
+        "detail": "名气+9/能力+5/健康-4",
         "changes": {
           "ability": 3,
           "fame": 4,
@@ -1218,7 +1218,7 @@
       {
         "id": "dream-29-b",
         "label": "趁热寻找强队",
-        "detail": "名气 +7 / 关系 -5",
+        "detail": "名气+7/关系-5",
         "changes": {
           "ability": 1,
           "connections": 1
@@ -1243,7 +1243,7 @@
       {
         "id": "dream-30-a",
         "label": "邀请年轻选手补强",
-        "detail": "关系 +6 / 阵容稳定 +8 / 资产 -5",
+        "detail": "关系+6/阵容稳定+8/资产-5",
         "changes": {
           "ability": 1,
           "fame": 1,
@@ -1253,7 +1253,7 @@
       {
         "id": "dream-30-b",
         "label": "接受外部报价",
-        "detail": "能力 +4 / 名气 +8",
+        "detail": "能力+4/名气+8",
         "changes": {
           "ability": 2,
           "connections": 1

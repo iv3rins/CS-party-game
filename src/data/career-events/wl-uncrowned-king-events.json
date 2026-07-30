@@ -6,8 +6,8 @@
     "category": "舆论媒体",
     "kind": "field",
     "timing": "post-report",
-    "title": "连续三年Rating 1.15+但被质疑数据刷子",
-    "briefing": "23岁，你连续三年在联赛中打出Rating 1.15以上的数据，但队伍始终止步四强。一个知名主播在直播中翻着你的比赛数据说：'这个人的数据都是虐菜刷出来的，你看他对阵TOP5队伍时的Rating——1.02。'弹幕里在刷'数据刷子'。",
+    "title": "连续三年Rating1.15+但被质疑数据刷子",
+    "briefing": "23岁，你连续三年在联赛中打出Rating1.15以上的数据，但队伍始终止步四强。一个知名主播在直播中翻着你的比赛数据说：'这个人的数据都是虐菜刷出来的，你看他对阵TOP5队伍时的Rating——1.02。",
     "tags": [
       "worldline:wl-uncrowned-king:high-stats-low-trophies",
       "舆论",
@@ -515,6 +515,498 @@
             },
             "changes": {
               "connections": -3,
+              "health": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-005",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "一个人扛着弱队打强队体力透支",
+    "briefing": "24岁，这周已经是连续第五个比赛日了。没有替补，每一局你都在场上。第四张图时你的手开始发抖——不是紧张，是疲劳。教练问你还能不能继续，你说能。但你知道自己的反应已经慢了不止0.1秒。队伍里没有人能替你分担。",
+    "tags": [
+      "worldline:wl-uncrowned-king:high-stats-low-trophies",
+      "疲劳",
+      "负重"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 28,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 78
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 40
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "high-stats-low-trophies"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "push-through",
+        "label": "硬撑着打完这场比赛",
+        "detail": "用意志力克服身体极限。",
+        "changes": {
+          "ability": 2,
+          "health": -6,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "guts-win",
+            "label": "咬牙坚持拿下了比赛个人数据爆炸",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 8,
+              "health": -5
+            }
+          },
+          {
+            "id": "collapse",
+            "label": "过度疲劳导致比赛后半段数据断崖式下跌",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": -4,
+              "health": -8,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "admit-tired",
+        "label": "承认体力不支让队伍调整战术",
+        "detail": "降低自己的战术占比让队友多打。",
+        "changes": {
+          "connections": 3,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "team-steps-up",
+            "label": "队友在你让出资源后打出了惊喜",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": 5,
+              "teamForm": 3
+            }
+          },
+          {
+            "id": "team-collapses",
+            "label": "你不在核心位置队伍直接崩盘",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "teamForm": -5,
+              "fame": -5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-006",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "经纪人劝你降薪去强队赌一把",
+    "briefing": "25岁，经纪人打了一通很长的电话。他说你现在这个队伍拿不到冠军的，天花板就在那儿。有一支争冠级的队伍愿意给你一个位置，但工资只有现在的60%，而且是从替补打起。他说：你27岁的工资取决于你25岁这三年拿了什么冠军。",
+    "tags": [
+      "worldline:wl-uncrowned-king:contract-crossroads",
+      "经纪人",
+      "降薪",
+      "赌博"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 23,
+    "maxAge": 29,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 50
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 30
+    },
+    "cooldownSeasons": 10,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "contract-crossroads"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "gamble-titles",
+        "label": "降薪去强队赌冠军",
+        "detail": "放弃收入和地位赌一个冠军。",
+        "changes": {
+          "earnings": -8,
+          "fame": -2,
+          "connections": -3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-uncrowned-king",
+            "action": "advance",
+            "toStage": "contract-crossroads",
+            "branchId": "paycut-gamble",
+            "note": "降薪赌冠军"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "gamble-pays",
+            "label": "赌对了——队伍夺冠你拿到了一枚奖牌",
+            "weight": {
+              "const": 30
+            },
+            "changes": {
+              "fame": 15,
+              "connections": 5
+            }
+          },
+          {
+            "id": "bench-rotting",
+            "label": "坐了两年冷板凳错过了巅峰期",
+            "weight": {
+              "const": 70
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -5,
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "stay-king",
+        "label": "留在弱队当王拿高薪",
+        "detail": "稳定但放弃争冠。",
+        "changes": {
+          "earnings": 8,
+          "fame": 3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "good-money",
+            "label": "收入丰厚但年年无缘冠军",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "earnings": 8,
+              "fame": 2
+            }
+          },
+          {
+            "id": "team-improves2",
+            "label": "队伍利用资金引援了",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": 5,
+              "teamForm": 5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-007",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "field",
+    "timing": "post-report",
+    "title": "被媒体评为最强无冠选手",
+    "briefing": "26岁，一个权威媒体发布了一份榜单：现役最强无冠选手TOP10。你排在第一。文章写道拥有联盟前三的个人数据但荣誉栏空空如也。你的父母看到了这篇文章，妈妈打电话问你上面说的是真的吗。你说妈你别看那些。",
+    "tags": [
+      "worldline:wl-uncrowned-king:high-stats-low-trophies",
+      "舆论",
+      "无冠",
+      "家庭"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 24,
+    "maxAge": 30,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 55
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 25
+    },
+    "cooldownSeasons": 5,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "high-stats-low-trophies"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "ignore-and-fight",
+        "label": "不去看这些文章继续比赛",
+        "detail": "专注当下不被外界影响。",
+        "changes": {
+          "ability": 2,
+          "fame": -1
+        },
+        "outcomes": [
+          {
+            "id": "focus-pays2",
+            "label": "下一场比赛中打出了生涯最高数据",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 5
+            }
+          },
+          {
+            "id": "sticks-in-mind",
+            "label": "不在意是假的心里还是堵",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "talk-to-family",
+        "label": "和家里认真聊一下这件事",
+        "detail": "和父母坦诚自己的职业生涯。",
+        "changes": {
+          "connections": 3,
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "family-support",
+            "label": "父母说无论有没有冠军都为你骄傲",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "connections": 5,
+              "health": 5
+            }
+          },
+          {
+            "id": "more-pressure2",
+            "label": "他们越说支持你你越觉得愧疚",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "health": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-008",
+    "revision": 1,
+    "category": "角色转职",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "28岁要么牺牲数据要么接受无冠",
+    "briefing": "28岁，你站在职业生涯的十字路口。你的个人数据依然漂亮，但冠军依旧遥遥无期。教练在一次谈话中说了一句让你失眠的话：你可能需要决定你更想要什么——漂亮的个人数据，还是一个冠军。不是所有人能两样都有的。",
+    "tags": [
+      "worldline:wl-uncrowned-king:sacrifice-or-persist",
+      "抉择",
+      "数据",
+      "冠军"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 26,
+    "maxAge": 32,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 78
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 20
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "sacrifice-or-persist"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "sacrifice-data",
+        "label": "牺牲个人数据转型体系选手",
+        "detail": "降低自己的战术占比帮助团队。",
+        "changes": {
+          "ability": -3,
+          "connections": 4,
+          "teamForm": 4
+        },
+        "outcomes": [
+          {
+            "id": "team-elevates",
+            "label": "你让出资源后年轻核心打出了生涯年",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -2,
+              "connections": 6,
+              "teamForm": 6
+            }
+          },
+          {
+            "id": "data-drops-team-same",
+            "label": "数据下降了队伍成绩没变化",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -4,
+              "fame": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "keep-hunting",
+        "label": "坚持自己的打法继续等机会",
+        "detail": "相信自己总有一天会遇到合适的队伍。",
+        "changes": {
+          "ability": 2,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "eventually-finds",
+            "label": "两个赛季后终于等到了一支有竞争力的队伍",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 5,
+              "fame": 5
+            }
+          },
+          {
+            "id": "time-runs-out",
+            "label": "年龄增长数据开始下滑",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -3,
               "health": -3
             }
           }

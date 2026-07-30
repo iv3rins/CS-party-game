@@ -73,6 +73,7 @@ if(!unique(titleIds)||!titlesRaw.some(value=>isObject(value)&&Array.isArray(valu
 const requiredTemplates=['honorsWithMvp','honorsWithoutMvp','pressure','compareAbove','compareFirst'];
 if(!isObject(top20Json.templates)||requiredTemplates.some(key=>typeof top20Json.templates[key as keyof typeof top20Json.templates]!=='string'))errors.push('TOP20 缺少必需模板');
 else for(const key of requiredTemplates){const value=top20Json.templates[key as keyof typeof top20Json.templates];if(templateTokens(value).some(token=>!TEMPLATE_KEYS.has(token)))errors.push(`TOP20 模板 ${key} 占位符无效`);}
+if(!isObject(top20Json.tierModel)||['TOP 1','TOP 2-3','TOP 4-5','TOP 6-10','TOP 11-15','TOP 16-20'].some(key=>{const tier=(top20Json.tierModel as Record<string,unknown>)[key];return !isObject(tier)||typeof tier.minScore!=='number'||typeof tier.minRating!=='number';}))errors.push('TOP20 六档模型无效');
 if(!isObject(top20Json.interview)||!Array.isArray(top20Json.interview.quotes)||!top20Json.interview.quotes.length||top20Json.interview.quotes.some(quote=>typeof quote.id!=='string'||typeof quote.text!=='string')||top20Json.interview.chanceBps<0||top20Json.interview.chanceBps>10000)errors.push('TOP20 采访配置无效');
 if(errors.length)throw new Error(`职业内容配置无效：\n${errors.join('\n')}`);
 

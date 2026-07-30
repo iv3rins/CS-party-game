@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { advanceTournament, becomeStreamer, CareerState, continueFromReport, createCareer, generateAnnualTop20, getCurrentCareerScore, loadCareer, previewDecisionOutcome, resolveCareerChoice, resolveEmergency, saveCareer, startSeason, type HonorAward, type SeasonRecord, type TournamentResult } from './careerEngine';
+import { TOURNAMENTS } from './careerData';
 import { ALL_CAREER_EVENTS, EVENT_CATALOG_SIZE, TOTAL_EVENT_COUNT } from './careerEventCatalog';
 import { MAJOR_CITIES } from './careerData';
 import { getHistoricalPlayerBaseline } from './historicalTop20';
@@ -159,9 +160,9 @@ describe('career weighted event contracts', () => {
 
   it('guarantees annual TOP1 for two distinct Major MVPs and keeps a full TOP20', () => {
     const state=createCareer({seed:'double-major',name:'Spec',pace:'fast',originId:'academy',role:'entry'});
-    const context={major:1,elite:1,playoffs:1,arena:1,bigMatches:1,finals:1,elimination:1,vsTop5:1,vsTop10:1,vsTop20:1};
-    const tournament=(id:string):TournamentResult=>({id,tournamentId:id,name:`${id} Major`,organizer:'虚构赛事方',city:'成都',tier:'Major',honorClass:'major',invited:true,qualified:true,invitationReason:'测试',placement:'冠军',matches:5,wins:5,maps:15,mapWins:10,teamPrize:100,playerPrize:13.6,salaryPaid:0,rating:1.01,rankingDelta:10,context});
-    const record=(half:'first'|'second',result:TournamentResult):SeasonRecord=>{const mvp:HonorAward={id:`${result.id}-mvp`,season:half==='first'?1:2,tournamentName:result.name,kind:'MVP',honorClass:'major'};return {season:half==='first'?1:2,careerYear:1,half,age:16,team:state.team,tier:state.tier,rating:1.01,kd:1,adr:70,matches:5,winRate:50,placement:'冠军',teamPrize:100,playerPrize:13.6,salaryPaid:0,note:'测试',deltas:{ability:0,connections:0,integrity:0,fame:0,health:0,earnings:0},tournaments:[result],globalRank:10,regionRank:1,rankingDelta:10,honors:[mvp]};};
+    const context={major:1.31,elite:1.31,playoffs:1.31,arena:1.28,bigMatches:1.25,finals:1.30,elimination:1.28,vsTop5:1.20,vsTop10:1.22,vsTop20:1.24};
+    const tournament=(id:string):TournamentResult=>({id,tournamentId:id,name:`${id} Major`,organizer:'虚构赛事方',city:'成都',tier:'Major',honorClass:'major',invited:true,qualified:true,invitationReason:'测试',placement:'冠军',matches:5,wins:5,maps:15,mapWins:10,teamPrize:100,playerPrize:13.6,salaryPaid:0,rating:1.31,rankingDelta:10,context});
+    const record=(half:'first'|'second',result:TournamentResult):SeasonRecord=>{const mvp:HonorAward={id:`${result.id}-mvp`,season:half==='first'?1:2,tournamentName:result.name,kind:'MVP',honorClass:'major'};return {season:half==='first'?1:2,careerYear:1,half,age:16,team:state.team,tier:state.tier,rating:1.31,kd:1,adr:70,matches:5,winRate:50,placement:'冠军',teamPrize:100,playerPrize:13.6,salaryPaid:0,note:'测试',deltas:{ability:0,connections:0,integrity:0,fame:0,health:0,earnings:0},tournaments:[result],globalRank:10,regionRank:1,rankingDelta:10,honors:[mvp]};};
     const annual=generateAnnualTop20(state,[record('first',tournament('spring')),record('second',tournament('autumn'))]);
     expect(annual).toMatchObject({eligible:true,playerRank:1});
     expect(annual.entries).toHaveLength(20);
@@ -200,6 +201,13 @@ describe('career weighted event contracts', () => {
     expect(streamer.decision).toEqual(becomeStreamer(state).decision);
   });
 
+  it('never offers match decisions before the first tournament starts', () => {
+    for (const seed of ['pre-match-1','pre-match-2','pre-match-3','pre-match-4','pre-match-5']) {
+      const state=startSeason(createCareer({seed,name:'Timing',pace:'hardcore',originId:'academy',role:'entry'}));
+      if(state.phase==='emergency')expect(state.decision?.category).not.toMatch(/^赛事内/);
+    }
+  });
+
   it('protects the first rookie season from severe opening emergencies and guarantees growth', () => {
     const initial=createCareer({seed:'rookie-protection',name:'Rookie',pace:'hardcore',originId:'academy',role:'entry'});
     let state=startSeason(initial);
@@ -223,6 +231,8 @@ describe('career weighted event contracts', () => {
     let state=settle({...create('major-calendar'),globalRank:100,regionRank:50,teamForm:20});
     const first=state.history[0].tournaments.filter(result=>result.tier==='Major');
     expect(first).toHaveLength(1);
+    const superElite = TOURNAMENTS.filter(item => item.id === 'esi-katowice' || item.id === 'esi-cologne');
+    expect(superElite.every(item => item.honorClass === 'super-elite' && item.tier !== 'Major')).toBe(true);
     expect(first[0].name).toMatch(/^(PJL|ESI|遮天电竞|BURST|NovaLadder) .+ Major$/);
     expect(MAJOR_CITIES).toContain(first[0].city);
     if(first[0].qualified===false)expect(first[0]).toMatchObject({placement:'预选出局',matches:0,teamPrize:0,playerPrize:0});

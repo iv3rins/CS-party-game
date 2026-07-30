@@ -8,7 +8,11 @@
     "timing": "post-report",
     "title": "聚光灯突然转向你",
     "briefing": "连续几场比赛后，媒体希望把你包装成队伍的新门面，教练和老队员都在等待你如何回应。",
-    "tags": ["worldline:rising-star:attention", "媒体", "队内关系"],
+    "tags": [
+      "worldline:rising-star:attention",
+      "媒体",
+      "队内关系"
+    ],
     "source": {
       "type": "human-authored",
       "reviewStatus": "approved",
@@ -16,61 +20,203 @@
     },
     "eligibility": {
       "op": "gte",
-      "left": { "var": "player.fame" },
-      "right": { "const": 35 }
+      "left": {
+        "var": "player.fame"
+      },
+      "right": {
+        "const": 35
+      }
     },
     "triggerWeight": {
       "op": "add",
       "args": [
-        { "const": 30 },
-        { "var": "player.fame" }
+        {
+          "const": 30
+        },
+        {
+          "var": "player.fame"
+        }
       ]
     },
     "cooldownSeasons": 3,
     "maxOccurrences": 1,
     "worldline": {
       "worldlineId": "rising-star",
-      "stages": ["attention"],
-      "statuses": ["active"]
+      "stages": [
+        "attention"
+      ],
+      "statuses": [
+        "active"
+      ]
     },
     "options": [
       {
         "id": "accept-spotlight",
         "label": "接下公开采访",
         "detail": "获得更多表达空间，也让下一场比赛承受更直接的期待",
-        "changes": { "fame": 6, "connections": -2, "highPressureChokingRisk": 3 },
+        "changes": {
+          "fame": 6,
+          "connections": -2,
+          "highPressureChokingRisk": 3
+        },
         "worldlineTransitions": [
-          { "worldlineId": "rising-star", "action": "branch", "toStage": "pressure", "branchId": "public-face", "note": "主动成为队伍的公开门面" }
+          {
+            "worldlineId": "rising-star",
+            "action": "branch",
+            "toStage": "pressure",
+            "branchId": "public-face",
+            "note": "主动成为队伍的公开门面"
+          }
         ],
         "outcomes": [
-          { "id": "message-resonates", "label": "表达被认为坦率而成熟", "weight": { "op": "add", "args": [{ "const": 30 }, { "var": "player.connections" }] }, "changes": { "fame": 4, "connections": 2 } },
-          { "id": "words-amplified", "label": "一句话被截取成新的争议", "weight": { "op": "max", "args": [{ "const": 10 }, { "op": "sub", "left": { "const": 100 }, "right": { "var": "player.connections" } }] }, "changes": { "fame": 5, "connections": -4 } }
+          {
+            "id": "message-resonates",
+            "label": "表达被认为坦率而成熟",
+            "weight": {
+              "op": "add",
+              "args": [
+                {
+                  "const": 30
+                },
+                {
+                  "var": "player.connections"
+                }
+              ]
+            },
+            "changes": {
+              "fame": 4,
+              "connections": 2
+            }
+          },
+          {
+            "id": "words-amplified",
+            "label": "一句话被截取成新的争议",
+            "weight": {
+              "op": "max",
+              "args": [
+                {
+                  "const": 10
+                },
+                {
+                  "op": "sub",
+                  "left": {
+                    "const": 100
+                  },
+                  "right": {
+                    "var": "player.connections"
+                  }
+                }
+              ]
+            },
+            "changes": {
+              "fame": 5,
+              "connections": -4
+            }
+          }
         ]
       },
       {
         "id": "share-stage",
         "label": "邀请队友一起出镜",
         "detail": "把新增关注分给团队，但个人标签可能变得不够鲜明",
-        "changes": { "connections": 5, "fame": 2, "ability": -1 },
+        "changes": {
+          "connections": 5,
+          "fame": 2,
+          "ability": -1
+        },
         "worldlineTransitions": [
-          { "worldlineId": "rising-star", "action": "branch", "toStage": "pressure", "branchId": "shared-stage", "note": "把聚光灯变成团队资源" }
+          {
+            "worldlineId": "rising-star",
+            "action": "branch",
+            "toStage": "pressure",
+            "branchId": "shared-stage",
+            "note": "把聚光灯变成团队资源"
+          }
         ],
         "outcomes": [
-          { "id": "team-story", "label": "团队故事得到更广泛传播", "weight": 55, "changes": { "rosterStability": 4, "fame": 2 } },
-          { "id": "identity-blurs", "label": "外界暂时看不清你的个人定位", "weight": 45, "changes": { "connections": 3, "fame": -2 } }
+          {
+            "id": "team-story",
+            "label": "团队故事得到更广泛传播",
+            "weight": 55,
+            "changes": {
+              "rosterStability": 4,
+              "fame": 2
+            }
+          },
+          {
+            "id": "identity-blurs",
+            "label": "外界暂时看不清你的个人定位",
+            "weight": 45,
+            "changes": {
+              "connections": 3,
+              "fame": -2
+            }
+          }
         ]
       },
       {
         "id": "decline-focus",
         "label": "暂时拒绝采访",
         "detail": "保留训练节奏和私人空间，也可能让市场把注意力转向别人",
-        "changes": { "ability": 3, "health": 2, "fame": -4 },
+        "changes": {
+          "ability": 3,
+          "health": 2,
+          "fame": -4
+        },
         "worldlineTransitions": [
-          { "worldlineId": "rising-star", "action": "pause", "toStage": "attention", "branchId": "cool-down", "note": "主动让热度暂时降温" }
+          {
+            "worldlineId": "rising-star",
+            "action": "pause",
+            "toStage": "attention",
+            "branchId": "cool-down",
+            "note": "主动让热度暂时降温"
+          }
         ],
         "outcomes": [
-          { "id": "quiet-training", "label": "安静训练带来更稳定的准备", "weight": { "op": "add", "args": [{ "const": 30 }, { "var": "player.integrity" }] }, "changes": { "ability": 2, "teamForm": 2 } },
-          { "id": "window-moves-on", "label": "媒体很快寻找了新的焦点", "weight": { "op": "max", "args": [{ "const": 10 }, { "op": "sub", "left": { "const": 100 }, "right": { "var": "player.integrity" } }] }, "changes": { "fame": -3, "connections": -1 } }
+          {
+            "id": "quiet-training",
+            "label": "安静训练带来更稳定的准备",
+            "weight": {
+              "op": "add",
+              "args": [
+                {
+                  "const": 30
+                },
+                {
+                  "var": "player.integrity"
+                }
+              ]
+            },
+            "changes": {
+              "ability": 2,
+              "teamForm": 2
+            }
+          },
+          {
+            "id": "window-moves-on",
+            "label": "媒体很快寻找了新的焦点",
+            "weight": {
+              "op": "max",
+              "args": [
+                {
+                  "const": 10
+                },
+                {
+                  "op": "sub",
+                  "left": {
+                    "const": 100
+                  },
+                  "right": {
+                    "var": "player.integrity"
+                  }
+                }
+              ]
+            },
+            "changes": {
+              "fame": -3,
+              "connections": -1
+            }
+          }
         ]
       }
     ]

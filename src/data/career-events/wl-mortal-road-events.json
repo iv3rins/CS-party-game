@@ -7,7 +7,7 @@
     "kind": "offseason",
     "timing": "in-season",
     "title": "每天比别人多练两小时录像复盘",
-    "briefing": "18岁，你的天赋在同龄人中只能算中游。教练说你的枪法上限大概在70分左右。那天之后你每天训练结束后都会留在战术室看两小时demo复盘——对手的走位习惯、队友的闪光弹轨迹、自己的每一个死亡镜头。三个月后你的Rating从0.92涨到了1.01。",
+    "briefing": "18岁，你的天赋在同龄人中只能算中游。教练说你的枪法上限大概在70分左右。那天之后你每天训练结束后都会留在战术室看两小时demo复盘——对手的走位习惯、队友的闪光弹轨迹、自己的每一个死亡镜头。",
     "tags": [
       "worldline:wl-mortal-road:discipline-path",
       "训练",
@@ -585,6 +585,472 @@
             "changes": {
               "teamForm": -5,
               "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-006",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "每次赛后第一个到训练室",
+    "briefing": "25岁，无论前一天比赛几点结束，第二天早上八点半你准时出现在训练室。你的规矩是所有复盘工作当天做完不拖到第二天。队友笑你是公务员作息。但你知道自己的天赋不如他们，只能用这种笨办法维持竞争力。",
+    "tags": [
+      "worldline:wl-mortal-road:support-value",
+      "纪律",
+      "稳定"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 30,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 35
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "support-value"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "keep-routine",
+        "label": "保持纪律不动摇",
+        "detail": "风雨无阻坚持节奏。",
+        "changes": {
+          "ability": 2,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "consistency-pays2",
+            "label": "你的稳定性成为队伍最可靠的资产",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 4
+            }
+          },
+          {
+            "id": "routine-costly",
+            "label": "长期高强度自律让身体抗议",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "loosen-up2",
+        "label": "适当放松不要那么严格",
+        "detail": "给自己弹性空间。",
+        "changes": {
+          "health": 3,
+          "ability": -1
+        },
+        "outcomes": [
+          {
+            "id": "balance-works",
+            "label": "调整后训练效率反而提高了",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 2,
+              "health": 4
+            }
+          },
+          {
+            "id": "slipping2",
+            "label": "一放松就收不回来了",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -3,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-007",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "field",
+    "timing": "post-report",
+    "title": "被嘲讽数据难看",
+    "briefing": "26岁，一场比赛后你的0.88Rating被截图发到论坛上。帖子标题是这种数据也能打职业？你看到时正在吃晚饭。你放下筷子想了想——发帖人不知道你在那场比赛中做了十六次闪光掩护、九次拉枪线、四次牺牲换人。",
+    "tags": [
+      "worldline:wl-mortal-road:support-value",
+      "舆论",
+      "误解"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 23,
+    "maxAge": 30,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 30
+    },
+    "cooldownSeasons": 3,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "support-value"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "ignore",
+        "label": "不回应继续打自己的",
+        "detail": "专注比赛不被干扰。",
+        "changes": {
+          "fame": -1,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "silence-golden",
+            "label": "几个赛季后体系价值被圈内认可",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": 5,
+              "connections": 5
+            }
+          },
+          {
+            "id": "inside-hurts2",
+            "label": "没回应但每次看到还是难受",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "post-utility-data",
+        "label": "发帖解释自己的辅助贡献",
+        "detail": "用闪光助攻率等数据证明价值。",
+        "changes": {
+          "fame": 5,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "data-convinces3",
+            "label": "理性粉丝理解了你的价值",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": 8,
+              "connections": 3
+            }
+          },
+          {
+            "id": "more-scrutiny2",
+            "label": "被人逐帧分析找漏洞",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-008",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "队伍换了一批又一批只有你一直在",
+    "briefing": "27岁，你发现自己是队里待得最久的选手。三年来换了一轮又一轮，只有你始终在首发名单上。新来的年轻人不知道你的过去，只把你当普通辅助。教练在队内会议上说了一句话：他在的三年，队伍从来没有跌出过前八。",
+    "tags": [
+      "worldline:wl-mortal-road:system-core",
+      "稳定器",
+      "体系"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 25,
+    "maxAge": 32,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 25
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "system-core"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "be-anchor",
+        "label": "接受队伍稳定器角色",
+        "detail": "用持续存在打造稳定队伍。",
+        "changes": {
+          "connections": 5,
+          "teamForm": 3
+        },
+        "outcomes": [
+          {
+            "id": "institution",
+            "label": "你成了队里精神象征新人尊称老大哥",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "taken-granted",
+            "label": "大家习惯了你反而忽视你的价值",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "ask-recognition",
+        "label": "要求俱乐部认可长期贡献",
+        "detail": "希望续约涨薪体现地位。",
+        "changes": {
+          "connections": -2,
+          "earnings": 3
+        },
+        "outcomes": [
+          {
+            "id": "club-agrees2",
+            "label": "俱乐部续了两年并加薪",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "earnings": 5,
+              "connections": 3
+            }
+          },
+          {
+            "id": "club-hesitates2",
+            "label": "俱乐部以年龄为由只给一年短约",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-009",
+    "revision": 1,
+    "category": "教练管理",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "教练公开表扬你的战术执行力",
+    "briefing": "28岁，赛后采访时记者问教练你的价值。教练说了一句分量很重的话：他是我执教六年见过战术执行力最强的选手。他的评分不高但他的比赛计划评分永远是100分。你坐在休息室里听到采访回放，低头看了看自己满是老茧的手指。",
+    "tags": [
+      "worldline:wl-mortal-road:system-core",
+      "认可",
+      "教练"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 25,
+    "maxAge": 33,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 65
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 20
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "system-core"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "humble-continue",
+        "label": "保持谦逊继续努力",
+        "detail": "认可但不自满。",
+        "changes": {
+          "connections": 3,
+          "ability": 2
+        },
+        "outcomes": [
+          {
+            "id": "respect-grows2",
+            "label": "更多圈内人开始注意你的价值",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "fame": 5,
+              "connections": 5
+            }
+          },
+          {
+            "id": "pressure-grows",
+            "label": "认可也带来了更多期待",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "highPressureChokingRisk": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "ask-more-role",
+        "label": "借此要求更多战术参与",
+        "detail": "利用信任扩大角色。",
+        "changes": {
+          "ability": 2,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "expands-role",
+            "label": "新角色让体系价值翻倍",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 3
+            }
+          },
+          {
+            "id": "stretched-thin",
+            "label": "承担太多影响最擅长的部分",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -3,
+              "teamForm": -3
             }
           }
         ]

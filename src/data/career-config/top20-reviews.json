@@ -10,6 +10,14 @@
     "minChars": 150,
     "maxChars": 340
   },
+  "tierModel": {
+    "TOP 1": { "minScore": 4500, "minRating": 1.30, "label": "现象级 GOAT" },
+    "TOP 2-3": { "minScore": 3500, "minRating": 1.25, "label": "超级巨星" },
+    "TOP 4-5": { "minScore": 2800, "minRating": 1.20, "label": "精英核心" },
+    "TOP 6-10": { "minScore": 2000, "minRating": 1.15, "label": "全明星" },
+    "TOP 11-15": { "minScore": 1500, "minRating": 1.12, "label": "中坚力量" },
+    "TOP 16-20": { "minScore": 1200, "minRating": 1.10, "label": "守门员" }
+  },
   "templates": {
     "honorsWithMvp": "{{playerName}} 凭借 {{mvpCount}} 次 MVP、{{evpCount}} 次 EVP 与 {{vpCount}} 次 VP 进入 {{year}} 年度第 {{rank}} 名。",
     "honorsWithoutMvp": "{{playerName}} 虽然没有拿到 MVP，但依靠 {{evpCount}} 次 EVP 与 {{vpCount}} 次 VP 进入 {{year}} 年度第 {{rank}} 名。",

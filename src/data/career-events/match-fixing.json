@@ -9,21 +9,79 @@
       {
         "id": "report-contact",
         "label": "保留证据并立即上报",
-        "detail": "清白 +10 / 关系 -4 / 75% 锁定线索 / 25% 对方提前消失",
-        "changes": { "integrity": 10, "connections": -4 },
+        "detail": "清白+10/关系-4/75%锁定线索/25%对方提前消失",
+        "changes": {
+          "integrity": 10,
+          "connections": -4
+        },
         "outcomes": [
-          { "id": "evidence-secured", "label": "调查人员锁定了联络链", "probability": 75, "changes": { "fame": 2 } },
-          { "id": "contact-vanished", "label": "对方删除账号，但你的申报记录被保留", "probability": 25, "changes": { "connections": -2 } }
+          {
+            "id": "evidence-secured",
+            "label": "调查人员锁定了联络链",
+            "probability": 75,
+            "changes": {
+              "fame": 2
+            }
+          },
+          {
+            "id": "contact-vanished",
+            "label": "对方删除账号，但你的申报记录被保留",
+            "probability": 25,
+            "changes": {
+              "connections": -2
+            }
+          }
         ]
       },
       {
         "id": "hear-offer",
         "label": "继续听完报价",
-        "detail": "短期可能获利 / 清白下降 / 必定留下跨赛季调查风险",
-        "changes": { "integrity": -10, "earnings": 18 },
+        "detail": "短期可能获利/清白下降/必定留下跨赛季调查风险",
+        "changes": {
+          "integrity": -10,
+          "earnings": 18
+        },
         "outcomes": [
-          { "id": "walk-away-late", "label": "你最终拒绝，但聊天记录已经留下", "probability": 55, "changes": { "fame": 3 }, "delayed": { "tag": "matchFixingExposure", "riskHint": "未来 1–3 个赛季可能接受假赛调查", "minSeasons": 1, "maxSeasons": 3, "changes": { "integrity": -8, "connections": -5 }, "revealText": "早前的盘口聊天记录被调查机构调取。" } },
-          { "id": "take-advance", "label": "一笔来源不明的预付款进入账户", "probability": 45, "changes": { "earnings": 22, "integrity": -12 }, "delayed": { "tag": "matchFixingExposure", "riskHint": "资金记录可能导致罚款、解约或长期禁赛", "minSeasons": 1, "maxSeasons": 2, "changes": { "integrity": -20, "fame": -12, "earnings": -30 }, "revealText": "异常资金与比赛盘口波动被并案调查。" } }
+          {
+            "id": "walk-away-late",
+            "label": "你最终拒绝，但聊天记录已经留下",
+            "probability": 55,
+            "changes": {
+              "fame": 3
+            },
+            "delayed": {
+              "tag": "matchFixingExposure",
+              "riskHint": "未来1–3个赛季可能接受假赛调查",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "integrity": -8,
+                "connections": -5
+              },
+              "revealText": "早前的盘口聊天记录被调查机构调取。"
+            }
+          },
+          {
+            "id": "take-advance",
+            "label": "一笔来源不明的预付款进入账户",
+            "probability": 45,
+            "changes": {
+              "earnings": 22,
+              "integrity": -12
+            },
+            "delayed": {
+              "tag": "matchFixingExposure",
+              "riskHint": "资金记录可能导致罚款、解约或长期禁赛",
+              "minSeasons": 1,
+              "maxSeasons": 2,
+              "changes": {
+                "integrity": -20,
+                "fame": -12,
+                "earnings": -30
+              },
+              "revealText": "异常资金与比赛盘口波动被并案调查。"
+            }
+          }
         ]
       }
     ]
@@ -39,21 +97,82 @@
       {
         "id": "refuse-record",
         "label": "拒绝并保存语音记录",
-        "detail": "清白 +9 / 阵容稳定 -8 / 80% 证据有效 / 20% 更衣室孤立",
-        "changes": { "integrity": 9, "rosterStability": -8 },
+        "detail": "清白+9/阵容稳定-8/80%证据有效/20%更衣室孤立",
+        "changes": {
+          "integrity": 9,
+          "rosterStability": -8
+        },
         "outcomes": [
-          { "id": "valid-record", "label": "记录被正式受理", "probability": 80, "changes": { "connections": 3 } },
-          { "id": "locker-isolation", "label": "队友否认一切，你在队内受到孤立", "probability": 20, "changes": { "connections": -8, "teamForm": -5 } }
+          {
+            "id": "valid-record",
+            "label": "记录被正式受理",
+            "probability": 80,
+            "changes": {
+              "connections": 3
+            }
+          },
+          {
+            "id": "locker-isolation",
+            "label": "队友否认一切，你在队内受到孤立",
+            "probability": 20,
+            "changes": {
+              "connections": -8,
+              "teamForm": -5
+            }
+          }
         ]
       },
       {
         "id": "follow-call",
         "label": "按要求故意失误",
-        "detail": "收入 +25 / 清白 -25 / 必定留下调查风险",
-        "changes": { "earnings": 25, "integrity": -25, "teamForm": -6 },
+        "detail": "收入+25/清白-25/必定留下调查风险",
+        "changes": {
+          "earnings": 25,
+          "integrity": -25,
+          "teamForm": -6
+        },
         "outcomes": [
-          { "id": "market-unnoticed", "label": "当场没有人提出质疑", "probability": 60, "changes": { "fame": 2 }, "delayed": { "tag": "matchFixingExposure", "riskHint": "录像复核可能导致解约与禁赛", "minSeasons": 1, "maxSeasons": 3, "changes": { "integrity": -25, "connections": -15, "fame": -15 }, "revealText": "异常回合在盘口调查中被逐帧复核。" } },
-          { "id": "instant-suspicion", "label": "解说和裁判立即注意到异常操作", "probability": 40, "changes": { "integrity": -18, "connections": -10, "fame": 8 }, "delayed": { "tag": "matchFixingExposure", "riskHint": "正式调查已经启动", "minSeasons": 1, "maxSeasons": 1, "changes": { "integrity": -30, "earnings": -35 }, "revealText": "赛事诚信部门完成异常回合调查并追缴收入。" } }
+          {
+            "id": "market-unnoticed",
+            "label": "当场没有人提出质疑",
+            "probability": 60,
+            "changes": {
+              "fame": 2
+            },
+            "delayed": {
+              "tag": "matchFixingExposure",
+              "riskHint": "录像复核可能导致解约与禁赛",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "integrity": -25,
+                "connections": -15,
+                "fame": -15
+              },
+              "revealText": "异常回合在盘口调查中被逐帧复核。"
+            }
+          },
+          {
+            "id": "instant-suspicion",
+            "label": "解说和裁判立即注意到异常操作",
+            "probability": 40,
+            "changes": {
+              "integrity": -18,
+              "connections": -10,
+              "fame": 8
+            },
+            "delayed": {
+              "tag": "matchFixingExposure",
+              "riskHint": "正式调查已经启动",
+              "minSeasons": 1,
+              "maxSeasons": 1,
+              "changes": {
+                "integrity": -30,
+                "earnings": -35
+              },
+              "revealText": "赛事诚信部门完成异常回合调查并追缴收入。"
+            }
+          }
         ]
       }
     ]
@@ -69,21 +188,60 @@
       {
         "id": "confess-cooperate",
         "label": "完整交代并提交证据",
-        "detail": "罚款 25 万 / 清白 +6 / 70% 从轻处理 / 30% 半年禁赛式状态损失",
-        "changes": { "earnings": -25, "integrity": 6, "connections": -5 },
+        "detail": "罚款25万/清白+6/70%从轻处理/30%半年禁赛式状态损失",
+        "changes": {
+          "earnings": -25,
+          "integrity": 6,
+          "connections": -5
+        },
         "outcomes": [
-          { "id": "leniency", "label": "因主动配合获得从轻处理", "probability": 70, "changes": { "fame": -5 } },
-          { "id": "suspension", "label": "仍被处以长期停赛，竞技状态严重下降", "probability": 30, "changes": { "ability": -12, "fame": -12, "connections": -10 } }
+          {
+            "id": "leniency",
+            "label": "因主动配合获得从轻处理",
+            "probability": 70,
+            "changes": {
+              "fame": -5
+            }
+          },
+          {
+            "id": "suspension",
+            "label": "仍被处以长期停赛，竞技状态严重下降",
+            "probability": 30,
+            "changes": {
+              "ability": -12,
+              "fame": -12,
+              "connections": -10
+            }
+          }
         ]
       },
       {
         "id": "deny-destroy",
         "label": "否认并删除剩余记录",
-        "detail": "15% 暂时脱身 / 85% 证据链坐实并遭重罚",
-        "changes": { "integrity": -15 },
+        "detail": "15%暂时脱身/85%证据链坐实并遭重罚",
+        "changes": {
+          "integrity": -15
+        },
         "outcomes": [
-          { "id": "temporary-escape", "label": "证据暂时不足，但调查不会彻底结束", "probability": 15, "changes": { "fame": 4 } },
-          { "id": "case-proven", "label": "删除行为成为不利证据，合同与职业信誉崩溃", "probability": 85, "changes": { "integrity": -60, "connections": -30, "fame": -25, "earnings": -50 } }
+          {
+            "id": "temporary-escape",
+            "label": "证据暂时不足，但调查不会彻底结束",
+            "probability": 15,
+            "changes": {
+              "fame": 4
+            }
+          },
+          {
+            "id": "case-proven",
+            "label": "删除行为成为不利证据，合同与职业信誉崩溃",
+            "probability": 85,
+            "changes": {
+              "integrity": -60,
+              "connections": -30,
+              "fame": -25,
+              "earnings": -50
+            }
+          }
         ]
       }
     ]
@@ -98,21 +256,66 @@
       {
         "id": "reject-stream-tip",
         "label": "拒绝并通知前东家",
-        "detail": "清白 +8 / 关系 +5 / 收入不变",
-        "changes": { "integrity": 8, "connections": 5 },
+        "detail": "清白+8/关系+5/收入不变",
+        "changes": {
+          "integrity": 8,
+          "connections": 5
+        },
         "outcomes": [
-          { "id": "former-team-thanks", "label": "前东家确认情报未泄露", "probability": 85, "changes": { "fame": 2 } },
-          { "id": "public-rumor", "label": "接触传闻仍在社区流传", "probability": 15, "changes": { "fame": 5 } }
+          {
+            "id": "former-team-thanks",
+            "label": "前东家确认情报未泄露",
+            "probability": 85,
+            "changes": {
+              "fame": 2
+            }
+          },
+          {
+            "id": "public-rumor",
+            "label": "接触传闻仍在社区流传",
+            "probability": 15,
+            "changes": {
+              "fame": 5
+            }
+          }
         ]
       },
       {
         "id": "sell-stream-tip",
         "label": "出售模糊情报",
-        "detail": "收入 +20 / 清白 -18 / 可能影响复出审查",
-        "changes": { "earnings": 20, "integrity": -18 },
+        "detail": "收入+20/清白-18/可能影响复出审查",
+        "changes": {
+          "earnings": 20,
+          "integrity": -18
+        },
         "outcomes": [
-          { "id": "tip-unused", "label": "情报没有直接影响比赛", "probability": 50, "changes": { "connections": -4 } },
-          { "id": "tip-linked", "label": "情报与异常投注账户产生关联", "probability": 50, "changes": { "connections": -8 }, "delayed": { "tag": "matchFixingExposure", "riskHint": "复出前可能遭遇赛事诚信审查", "minSeasons": 1, "maxSeasons": 2, "changes": { "integrity": -18, "fame": -10 }, "revealText": "直播待业期出售的赛前情报进入调查材料。" } }
+          {
+            "id": "tip-unused",
+            "label": "情报没有直接影响比赛",
+            "probability": 50,
+            "changes": {
+              "connections": -4
+            }
+          },
+          {
+            "id": "tip-linked",
+            "label": "情报与异常投注账户产生关联",
+            "probability": 50,
+            "changes": {
+              "connections": -8
+            },
+            "delayed": {
+              "tag": "matchFixingExposure",
+              "riskHint": "复出前可能遭遇赛事诚信审查",
+              "minSeasons": 1,
+              "maxSeasons": 2,
+              "changes": {
+                "integrity": -18,
+                "fame": -10
+              },
+              "revealText": "直播待业期出售的赛前情报进入调查材料。"
+            }
+          }
         ]
       }
     ]

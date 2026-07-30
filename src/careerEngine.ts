@@ -44,10 +44,11 @@ export interface ContextRatings { major: number; elite: number; playoffs: number
 export interface UpsetRecord { kind: 'positive' | 'negative'; opponent: string; opponentRank: number; format: string; score: string; probability: number; rankingImpact: number; }
 export interface TournamentResult { id: string; tournamentId: string; name: string; organizer: string; city?: string; tier: TournamentTier; honorClass: HonorClass; invited: boolean; qualified?: boolean; invitationReason: string; placement: string; matches: number; wins: number; maps: number; mapWins: number; teamPrize: number; playerPrize: number; salaryPaid: number; rating: number; rankingDelta: number; context: ContextRatings; qualifierOpponent?: string; qualifierScore?: string; qualifierStage?: string; upset?: UpsetRecord; expectedPlacement?: string; hasCriticalEvent?: boolean; criticalEventId?: string; }
 export interface HonorAward { id: string; season: number; tournamentName: string; kind: 'MVP' | 'EVP' | 'VP' | '冠军'; honorClass: HonorClass; }
-export interface Top20Entry { rank: number; playerId: string; nick: string; team: string; score: number; isPlayer: boolean; isTeammate?: boolean; rating?: number; adr?: number; maps?: number; }
+export type Top20Tier = 'TOP 1' | 'TOP 2-3' | 'TOP 4-5' | 'TOP 6-10' | 'TOP 11-15' | 'TOP 16-20';
+export interface Top20Entry { rank: number; playerId: string; nick: string; team: string; score: number; isPlayer: boolean; isTeammate?: boolean; rating?: number; adr?: number; maps?: number; tier?: Top20Tier; }
 export interface TeammateSeasonPerformance { season: number; careerYear: number; rating: number; adr: number; maps: number; mvp: number; evp: number; vp: number; majorTitles: number; eliteTitles: number; }
 export interface CareerRosterPlayer { id: string; nick: string; role: PlayerRole; isPlayer?: boolean; ability: number; fame: number; seasonPerformances: TeammateSeasonPerformance[]; top20History: Array<{ calendarYear: number; rank: number; score: number }>; }
-export interface AnnualTop20 { calendarYear: number; careerYear: number; eligible: boolean; playerRank?: number; entries: Top20Entry[]; review?: string; generatedQuote?: string; t1Maps?: number; nominationChance?: number; apsScore?: number; }
+export interface AnnualTop20 { calendarYear: number; careerYear: number; eligible: boolean; playerRank?: number; entries: Top20Entry[]; review?: string; generatedQuote?: string; t1Maps?: number; nominationChance?: number; apsScore?: number; playerTier?: Top20Tier; }
 export interface RenewalFactor { label: string; value: number; }
 export interface RenewalEvaluation { season: number; chance: number; attitude: '稳妥' | '观望' | '危险'; factors: RenewalFactor[]; contractExpired: boolean; retained?: boolean; summary: string; }
 export interface MarketOffer { id: string; teamId: string; team: string; rank: number; tier: string; role: '首发' | '轮换' | '试训'; salary: number; contractHalfSeasons: number; signingBonus: number; reason: string; cost: string; international?: boolean; }
@@ -113,14 +114,14 @@ const eventCountFor = (state: CareerState) => {
   if(state.half==='first')return 0;
   return roll<.85?0:1;
 };
-const pickCatalogEvent = (state:CareerState, kind:Decision['kind'], key:string, timing?:Decision['timing'],tournament?:TournamentResult) => {
+const pickCatalogEvent = (state:CareerState, kind:Decision['kind'], key:string, timing?:Decision['timing'],tournament?:TournamentResult,excludeCategories?:string[]) => {
   const context=eventContextFor(state,tournament);
-  const template=pickEvent(EVENT_DEFINITIONS,context,{kind,timing,excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
+  const template=pickEvent(EVENT_DEFINITIONS,context,{kind,timing,excludeCategories,excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
   return template?instantiateEvent(template,`${key}-${template.catalogId}`,context):undefined;
 };
 const rookieSafeFieldEvent=(state:CareerState,key:string,tournament?:TournamentResult)=>{
   const context=eventContextFor(state,tournament);
-  const template=pickEvent(EVENT_DEFINITIONS,context,{kind:'field',excludeCategories:['伤病健康','合规风险','治安'],excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
+  const template=pickEvent(EVENT_DEFINITIONS,context,{kind:'field',excludeCategories:['赛事内关键局','赛事内非关键突发','伤病健康','合规风险','治安'],excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
   return template?instantiateEvent(template,key,context):undefined;
 };
 const emergenciesFor = (state:CareerState) => {
@@ -131,10 +132,10 @@ const emergenciesFor = (state:CareerState) => {
   }
   if(state.season===2){
     if(seeded(state,'rookie-severe-event')()>=.03)return [];
-    const event=pickCatalogEvent(state,'emergency',`s${state.season}-rookie-risk`);
+    const event=pickCatalogEvent(state,'emergency',`s${state.season}-rookie-risk`,undefined,undefined,['赛事内关键局','赛事内非关键突发']);
     return event?[event]:[];
   }
-  return Array.from({ length: eventCountFor(state) }, (_, index) => pickCatalogEvent(state,'emergency',`s${state.season}-e${index+1}`)).filter((event):event is Decision=>Boolean(event));
+  return Array.from({ length: eventCountFor(state) }, (_, index) => pickCatalogEvent(state,'emergency',`s${state.season}-e${index+1}`,undefined,undefined,['赛事内关键局','赛事内非关键突发'])).filter((event):event is Decision=>Boolean(event));
 };
 const tournamentEventFor = (state: CareerState, result: TournamentResult, index: number) => {
   const trigger=state.season===1?(state.pace==='hardcore'?.3:state.pace==='standard'?.04:0):state.season===2?.03:state.pace==='hardcore'?.08:state.pace==='standard'?.04:0;
@@ -408,6 +409,10 @@ const invitationFor = (state:CareerState, tournament:typeof TOURNAMENTS[number])
   return {invited:true,reason:'非排名赛自由邀请'};
 };
 const honorWeight: Record<HonorClass, number> = { medium: 1, large: 2, elite: 3, 'super-elite': 4, major: 5 };
+const superEliteOrMajor = (honorClass: HonorClass) => honorClass === 'super-elite' || honorClass === 'major';
+const top20TierForRank = (rank: number): Top20Tier => rank === 1 ? 'TOP 1' : rank <= 3 ? 'TOP 2-3' : rank <= 5 ? 'TOP 4-5' : rank <= 10 ? 'TOP 6-10' : rank <= 15 ? 'TOP 11-15' : 'TOP 16-20';
+const top20TierMinScore: Record<Top20Tier, number> = { 'TOP 1': 4500, 'TOP 2-3': 3500, 'TOP 4-5': 2800, 'TOP 6-10': 2000, 'TOP 11-15': 1500, 'TOP 16-20': 1200 };
+const top20TierMinRating: Record<Top20Tier, number> = { 'TOP 1': 1.30, 'TOP 2-3': 1.25, 'TOP 4-5': 1.20, 'TOP 6-10': 1.15, 'TOP 11-15': 1.12, 'TOP 16-20': 1.10 };
 const iglProfileFor=(state:CareerState)=>{
   if(state.role!=='igl')return {ratingBase:undefined as number|undefined,ratingSpread:.16,teamBoost:0,stabilityBoost:0};
   const archetype=state.iglArchetype??'brain';
@@ -590,7 +595,25 @@ const apsFor=(profile:ApsProfile,honors?:HonorAward[])=>{
   const rawScore=(profile.rating-1)*300+(profile.adr-70)*2;
   const playoffDelta=profile.playoffs>=1.20?.08:profile.rating-profile.playoffs>.15?-.08:0;
   const top5Delta=profile.vsTop5>=1.15?.05:profile.vsTop5<1?-.05:0;
-  return Math.max(0,(awardScore+rawScore)*(1+playoffDelta+top5Delta));
+  const majorMvpBonus=honors?.some(honor=>honor.kind==='MVP'&&honor.honorClass==='major')?3500:0;
+  const superEliteMvpBonus=honors?.some(honor=>honor.kind==='MVP'&&honor.honorClass==='super-elite')?2200:0;
+  const scale=honors ? 1 : 10;
+  return Math.max(0,Math.round((awardScore*scale+rawScore*scale+majorMvpBonus+superEliteMvpBonus)*(1+playoffDelta+top5Delta)));
+};
+const tierQualified=(profile:ApsProfile,honors:HonorAward[],tier:Top20Tier)=>{
+  const eliteEvps=honors.length?honors.filter(honor=>honor.kind==='EVP'&&superEliteOrMajor(honor.honorClass)).length:profile.evp;
+  const eliteMvps=honors.length?honors.filter(honor=>honor.kind==='MVP'&&superEliteOrMajor(honor.honorClass)).length:profile.mvp;
+  if(profile.rating<top20TierMinRating[tier])return false;
+  if(tier==='TOP 1')return eliteMvps>=1&&profile.playoffs>=profile.rating&&profile.vsTop5>=1.15;
+  if(tier==='TOP 2-3')return eliteMvps+eliteEvps>=2;
+  if(tier==='TOP 4-5')return eliteEvps>=4;
+  if(tier==='TOP 6-10')return eliteEvps>=3;
+  if(tier==='TOP 11-15')return eliteEvps>=1;
+  return eliteEvps>=1||profile.maps>=80;
+};
+const tierForCandidate=(profile:ApsProfile,honors:HonorAward[],score:number):Top20Tier|undefined=>{
+  const tiers:Top20Tier[]=['TOP 1','TOP 2-3','TOP 4-5','TOP 6-10','TOP 11-15','TOP 16-20'];
+  return tiers.find(tier=>score>=top20TierMinScore[tier]&&tierQualified(profile,honors,tier));
 };
 export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecord[]): AnnualTop20 => {
   const calendarYear=CAREER_START_YEAR+state.careerYear-1;
@@ -603,9 +626,9 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
   const playerAps=apsFor(profile,honors);
   const edgeConditions=[profile.evp>=2,profile.vp>=5,profile.playoffs>=1.05].filter(Boolean).length;
   const majorMvpCount=new Set(honors.filter(honor=>honor.kind==='MVP'&&honor.honorClass==='major').map(honor=>honor.tournamentName)).size;
-  const guaranteedTop1=majorMvpCount>=2;
+  const guaranteedTop1=majorMvpCount>=1&&profile.rating>=1.30&&profile.playoffs>=profile.rating&&profile.vsTop5>=1.15;
   const eligible=profile.maps>=40||guaranteedTop1;
-  const playerTop3Qualified=playerAps>=600&&profile.rating>=1.25&&profile.topAwards>=2;
+  const playerTop3Qualified=playerAps>=4500&&profile.rating>=1.30&&tierQualified(profile,honors,'TOP 1');
   const seenNpcNicks=new Set<string>();
   const npcProfiles=CAREER_TEAMS.slice(0,30).flatMap(team=>team.roster.flatMap(player=>{
     if(seenNpcNicks.has(player.nick))return [];
@@ -625,8 +648,8 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
     const topAwards=Math.min(mvp+evp,Math.floor((team.strength/100)*rng()*3.5));
     const npcProfile:ApsProfile={rating,adr,maps,playoffs,finals,vsTop5,mvp,evp,vp,topAwards};
     const historicalBaseline=getHistoricalPlayerBaseline(player.nick,state.careerYear);
-    const calibratedScore=historicalBaseline===undefined?apsFor(npcProfile):Math.max(apsFor(npcProfile),historicalBaseline*(.9+rng()*.2));
-    return [{playerId:player.id,nick:player.nick,team:team.name,score:calibratedScore,isPlayer:false,isTeammate:false,rating,adr,maps,top3Qualified:npcProfile.rating>=1.25&&npcProfile.topAwards>=2}];
+    const calibratedScore=historicalBaseline===undefined?apsFor(npcProfile):Math.max(apsFor(npcProfile),historicalBaseline*6*(.9+rng()*.2));
+    return [{playerId:player.id,nick:player.nick,team:team.name,score:calibratedScore,isPlayer:false,isTeammate:false,rating,adr,maps,top3Qualified:npcProfile.rating>=1.25&&npcProfile.topAwards>=2,tier:tierForCandidate(npcProfile,[],calibratedScore)}];
   }));
   const currentTeammateIds=new Set(state.roster.filter(player=>!player.isPlayer).map(player=>player.id));
   const teammateProfiles=state.roster.filter(player=>!player.isPlayer).flatMap(player=>{
@@ -638,19 +661,19 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
     const mvp=seasons.reduce((sum,item)=>sum+item.mvp,0),evp=seasons.reduce((sum,item)=>sum+item.evp,0),vp=seasons.reduce((sum,item)=>sum+item.vp,0);
     const majorTitles=seasons.reduce((sum,item)=>sum+item.majorTitles,0);
     const profile:ApsProfile={rating,adr,maps,playoffs:Number((rating+.01).toFixed(2)),finals:Number((rating+.02).toFixed(2)),vsTop5:Number((rating-.02).toFixed(2)),mvp,evp,vp,topAwards:mvp+evp};
-    const rawScore=apsFor(profile);
-    const score=majorTitles?Math.max(rawScore,360+Math.max(0,player.ability-70)*6+majorTitles*45):rawScore;
-    return [{playerId:player.id,nick:player.nick,team:state.team,score,isPlayer:false,isTeammate:true,rating:Number(rating.toFixed(2)),adr:Math.round(adr),maps,top3Qualified:rating>=1.25&&profile.topAwards>=2}];
+    const rawScore=apsFor(profile)*10;
+    const score=majorTitles?Math.max(rawScore,1200+Math.max(0,player.ability-70)*60+majorTitles*450):rawScore;
+    return [{playerId:player.id,nick:player.nick,team:state.team,score,isPlayer:false,isTeammate:true,rating:Number(rating.toFixed(2)),adr:Math.round(adr),maps,top3Qualified:rating>=1.25&&profile.topAwards>=2,tier:score>=1200&&rating>=1.10?('TOP 16-20' as Top20Tier):undefined}];
   });
-  const candidates=[...npcProfiles.filter(candidate=>!currentTeammateIds.has(candidate.playerId)),...teammateProfiles,{playerId:`career-player-${state.seed}`,nick:state.name,team:state.team,score:playerAps,isPlayer:true,isTeammate:false,rating:Number(weightedRating.toFixed(2)),adr:Math.round(weightedAdr),maps:profile.maps,top3Qualified:playerTop3Qualified}]
+  const candidates=[...npcProfiles.filter(candidate=>!currentTeammateIds.has(candidate.playerId)),...teammateProfiles,{playerId:`career-player-${state.seed}`,nick:state.name,team:state.team,score:playerAps,isPlayer:true,isTeammate:false,rating:Number(weightedRating.toFixed(2)),adr:Math.round(weightedAdr),maps:profile.maps,top3Qualified:playerTop3Qualified,tier:tierForCandidate(profile,honors,playerAps)}]
     .filter(candidate=>!candidate.isPlayer||eligible)
     .sort((a,b)=>b.score-a.score||a.playerId.localeCompare(b.playerId));
-  const top3=candidates.filter(candidate=>candidate.score>=600&&candidate.top3Qualified).slice(0,3);
+  const top3=candidates.filter(candidate=>candidate.score>=4500&&candidate.top3Qualified).slice(0,3);
   const rest=candidates.filter(candidate=>!top3.includes(candidate));
   const pool=[...top3,...rest].slice(0,20);
-  let entries=pool.map((entry,index)=>({playerId:entry.playerId,nick:entry.nick,team:entry.team,score:Math.round(entry.score),isPlayer:entry.isPlayer,isTeammate:entry.isTeammate,rating:entry.rating,adr:entry.adr,maps:entry.maps,rank:index+1}));
+  let entries=pool.map((entry,index)=>({playerId:entry.playerId,nick:entry.nick,team:entry.team,score:Math.round(entry.score),isPlayer:entry.isPlayer,isTeammate:entry.isTeammate,rating:entry.rating,adr:entry.adr,maps:entry.maps,tier:entry.tier,rank:index+1}));
   if(guaranteedTop1){
-    const playerEntry={playerId:`career-player-${state.seed}`,nick:state.name,team:state.team,score:Math.round(playerAps),isPlayer:true,isTeammate:false,rating:Number(weightedRating.toFixed(2)),adr:Math.round(weightedAdr),maps:profile.maps,rank:1};
+    const playerEntry={playerId:`career-player-${state.seed}`,nick:state.name,team:state.team,score:Math.round(playerAps),isPlayer:true,isTeammate:false,rating:Number(weightedRating.toFixed(2)),adr:Math.round(weightedAdr),maps:profile.maps,tier:tierForCandidate(profile,honors,playerAps),rank:1};
     entries=[playerEntry,...entries.filter(entry=>!entry.isPlayer)].slice(0,20).map((entry,index)=>({...entry,rank:index+1}));
   }
   const initialPlayerRank=entries.find(entry=>entry.isPlayer)?.rank;
@@ -658,7 +681,7 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
     entries=entries.filter(entry=>!entry.isPlayer);
     const entryIds=new Set(entries.map(entry=>entry.playerId));
     const replacement=candidates.find(candidate=>!candidate.isPlayer&&!entryIds.has(candidate.playerId));
-    if(replacement)entries.push({playerId:replacement.playerId,nick:replacement.nick,team:replacement.team,score:Math.round(replacement.score),isPlayer:false,isTeammate:replacement.isTeammate,rating:replacement.rating,adr:replacement.adr,maps:replacement.maps,rank:entries.length+1});
+    if(replacement)entries.push({playerId:replacement.playerId,nick:replacement.nick,team:replacement.team,score:Math.round(replacement.score),isPlayer:false,isTeammate:replacement.isTeammate,rating:replacement.rating,adr:replacement.adr,maps:replacement.maps,tier:replacement.tier,rank:entries.length+1});
     entries=entries.map((entry,index)=>({...entry,rank:index+1}));
   }
   const playerRank=entries.find(entry=>entry.isPlayer)?.rank;
@@ -666,7 +689,8 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
   const quoteRoll=seeded(state,`top20-quote:${calendarYear}`)();
   const quoteIndex=Math.floor(seeded(state,`top20-quote-pick:${calendarYear}:${CAREER_CONTENT_VERSION}`)()*top20InterviewPolicy.quotes.length);
   const generatedQuote=playerRank&&quoteRoll*10000<top20InterviewPolicy.chanceBps?`“${top20InterviewPolicy.quotes[quoteIndex].text}”${top20InterviewPolicy.suffix}`:undefined;
-  return {calendarYear,careerYear:state.careerYear,eligible,playerRank,entries,review,generatedQuote,t1Maps:profile.maps,nominationChance:eligible?100:0,apsScore:Math.round(playerAps)};
+  const playerTier=entries.find(entry=>entry.isPlayer)?.tier;
+  return {calendarYear,careerYear:state.careerYear,eligible,playerRank,entries,review,generatedQuote,t1Maps:profile.maps,nominationChance:eligible?100:0,apsScore:Math.round(playerAps),playerTier};
 };
 
 const applyOriginVariance = (base: number, radius:number, seed: number, originId:string,key: string) => {

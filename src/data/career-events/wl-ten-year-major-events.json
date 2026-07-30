@@ -7,7 +7,7 @@
     "kind": "offseason",
     "timing": "in-season",
     "title": "在二线队打出高Rating获得T1试训机会",
-    "briefing": "19岁，你在T2队伍连续三个月打出Rating 1.18以上。一家T1队伍的球探在赛后找到了你的教练，说想邀请你去线下试训。那家队伍就是你卧室海报上贴的那一支。",
+    "briefing": "19岁，你在T2队伍连续三个月打出Rating1.18以上。一家T1队伍的球探在赛后找到了你的教练，说想邀请你去线下试训。那家队伍就是你卧室海报上贴的那一支。",
     "tags": [
       "worldline:wl-ten-year-major:promising-start",
       "试训",
@@ -71,7 +71,7 @@
         "outcomes": [
           {
             "id": "trial-passed",
-            "label": "试训表现出色成功拿到试训合同",
+            "label": "试训表现出色拿到试训合同",
             "weight": {
               "const": 50
             },
@@ -548,7 +548,7 @@
     "kind": "field",
     "timing": "in-season",
     "title": "手腕伤病被迫休养半年",
-    "briefing": "24岁，你正在职业低谷期手腕却出了问题。医生说腕管综合征需要至少休养六个月。你在医院走廊里坐着，看着诊断报告上'建议停止高强度训练'几个字。隔壁床位一个老人在打点滴，你忽然想给他看你的职业ID——但你又觉得他大概不知道这是什么。",
+    "briefing": "24岁，你正在职业低谷期手腕却出了问题。医生说腕管综合征需要至少休养六个月。你在医院走廊里坐着，看着诊断报告上'建议停止高强度训练'几个字。",
     "tags": [
       "worldline:wl-ten-year-major:wandering-years",
       "伤病",
@@ -783,6 +783,961 @@
             "changes": {
               "fame": -3,
               "health": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-007",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "在二线替补席上保持训练不放弃",
+    "briefing": "23岁，你被下放到T2队伍的替补席。教练说队伍要培养年轻人。你的训练时间被压缩到每天上午两小时。你去跟经理申请晚上练枪，经理同意了。你开始每天晚上11点到凌晨4点在训练室独自训练。",
+    "tags": [
+      "worldline:wl-ten-year-major:wandering-years",
+      "替补",
+      "训练"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 27,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "const": 1
+          },
+          "right": {
+            "const": 1
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 25
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "wandering-years"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "grind-it",
+        "label": "坚持每天凌晨加练",
+        "detail": "牺牲睡眠维持训练量但影响健康。",
+        "changes": {
+          "ability": 3,
+          "health": -4,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "maintained",
+            "label": "半年后枪法没有退步反而更稳定了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 4,
+              "health": -3
+            }
+          },
+          {
+            "id": "burnout-again",
+            "label": "长期熬夜让训练效率越来越低",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -2,
+              "health": -6
+            }
+          }
+        ]
+      },
+      {
+        "id": "demand-trade2",
+        "label": "要求队伍交易自己",
+        "detail": "不想在替补席浪费时间。",
+        "changes": {
+          "connections": -4,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "trade-done",
+            "label": "冬季转会窗被交易到了另一支T2队伍",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "connections": 3,
+              "fame": 3
+            }
+          },
+          {
+            "id": "no-takers3",
+            "label": "市场上没有队伍愿意接手",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": -3,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-008",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "降级到T2联赛后第一次直面心理落差",
+    "briefing": "25岁，你坐在T2联赛的比赛席上，对面是一群不到20岁的小孩。场馆只有你以前比赛的十分之一大，观众席上不到五十个人。你想起三年前自己在万人场馆里打Major预选赛的场景。你深吸一口气告诉自己：打好眼前这一场。",
+    "tags": [
+      "worldline:wl-ten-year-major:wandering-years",
+      "落差",
+      "降级"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 23,
+    "maxAge": 29,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 22
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 20
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "wandering-years"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "dominate-t2-2",
+        "label": "在T2打出统治级表现",
+        "detail": "用实力碾压低级别联赛。",
+        "changes": {
+          "ability": 3,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "t2-dom",
+            "label": "T2联赛打出1.30+Rating重新引起T1关注",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 10,
+              "connections": 5
+            }
+          },
+          {
+            "id": "t2-not-easy",
+            "label": "T2有自己的节奏和强度",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": -2,
+              "ability": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "motivate-young",
+        "label": "用自己的经历激励年轻人",
+        "detail": "用老将经验帮助队伍提升。",
+        "changes": {
+          "connections": 5,
+          "fame": 2
+        },
+        "outcomes": [
+          {
+            "id": "young-improve2",
+            "label": "年轻队友在你的指导下进步明显",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 8,
+              "teamForm": 4
+            }
+          },
+          {
+            "id": "gap-wide",
+            "label": "年轻人和你的比赛理解差距太大",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-009",
+    "revision": 1,
+    "category": "教练管理",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "教练建议你转型辅助因为枪法跟不上了",
+    "briefing": "26岁，教练把你叫到办公室。他说你的瞄准反应开始下降了，但你的地图理解和判断是队里顶级的，想让你试试辅助位。你沉默了很久。你知道他说得对——最近训练赛你的对枪胜率确实在下降。",
+    "tags": [
+      "worldline:wl-ten-year-major:transformation",
+      "转型",
+      "辅助"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 24,
+    "maxAge": 30,
+    "roles": [
+      "entry"
+    ],
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 23
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 18
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "transformation"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-trans",
+        "label": "接受转型学习辅助角色",
+        "detail": "放下明星心理重新学一个位置。",
+        "changes": {
+          "ability": -3,
+          "positionFamiliarity": 6,
+          "connections": 4
+        },
+        "outcomes": [
+          {
+            "id": "natural-supp",
+            "label": "辅助位上展现出了惊人的天赋",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 2,
+              "positionFamiliarity": 8,
+              "connections": 6
+            }
+          },
+          {
+            "id": "awkward-phase2",
+            "label": "辅助位的节奏和你打了十年的完全不一样",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -4,
+              "positionFamiliarity": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "push-harder2",
+        "label": "拒绝转型加倍训练拼枪法",
+        "detail": "用更多训练对抗年龄衰退。",
+        "changes": {
+          "ability": 2,
+          "health": -6
+        },
+        "outcomes": [
+          {
+            "id": "delay-decline",
+            "label": "高强度训练让衰退暂缓了半年",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 3,
+              "health": -4
+            }
+          },
+          {
+            "id": "injury-decline",
+            "label": "高强度训练引发手腕旧伤",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": -4,
+              "health": -8
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-010",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "开始跟着IGL系统学习指挥",
+    "briefing": "27岁，转型辅助后你发现自己对比赛的理解远超预期。你开始和IGL讨论战术思路。IGL说需要一个副指挥分担战术布置，问你有兴趣吗。你犹豫了——指挥意味着更多责任和更低的数据，但也是延长职业生涯最好的方式。",
+    "tags": [
+      "worldline:wl-ten-year-major:transformation",
+      "指挥",
+      "学习"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 25,
+    "maxAge": 31,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 55
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 15
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "transformation"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "study-igl2",
+        "label": "系统学习指挥理论和战术",
+        "detail": "投入精力深度学习。",
+        "changes": {
+          "ability": -2,
+          "connections": 5
+        },
+        "outcomes": [
+          {
+            "id": "natural-igl3",
+            "label": "指挥天赋超出所有人预期",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "slow-learner2",
+            "label": "战术理论比想象中复杂",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -3,
+              "connections": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "learn-practice",
+        "label": "在实战中边打边学",
+        "detail": "不系统学习直接实践。",
+        "changes": {
+          "ability": -3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "practical-grow",
+            "label": "一年的实战让副指挥能力提升",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 2,
+              "connections": 5
+            }
+          },
+          {
+            "id": "too-many-errors",
+            "label": "实战中犯错太多影响队伍成绩",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -4,
+              "connections": -2,
+              "teamForm": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-011",
+    "revision": 1,
+    "category": "角色转职",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "完全接受体系角色Rating降到0.95",
+    "briefing": "28岁，你的转型期结束了。你的位置固定为辅助兼副指挥，个人数据稳定在0.95Rating——但你指挥的战术让两个突破手打出了职业生涯最佳数据。有人质疑你的数据，教练在采访时说：他的工作不在计分板上。",
+    "tags": [
+      "worldline:wl-ten-year-major:transformation",
+      "体系",
+      "数据"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 26,
+    "maxAge": 32,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 72
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 12
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "transformation"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "embrace-role",
+        "label": "全心做好体系角色",
+        "detail": "接受新定位。",
+        "changes": {
+          "ability": -1,
+          "connections": 5,
+          "teamForm": 4
+        },
+        "outcomes": [
+          {
+            "id": "system-works",
+            "label": "队伍在你的体系支持下连续两次打进决赛",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 6,
+              "fame": 3,
+              "teamForm": 5
+            }
+          },
+          {
+            "id": "public-rating",
+            "label": "公众仍然用Rating评价你",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "raise-rating2",
+        "label": "在不影响体系前提下提升数据",
+        "detail": "维持体系的同时找平衡。",
+        "changes": {
+          "ability": 2,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "balance-ok",
+            "label": "找到了提升数据又维持体系的平衡点",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 3
+            }
+          },
+          {
+            "id": "team-suffers3",
+            "label": "专注于数据让体系出现裂痕",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": -2,
+              "teamForm": -4,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-012",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "年轻选手主动来请教经验",
+    "briefing": "29岁，训练结束后两名年轻选手走到你面前叫你龙哥。他们想请你帮忙看比赛录像。你愣了一下——你是队里最年长的、数据最低的、最不起眼的。但年轻人说IGL说你打了十年职业，你的经验就是最好的教材。",
+    "tags": [
+      "worldline:wl-ten-year-major:final-push",
+      "导师",
+      "尊重"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 27,
+    "maxAge": 33,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 55
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 10
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "final-push"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "teach-reg",
+        "label": "每周抽时间带他们看录像",
+        "detail": "投入时间培养后辈。",
+        "changes": {
+          "connections": 4,
+          "ability": 1
+        },
+        "outcomes": [
+          {
+            "id": "students-grow",
+            "label": "两个年轻人决策能力三个月明显提升",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 6,
+              "teamForm": 4
+            }
+          },
+          {
+            "id": "takes-energy",
+            "label": "带新人占用了自己恢复体力的时间",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "occasional-help",
+        "label": "偶尔指点但以自己训练为主",
+        "detail": "不投入太多精力。",
+        "changes": {
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "some-help2",
+            "label": "简单指点也让他们少走了弯路",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "connections": 4
+            }
+          },
+          {
+            "id": "not-enough2",
+            "label": "年轻人需要的是系统指导",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-013",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "29岁最后的机会",
+    "briefing": "29岁，队伍奇迹般地打进了Major正赛。你知道自己已经不是决定比赛的那个人了——你的任务是在关键时刻给年轻人创造机会。四分之一决赛对阵世界第一的队伍。第一张图你们赢了。第二张图大比分落后。",
+    "tags": [
+      "worldline:wl-ten-year-major:final-push",
+      "Major",
+      "最后机会"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 27,
+    "maxAge": 33,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 60
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 8
+    },
+    "cooldownSeasons": 15,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "final-push"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "steady-speech2",
+        "label": "用平静语气稳住军心",
+        "detail": "用经验告诉年轻人输一局不等于输比赛。",
+        "changes": {
+          "connections": 4
+        },
+        "outcomes": [
+          {
+            "id": "speech-calms2",
+            "label": "年轻人冷静后打出训练水平翻盘",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "connections": 5,
+              "fame": 8
+            }
+          },
+          {
+            "id": "nervous-not-fixed",
+            "label": "紧张不是几句话能消除的",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "teamForm": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "take-charge2",
+        "label": "亲自布置每一回合",
+        "detail": "用自己的经验来赌最后几局。",
+        "changes": {
+          "ability": 2,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "veteran-calls2",
+            "label": "临场指挥发挥奇效打出精妙配合",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 10
+            }
+          },
+          {
+            "id": "exec-fails2",
+            "label": "年轻人执行力跟不上你的布置",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": -2,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-014",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "30岁站上决赛舞台",
+    "briefing": "30岁，你第二次打进Major决赛。对手是当年那支拒绝了你的队伍。对面坐着那个取代你位置的选手——他已经拿了三个Major。而你以拼图选手、辅助兼副指挥的身份站在他对面。十年的漂泊后，你终于又站在了这个舞台上。",
+    "tags": [
+      "worldline:wl-ten-year-major:final-push",
+      "Major",
+      "决赛",
+      "老将"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 28,
+    "maxAge": 35,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 28
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 5
+    },
+    "cooldownSeasons": 30,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "final-push"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "do-job",
+        "label": "专注做好辅助任务",
+        "detail": "不贪功不失误把舞台留给年轻人。",
+        "changes": {
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "support-wins2",
+            "label": "你的道具让突破手拿下MVP夺冠",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 10,
+              "connections": 5
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "young-not-ready",
+            "label": "年轻人经验不足以赢下这种级别",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "vintage-performance",
+        "label": "打出巅峰时期的表现",
+        "detail": "用十年积累打一场自己的决赛。",
+        "changes": {
+          "ability": 4,
+          "health": -3
+        },
+        "outcomes": [
+          {
+            "id": "one-more-dance",
+            "label": "决赛打出1.12Rating像回到了22岁",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 15,
+              "connections": 5
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "body-limits",
+            "label": "激烈对抗中体力跟不上了",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": -3,
+              "health": -5
             }
           }
         ]
