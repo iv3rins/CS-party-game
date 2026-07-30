@@ -91,6 +91,7 @@ publish_server_release() {
   log "发布后端版本 $(basename "$new_release")"
   mkdir -p "$new_release"
   rsync -a --delete "$SOURCE_DIR/server/dist/" "$new_release/dist/"
+  rsync -a "$SOURCE_DIR/server/migrations/" "$new_release/migrations/"
   rsync -a "$SOURCE_DIR/server/node_modules/" "$new_release/node_modules/"
   rsync -a "$SOURCE_DIR/server/package.json" "$new_release/"
   chown -R "$DEPLOY_USER:$DEPLOY_USER" "$new_release"
