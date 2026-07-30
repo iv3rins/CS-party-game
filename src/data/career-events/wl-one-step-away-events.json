@@ -1,0 +1,2914 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-001",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "Major四强赛1v3残局失利",
+    "briefing": "22岁，Major半决赛决胜图14:13领先。你作为最后一人面对敌方三人的回防，C4只剩8秒引爆。只要拿下这一分就拿到赛点，但对手三人都在包点附近。这是你职业生涯第一次打进Major四强。",
+    "tags": [
+      "worldline:wl-one-step-away:first-near-miss",
+      "Major",
+      "四强",
+      "残局",
+      "1v3"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 20,
+    "maxAge": 24,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.isMajor"
+          },
+          "right": {
+            "const": true
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.isPlayoff"
+          },
+          "right": {
+            "const": true
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 70
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "first-near-miss"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "peek-aggressive",
+        "label": "主动拉出去逐个击破",
+        "detail": "利用对手回防的时间差打闪身枪，但任何一次对枪失误都会直接输掉比赛。",
+        "changes": {
+          "health": -2
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "advance",
+            "toStage": "repeated-heartbreak",
+            "branchId": "major-loss-1v3",
+            "note": "Major四强1v3失利导致职业生涯转折"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "three-kills-ace",
+            "label": "连杀三人完成不可思议的残局，晋级Major决赛",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 18
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "second-kill-only",
+            "label": "只换掉一人后被补掉，失去赛点",
+            "weight": {
+              "const": 80
+            },
+            "changes": {
+              "ability": -2,
+              "fame": -5,
+              "teamForm": -3
+            }
+          },
+          {
+            "id": "first-peek-fail",
+            "label": "第一枪就空了，被直接架死",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -8,
+              "highPressureChokingRisk": 8
+            },
+            "delayed": {
+              "tag": "major-choke-trauma",
+              "riskHint": "Major关键局失利会在未来1-3赛季影响你的高压表现",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "highPressureChokingRisk": 12,
+                "ability": -3
+              },
+              "revealText": "那次1v3失利的阴影在每次进入关键局时都会重现，你的肌肉记忆出现犹豫。"
+            }
+          }
+        ]
+      },
+      {
+        "id": "hold-for-time",
+        "label": "拖延时间等C4爆炸",
+        "detail": "躲起来拖时间赢下这一局，但对手会利用这个回合重整旗鼓。",
+        "changes": {
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "time-win",
+            "label": "成功拖到C4爆炸，拿到赛点",
+            "weight": {
+              "const": 80
+            },
+            "changes": {
+              "ability": 2
+            },
+            "resultPatch": {
+              "placementDelta": 1
+            }
+          },
+          {
+            "id": "found-and-killed",
+            "label": "被对手搜点找到击杀，失去赛点",
+            "weight": {
+              "const": 15
+            },
+            "changes": {
+              "ability": -2,
+              "fame": -4,
+              "highPressureChokingRisk": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": "ask-coach-pause",
+        "label": "申请暂停由教练布置",
+        "detail": "利用最后一次暂停让教练制定残局方案，但暂停后手感和节奏可能丢失。",
+        "changes": {
+          "connections": 3,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "pause-works",
+            "label": "教练方案精准，成功完成残局",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 5,
+              "fame": 8
+            },
+            "resultPatch": {
+              "placementDelta": 1
+            }
+          },
+          {
+            "id": "pause-breaks-flow",
+            "label": "暂停打乱了手感和节奏，残局执行混乱",
+            "weight": {
+              "const": 30
+            },
+            "changes": {
+              "ability": -4,
+              "connections": -3,
+              "fame": -5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-002",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "Major预选赛被世界排名第85名队伍爆冷",
+    "briefing": "20岁，Major亚洲区封闭预选赛决赛。对手是一支世界排名第85的队伍，队里没有一个知名选手。你们小组赛曾经16:2碾压过他们。只要赢下这场就进Major正赛。前两局你们却以11:16和8:16连输两场，对手的快攻打法完全打乱了你们的节奏。",
+    "tags": [
+      "worldline:wl-one-step-away:first-near-miss",
+      "Major预选",
+      "爆冷",
+      "轻敌"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 18,
+    "maxAge": 23,
+    "roles": [
+      "awper",
+      "entry"
+    ],
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.tier"
+          },
+          "right": {
+            "const": "Major"
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.isPlayoff"
+          },
+          "right": {
+            "const": true
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 60
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "first-near-miss"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "stay-calm-tactic",
+        "label": "回归基础战术放慢节奏",
+        "detail": "放弃复杂的战术配合，打最基础的点位控制和默认推进，重新建立比赛节奏。",
+        "changes": {
+          "ability": -1,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "base-tactics-work",
+            "label": "简单战术反而限制了对手的快节奏，拖入加时并最终翻盘",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 5,
+              "teamForm": 6
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "still-too-fast",
+            "label": "对手的快攻节奏完全压不住，被干净利落3:0带走",
+            "weight": {
+              "const": 15
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -8,
+              "connections": -4
+            },
+            "resultPatch": {
+              "placementDelta": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "copy-their-style",
+        "label": "学习对手的快攻打法以快制快",
+        "detail": "放弃自己熟悉的体系去模仿对手的风格，风险极大。",
+        "changes": {
+          "ability": -3,
+          "teamForm": -4
+        },
+        "outcomes": [
+          {
+            "id": "beat-at-their-game",
+            "label": "以快制快成功，对手反而不适应",
+            "weight": {
+              "const": 25
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 12
+            },
+            "resultPatch": {
+              "placementDelta": 1
+            }
+          },
+          {
+            "id": "lost-entirely",
+            "label": "自己的体系丢了，对手的也没学会，被碾压",
+            "weight": {
+              "const": 75
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -12,
+              "connections": -5
+            },
+            "delayed": {
+              "tag": "tactical-identity-crisis",
+              "riskHint": "风格迷失可能长期影响你的定位",
+              "minSeasons": 2,
+              "maxSeasons": 4,
+              "changes": {
+                "ability": -5
+              },
+              "revealText": "那次预选赛后你花了一个赛季才找回自己的打法节奏"
+            }
+          }
+        ]
+      },
+      {
+        "id": "refuse-to-lose",
+        "label": "暂停时对队友发火激励",
+        "detail": "用激烈言辞激活队友的斗志，但可能伤害队内关系。",
+        "changes": {
+          "connections": -4,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "fire-up-teammates",
+            "label": "队友被骂醒，第三局找回状态但为时已晚",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": 5,
+              "connections": -2
+            },
+            "resultPatch": {
+              "placementDelta": 1
+            }
+          },
+          {
+            "id": "teammates-shut-down",
+            "label": "队友更加沮丧，第三局开局就被连续得分",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "connections": -8,
+              "teamForm": -6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-003",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "决赛加时赛关键失误被做成集锦",
+    "briefing": "23岁，EIM总决赛决胜图30:30进入第31局加时。你是队伍的狙击手，在香蕉道拿到一个常规首杀后放松警惕被反闪反杀。这个失误被直播镜头反复回放，对手借势连拿两分锁定冠军。赛后社交媒体上你的失误画面被做成了表情包。",
+    "tags": [
+      "worldline:wl-one-step-away:repeated-heartbreak",
+      "EIM",
+      "决赛",
+      "加时",
+      "失误",
+      "舆论"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 26,
+    "roles": [
+      "awper"
+    ],
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "tournament.isPlayoff"
+          },
+          "right": {
+            "const": true
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.honorClass"
+          },
+          "right": {
+            "const": "elite"
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 55
+    },
+    "cooldownSeasons": 5,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "repeated-heartbreak"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "deny-mistake",
+        "label": "赛后采访否认是失误",
+        "detail": "解释为对手打得好，维护自己的公众形象但显得不够诚实。",
+        "changes": {
+          "fame": -2,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "fans-believe",
+            "label": "部分粉丝接受你的解释，但分析师逐帧分析证明确实是低级失误",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": -5,
+              "highPressureChokingRisk": 3
+            }
+          },
+          {
+            "id": "backlash-worse",
+            "label": "否认的态度让舆论更加愤怒，被骂'输了还不认'",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -12,
+              "connections": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "own-it",
+        "label": "在社交媒体上公开承认失误",
+        "detail": "诚实面对，自嘲缓解舆论，但让对手知道你确实状态有问题。",
+        "changes": {
+          "integrity": 5,
+          "fame": -3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "respect-earned",
+            "label": "诚实的姿态赢得了部分路人好感，但'关键时刻掉链子'标签还在",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "integrity": 8,
+              "fame": 3,
+              "highPressureChokingRisk": 5
+            }
+          },
+          {
+            "id": "memed-harder",
+            "label": "承认后反而被恶搞得更厉害，陷入了舆论漩涡",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": -8,
+              "highPressureChokingRisk": 10
+            },
+            "delayed": {
+              "tag": "public-choke-label",
+              "riskHint": "'关键局软脚'标签会影响市场和队友对你的信心",
+              "minSeasons": 2,
+              "maxSeasons": 5,
+              "changes": {
+                "fame": -5,
+                "connections": -3
+              },
+              "revealText": "粉丝给你起的外号在每次重要比赛时都会被刷屏"
+            }
+          }
+        ]
+      },
+      {
+        "id": "disconnect-social",
+        "label": "退出所有社交媒体专注训练",
+        "detail": "切断外界干扰，但也会失去粉丝互动和商业曝光。",
+        "changes": {
+          "fame": -5,
+          "health": 3,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "training-pays",
+            "label": "三个月的闭关训练让枪法恢复了95%的状态",
+            "weight": {
+              "const": 70
+            },
+            "changes": {
+              "ability": 5,
+              "health": 5
+            }
+          },
+          {
+            "id": "missed-commercial",
+            "label": "社交媒体的沉默让你错过了两个商业合作机会",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "fame": -8,
+              "earnings": -5,
+              "ability": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-004",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "field",
+    "timing": "post-report",
+    "title": "赛后采访被当面质问关键局表现",
+    "briefing": "24岁，连续第二次在Major淘汰赛关键局中表现失常。赛后记者直接问：'你连续两个Major都在关键局失误，你认为自己是关键局选手吗？'周围选手在偷笑，直播信号没有中断。",
+    "tags": [
+      "worldline:wl-one-step-away:repeated-heartbreak",
+      "采访",
+      "舆论",
+      "质疑",
+      "关键局"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 28,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 10
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 50
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "repeated-heartbreak"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "defensive-answer",
+        "label": "用数据反击质疑",
+        "detail": "例举自己的高压数据证明能力，但显得过于在意评价。",
+        "changes": {
+          "fame": 3,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "stats-convince-some",
+            "label": "部分观众被数据说服，但更多人觉得'急了'",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "backfires",
+            "label": "被解读为'被戳到痛处'，舆论进一步放大你的关键局问题",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": -8,
+              "highPressureChokingRisk": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": "honest-admission",
+        "label": "坦然承认当前确实有问题",
+        "detail": "承认事实但不找借口，诚实可能赢得尊重也可能被视为软弱。",
+        "changes": {
+          "integrity": 5,
+          "fame": -3,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "respected-honesty",
+            "label": "坦率的态度让一些评论员为你说话，但对手会把你作为突破口",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "integrity": 8,
+              "fame": 3
+            }
+          },
+          {
+            "id": "seen-as-weak",
+            "label": "被视为'认了'，失去了顶尖选手应有的霸气",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -5,
+              "connections": -3,
+              "highPressureChokingRisk": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": "aggressive-comeback",
+        "label": "直接回怼记者并离开",
+        "detail": "\"你想看我失败已经很久了吧？\"然后放下话筒走人。",
+        "changes": {
+          "fame": 8,
+          "connections": -5,
+          "integrity": -3
+        },
+        "outcomes": [
+          {
+            "id": "viral-respect",
+            "label": "视频在玩家社区病毒式传播，你被视为'真性情'",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": 15,
+              "connections": -3
+            }
+          },
+          {
+            "id": "unprofessional-label",
+            "label": "被官方罚款并贴上'不职业'的标签，赞助商开始观望",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "fame": 5,
+              "integrity": -8,
+              "connections": -6,
+              "earnings": -8
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-005",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "深夜队友来到宿舍安慰",
+    "briefing": "25岁，又一次在重要比赛中失利。你关了灯躺在床上盯着天花板发呆已经两个小时。凌晨一点，房门被敲响了——是你的老搭档，他手里拎着两瓶啤酒和一张不完整的比赛录像复盘。他说：'我知道你还醒着，开门吧。'",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "队内",
+      "安慰",
+      "低谷",
+      "友情"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 30,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 40
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 45
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "open-up",
+        "label": "开门和队友复盘聊到天亮",
+        "detail": "把内心的挣扎全部说出来，释放情绪但会暴露自己的脆弱。",
+        "changes": {
+          "health": -4,
+          "connections": 5
+        },
+        "outcomes": [
+          {
+            "id": "deep-bond",
+            "label": "深谈让你们的配合默契上了新台阶，他也分享了自己克服心魔的经历",
+            "weight": {
+              "const": 70
+            },
+            "changes": {
+              "connections": 10,
+              "highPressureChokingRisk": -5,
+              "health": -3
+            }
+          },
+          {
+            "id": "too-much-information",
+            "label": "说了太多不该说的，之后面对队友时有些尴尬",
+            "weight": {
+              "const": 25
+            },
+            "changes": {
+              "connections": -3,
+              "health": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "pretend-asleep",
+        "label": "假装睡着了不开门",
+        "detail": "暂时逃避对话，保护自己的情绪边界但也错过了支持。",
+        "changes": {
+          "connections": -2,
+          "health": 2
+        },
+        "outcomes": [
+          {
+            "id": "respect-boundary",
+            "label": "队友理解了你的边界，第二天训练时只是拍了拍你的肩膀说'随时可以找我'",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "connections": 2,
+              "health": 2
+            }
+          },
+          {
+            "id": "distance-grows",
+            "label": "队友觉得你在推开所有人，之后很少主动找你了",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "redirect-to-training",
+        "label": "开门但不去聊心理，只谈战术",
+        "detail": "把情绪包裹起来只讨论怎么提高，有用但治标不治本。",
+        "changes": {
+          "ability": 2,
+          "health": -3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "tactical-discussion-pays",
+            "label": "你们一起发现了一个关键的战术漏洞并改进了它",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 4,
+              "connections": 5
+            }
+          },
+          {
+            "id": "emotions-leak-out",
+            "label": "聊到一半还是控制不住情绪，两个人都沉默了",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": 2,
+              "health": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-006",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "连续第三次止步Major四强",
+    "briefing": "26岁，又一个Major四强。你已经连续三个Major在半决赛被同一支队伍淘汰。赛后更衣室里一片死寂，教练把战术板摔在地上。有个新人选手小声说了一句：'我们下个Major再来'。没人接话。",
+    "tags": [
+      "worldline:wl-one-step-away:repeated-heartbreak",
+      "Major",
+      "四强",
+      "重复失败"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 24,
+    "maxAge": 29,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 8
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 40
+    },
+    "cooldownSeasons": 5,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "repeated-heartbreak"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "stay-and-fight",
+        "label": "站起来说'我们还能打'",
+        "detail": "强行在更衣室里调动士气，即使自己也不确定是否还能突破。",
+        "changes": {
+          "connections": 3,
+          "health": -3
+        },
+        "outcomes": [
+          {
+            "id": "speech-works",
+            "label": "你的话让两个年轻队友哭了，他们发誓下个Major一定拼尽全力",
+            "weight": {
+              "const": 70
+            },
+            "changes": {
+              "connections": 8,
+              "teamForm": 5
+            }
+          },
+          {
+            "id": "empty-words",
+            "label": "大家礼貌性地点了点头，但没人真正相信了",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": -3,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "request-transfer",
+        "label": "向经理申请转会",
+        "detail": "换个环境也许能打破魔咒，但需要从零开始建立信任。",
+        "changes": {
+          "connections": -5,
+          "fame": 5
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "advance",
+            "toStage": "mental-burden",
+            "branchId": "transfer-after-heartbreak",
+            "note": "转会试图打破心魔但心理负担仍在"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "fresh-start",
+            "label": "新队伍给了你全新的角色和定位，暂时摆脱了阴影",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 8,
+              "health": 5
+            }
+          },
+          {
+            "id": "same-problem",
+            "label": "到了新队伍后，同样的关键局问题再次出现",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -5,
+              "connections": -4
+            },
+            "delayed": {
+              "tag": "inescapable-choke",
+              "riskHint": "转会也没能解决的心理问题可能在1-3赛季后集中爆发",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "highPressureChokingRisk": 15
+              },
+              "revealText": "换了三支队伍都没能摆脱关键局阴影，心理医生说你患上了竞技性焦虑障碍"
+            }
+          }
+        ]
+      },
+      {
+        "id": "accept-role-change",
+        "label": "主动要求转型指挥避开心魔",
+        "detail": "从个人发挥转为团队大脑，用战术而不是枪法影响比赛。",
+        "changes": {
+          "ability": -3,
+          "connections": 5
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "advance",
+            "toStage": "redemption-or-acceptance",
+            "branchId": "igl-transition",
+            "note": "转型指挥寻找新的竞争力"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "natural-igl",
+            "label": "转型指挥出人意料地顺利，你的比赛阅读能力弥补了枪法下降",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": 2,
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "neither-here",
+            "label": "指挥也不顺，枪法也丢了，两头都没落着",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": -6,
+              "fame": -5,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-007",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "field",
+    "timing": "post-report",
+    "title": "被国内媒体贴上无冠核心标签",
+    "briefing": "27岁，一个电竞自媒体发布了一篇深度长文《他很强，但他赢不了——中国CS最悲情的天才》。文章详细列举了你的个人数据——连续三年Rating 1.15+、三次入选TOP20、零个冠军。你在训练间隙看到了这篇推送，点进去看到自己职业生涯的失利时间线被清晰地排列出来。",
+    "tags": [
+      "worldline:wl-one-step-away:repeated-heartbreak",
+      "舆论",
+      "无冠",
+      "标签",
+      "媒体"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 25,
+    "maxAge": 32,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 55
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 35
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "repeated-heartbreak"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "write-comeback",
+        "label": "在社交媒体发长文回应",
+        "detail": "用真实的情绪回应批评，但可能越描越黑。",
+        "changes": {
+          "fame": 5,
+          "integrity": 3
+        },
+        "outcomes": [
+          {
+            "id": "article-respected",
+            "label": "真诚的回应获得了很多人的支持和鼓励",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": 8,
+              "connections": 5,
+              "highPressureChokingRisk": -3
+            }
+          },
+          {
+            "id": "further-scrutiny",
+            "label": "被解读为'玻璃心'，后续每场比赛的舆论压力更大了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": -5,
+              "highPressureChokingRisk": 8
+            }
+          }
+        ]
+      },
+      {
+        "id": "ignore-completely",
+        "label": "关掉手机专注当晚的训练赛",
+        "detail": "切断所有信息流，用训练对抗焦虑。",
+        "changes": {
+          "ability": 2,
+          "health": 2,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "training-pays-off",
+            "label": "当晚训练赛打出了三个月以来的最好数据",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 3,
+              "health": 3
+            }
+          },
+          {
+            "id": "ignore-completely-res-2",
+            "label": "脑子里全是那篇文章，训练赛打得一塌糊涂",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -4,
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "private-psychologist",
+        "label": "预约心理医生并进行系统治疗",
+        "detail": "正视问题寻求专业帮助，但费用不菲且需要时间来见效。",
+        "changes": {
+          "earnings": -5,
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "therapy-works",
+            "label": "心理医生帮你找到了焦虑的根源，开始制定系统方案",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "health": 6,
+              "highPressureChokingRisk": -8
+            }
+          },
+          {
+            "id": "therapy-takes-time",
+            "label": "治疗需要长期进行，短期内没有明显改善",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "health": 2,
+              "earnings": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-008",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "降薪加入争冠队伍却再拿亚军",
+    "briefing": "28岁，你拒绝了老东家开出的三年顶薪续约合同，降薪40%加入了一支已经有两名TOP20选手的争冠队伍。第一个赛季你们一路杀进Major决赛——然后在决胜局被对手让二追三翻盘。赛后更衣室里，新队友们沉默着收拾外设，有人踢翻了垃圾桶。",
+    "tags": [
+      "worldline:wl-one-step-away:repeated-heartbreak",
+      "转会",
+      "降薪",
+      "亚军",
+      "争冠"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 26,
+    "maxAge": 31,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 30
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "repeated-heartbreak"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "stay-and-try-again",
+        "label": "告诉队友'我们下赛季再来'",
+        "detail": "用领袖姿态凝聚队伍，但你自己也需要先相信这句话。",
+        "changes": {
+          "connections": 5,
+          "health": -2
+        },
+        "outcomes": [
+          {
+            "id": "team-rallies",
+            "label": "你的话让两个年轻队友决定留下来再冲一年",
+            "weight": {
+              "const": 70
+            },
+            "changes": {
+              "connections": 8,
+              "teamForm": 5
+            }
+          },
+          {
+            "id": "nobody-believes",
+            "label": "队友礼貌地点头，但第二天就有两个人提交了转会申请",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": -6,
+              "teamForm": -8,
+              "rosterStability": -10
+            }
+          }
+        ]
+      },
+      {
+        "id": "regret-decision",
+        "label": "私下联系前东家问能不能回去",
+        "detail": "承认自己可能做错了选择，但后路可能已经断了。",
+        "changes": {
+          "connections": -3,
+          "integrity": -2
+        },
+        "outcomes": [
+          {
+            "id": "old-team-says-yes",
+            "label": "前东家说欢迎你回来，但只能给替补合同",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "connections": 5,
+              "fame": -3
+            }
+          },
+          {
+            "id": "bridge-burned",
+            "label": "前东家已经签了新的核心选手",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "connections": -5,
+              "fame": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "double-down",
+        "label": "要求教练给新的战术地位",
+        "detail": "既然降薪来了就不能白来，要求以你为核心重新设计战术。",
+        "changes": {
+          "fame": 5,
+          "connections": -4
+        },
+        "outcomes": [
+          {
+            "id": "coach-agrees",
+            "label": "教练认可你的要求，下赛季的战术开始围绕你展开",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": 4,
+              "connections": 3
+            }
+          },
+          {
+            "id": "conflict-escalates",
+            "label": "教练认为你太自私，两个明星队友也不买账",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": -8,
+              "teamForm": -5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-009",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "年轻队友拿到冠军而我坐在替补席",
+    "briefing": "29岁，伤病让你错过了两个月的比赛。年轻替补顶替你的位置后表现出色，帮助队伍拿到了你三年都没能拿到的冠军。夺冠合照上，你穿着便服站在最边缘的位置，屏幕上正在播放MVP采访——不是你，是那个顶替你位置的19岁少年。",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "替补",
+      "年轻",
+      "冠军",
+      "嫉妒"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 26,
+    "maxAge": 33,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.health"
+          },
+          "right": {
+            "const": 60
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 25
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "genuine-congrats",
+        "label": "真心祝贺并主动带新人复盘",
+        "detail": "尽管内心复杂，但选择做一个职业的前辈。",
+        "changes": {
+          "connections": 5,
+          "fame": 3,
+          "integrity": 3
+        },
+        "outcomes": [
+          {
+            "id": "mentor-respected",
+            "label": "新人很感激你的指导，队伍氛围更好，你的管理地位提高了",
+            "weight": {
+              "const": 80
+            },
+            "changes": {
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "faking-it",
+            "label": "新人感觉到了你的勉强，反而更尴尬了",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": -3,
+              "fame": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "push-harder-training",
+        "label": "加倍训练夺回首发",
+        "detail": "用行动证明自己还能打，但有再次受伤的风险。",
+        "changes": {
+          "ability": 3,
+          "health": -5
+        },
+        "outcomes": [
+          {
+            "id": "earn-back-spot",
+            "label": "训练效果显著，两周后在训练赛中正面击败了新人",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 5,
+              "health": -4
+            }
+          },
+          {
+            "id": "injury-relapse",
+            "label": "过度训练导致旧伤复发",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "health": -12,
+              "ability": -3
+            },
+            "delayed": {
+              "tag": "chronic-injury-worsened",
+              "riskHint": "伤病加重可能导致更长时间的休战",
+              "minSeasons": 2,
+              "maxSeasons": 4,
+              "changes": {
+                "health": -15,
+                "ability": -5
+              },
+              "revealText": "旧伤在过度训练后恶化，医生说你必须休息至少一个赛季"
+            }
+          }
+        ]
+      },
+      {
+        "id": "request-trade",
+        "label": "请求被交易到不需要争首发的队伍",
+        "detail": "去一支能保证你首发的弱队，放弃冠军梦想。",
+        "changes": {
+          "connections": -3,
+          "fame": -5
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "pause",
+            "toStage": "mental-burden",
+            "branchId": "giving-up-trade",
+            "note": "主动降级打次级联赛"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "new-beginnings",
+            "label": "在新队伍重新成为核心，低压力环境让你恢复了自信",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 4,
+              "health": 5,
+              "fame": -3
+            }
+          },
+          {
+            "id": "downward-spiral",
+            "label": "降级后斗志消沉，表现越来越差",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -8,
+              "health": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-010",
+    "revision": 1,
+    "category": "教练管理",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "教练私下建议你去看心理医生",
+    "briefing": "30岁，训练赛结束后教练把你单独留在了战术室里。他关上门犹豫了很久才开口：'我找运动心理学的朋友聊过你的情况……他说你可能需要专业帮助。这个不是说你不行，是说你太在意了。'你看到教练的眼神里是真正的关心，不是质疑。",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "教练",
+      "心理",
+      "建议"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 28,
+    "maxAge": 35,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 15
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 45
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 20
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-help",
+        "label": "接受教练的推荐去预约心理医生",
+        "detail": "正视问题，但俱乐部和队友会知道你在接受心理治疗。",
+        "changes": {
+          "health": 5,
+          "connections": 3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "advance",
+            "toStage": "redemption-or-acceptance",
+            "branchId": "therapy-path",
+            "note": "开始心理治疗寻找心魔根源"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "therapy-breakthrough",
+            "label": "心理医生帮你找到了12岁那年第一次在重要比赛失误后留下的心理创伤",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "highPressureChokingRisk": -10,
+              "health": 8,
+              "connections": 5
+            }
+          },
+          {
+            "id": "slow-progress",
+            "label": "治疗有进展但需要时间，媒体报道你去看心理医生的消息",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "highPressureChokingRisk": -5,
+              "fame": 3,
+              "health": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "refuse-vehemently",
+        "label": "愤怒地拒绝并认为教练不信任自己",
+        "detail": "维护自尊但破坏了和教练的关系。",
+        "changes": {
+          "connections": -5,
+          "fame": 2,
+          "health": -2
+        },
+        "outcomes": [
+          {
+            "id": "conflict-hardens",
+            "label": "教练不再提这件事，但你们之间的信任出现了裂痕",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "connections": -6,
+              "teamForm": -3
+            }
+          },
+          {
+            "id": "coach-persists",
+            "label": "教练没有放弃，一周后又找了更委婉的方式和你谈",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": 2,
+              "fame": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "self-help",
+        "label": "表面接受但自己私下解决",
+        "detail": "不想让俱乐部知道，自己找网上的资料和学习方法。",
+        "changes": {
+          "integrity": -2,
+          "fame": -1
+        },
+        "outcomes": [
+          {
+            "id": "self-help-works",
+            "label": "自学了认知行为疗法，焦虑有所缓解",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "highPressureChokingRisk": -5,
+              "ability": 2
+            }
+          },
+          {
+            "id": "makes-it-worse",
+            "label": "网上的方法鱼龙混杂，反而加重了焦虑症状",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "highPressureChokingRisk": 8,
+              "health": -5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-011",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "社交媒体经纪人不让看评论",
+    "briefing": "31岁，经纪人没收了你的手机。他说你最近三场比赛的数据下滑是因为赛后刷评论到凌晨四点。你反驳说是训练太累，但他翻出了你凌晨三点的点赞记录。",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "社交媒体",
+      "经纪人",
+      "舆论"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 28,
+    "maxAge": 35,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 50
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 20
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "give-phone",
+        "label": "把手机交给经纪人保管一个月",
+        "detail": "强制戒断社交媒体，但可能错过商业机会和粉丝互动。",
+        "changes": {
+          "fame": -3,
+          "health": 5,
+          "earnings": -2
+        },
+        "outcomes": [
+          {
+            "id": "digital-detox-works",
+            "label": "一个月不看评论后，训练数据提升了12%",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": 4,
+              "health": 6
+            }
+          },
+          {
+            "id": "fomo-hits",
+            "label": "错过了一个重要的品牌合作机会",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": -5,
+              "earnings": -8
+            }
+          }
+        ]
+      },
+      {
+        "id": "limit-to-15min",
+        "label": "谈判每天只刷15分钟",
+        "detail": "折中方案，保留接触但不沉溺。",
+        "changes": {
+          "health": 2,
+          "fame": -1
+        },
+        "outcomes": [
+          {
+            "id": "comply-barely",
+            "label": "基本遵守了约定，但偶尔会偷偷刷",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "health": 3
+            }
+          },
+          {
+            "id": "back-to-old-habits",
+            "label": "两周后恢复了老习惯",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "public-declaration",
+        "label": "公开宣布暂时退出社交媒体",
+        "detail": "高调宣告专注比赛，既是承诺也是公关。",
+        "changes": {
+          "fame": 5,
+          "integrity": 3,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "public-respect",
+            "label": "粉丝纷纷表示理解和支持",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "fame": 8,
+              "connections": 3
+            }
+          },
+          {
+            "id": "mocked-as-drama",
+            "label": "被嘲讽为'戏多'",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-012",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "关键局肌肉记忆犹豫导致失误",
+    "briefing": "32岁，BURST小组赛出线战，比分14:13，你拿到一个熟悉的1v1残局。对手在沙二A大拉出的动作和你训练赛里见过的一模一样——你比对手快了0.2秒开火。但在扣下扳机的瞬间，你犹豫了。因为多年前那次同样的场景，你打输了。子弹打在了对手旁边的墙上。",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "BURST",
+      "残局",
+      "心魔",
+      "失误"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 29,
+    "maxAge": 35,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 20
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 15
+    },
+    "cooldownSeasons": 5,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "acknowledge-and-drill",
+        "label": "赛后大量练习那个场景到肌肉记忆",
+        "detail": "用一万次重复盖过失利的记忆，需要时间和体力。",
+        "changes": {
+          "ability": 3,
+          "health": -5
+        },
+        "outcomes": [
+          {
+            "id": "drill-works",
+            "label": "练习了三千次后，那个动作成了你的条件反射",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 5,
+              "highPressureChokingRisk": -5
+            }
+          },
+          {
+            "id": "drill-backfires",
+            "label": "越练越焦虑，每次看到那个场景反而更紧张",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -3,
+              "highPressureChokingRisk": 8
+            }
+          }
+        ]
+      },
+      {
+        "id": "avoid-same-scenario",
+        "label": "改变站位和打法不再进入那种场景",
+        "detail": "避开触发条件但限制了战术选择。",
+        "changes": {
+          "ability": -2,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "avoids-trigger",
+            "label": "焦虑确实减少了，但对手也发现了你的走位规律",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "highPressureChokingRisk": -5,
+              "ability": -3
+            }
+          },
+          {
+            "id": "still-encountered",
+            "label": "另一个地图上出现了类似的场景",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "highPressureChokingRisk": 5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-013",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "睡觉前脑海里反复回放失误画面",
+    "briefing": "33岁，每次关灯躺下后，那些关键失误的画面就会自动播放——1v3空掉的狙击、加时赛的失误、采访时的沉默。你试过数羊、喝酒、安眠药，但那些画面总是准时在凌晨三点出现。",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "失眠",
+      "心魔",
+      "焦虑"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 30,
+    "maxAge": 38,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 15
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 12
+    },
+    "cooldownSeasons": 3,
+    "maxOccurrences": 3,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "cognitive-therapy",
+        "label": "和运动心理师做系统的认知行为训练",
+        "detail": "科学手段干预，但需要时间和金钱投入。",
+        "changes": {
+          "earnings": -4,
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "cbt-effective",
+            "label": "八周后失眠症状明显改善，梦境中的失误画面减少了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "health": 8,
+              "highPressureChokingRisk": -8
+            }
+          },
+          {
+            "id": "slow-progress-again",
+            "label": "治疗有效果但很缓慢",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "health": 3,
+              "highPressureChokingRisk": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "prescription-medication",
+        "label": "找医生开安眠药和抗焦虑药",
+        "detail": "见效快但有依赖性和副作用，可能影响比赛状态。",
+        "changes": {
+          "health": 5,
+          "ability": -2
+        },
+        "outcomes": [
+          {
+            "id": "sleep-returns",
+            "label": "睡眠质量改善，但白天有轻微的昏沉感",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "health": 8,
+              "ability": -3
+            }
+          },
+          {
+            "id": "side-effects-worse",
+            "label": "药物副作用导致反应速度下降",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": -5,
+              "health": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "accept-insomnia",
+        "label": "接受失眠，利用深夜时间看demo",
+        "detail": "把清醒的时间变成优势。",
+        "changes": {
+          "ability": 3,
+          "health": -4
+        },
+        "outcomes": [
+          {
+            "id": "demo-study-pays",
+            "label": "深夜复盘让你发现了对手的两个战术习惯",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 3
+            }
+          },
+          {
+            "id": "burnout-accumulates",
+            "label": "长期睡眠不足让训练中的失误率升高了",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -3,
+              "health": -6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-014",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "队友IGL开始不给你关键残局",
+    "briefing": "34岁，在最近的淘汰赛中，你注意到IGL在关键残局时开始把资源给年轻选手。最后一次暂停时你听到他在队伍语音里说'把包给XXX打残局'。你在这支队伍呆了三年，你第一次感到自己不被信任了。赛后你找到IGL单独谈话。",
+    "tags": [
+      "worldline:wl-one-step-away:mental-burden",
+      "IGL",
+      "信任",
+      "残局"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 31,
+    "maxAge": 38,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 30
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 10
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "mental-burden"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "directly-confront",
+        "label": "直接问IGL为什么不信我",
+        "detail": "正面解决信任问题，但可能引发更大的矛盾。",
+        "changes": {
+          "connections": -2,
+          "fame": 2
+        },
+        "outcomes": [
+          {
+            "id": "honest-talk",
+            "label": "IGL坦诚地说'不是不信你，是看你压力太大了'",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": 5,
+              "highPressureChokingRisk": -3
+            }
+          },
+          {
+            "id": "conflict-escalates-2",
+            "label": "IGL觉得你在质问他的判断，气氛很僵",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": -6,
+              "teamForm": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "prove-in-training",
+        "label": "在训练赛中证明自己",
+        "detail": "不说话，用训练赛的残局表现赢回信任。",
+        "changes": {
+          "ability": 3,
+          "health": -2
+        },
+        "outcomes": [
+          {
+            "id": "training-impresses",
+            "label": "连续五场训练赛的残局胜率超过80%",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 4,
+              "connections": 4
+            }
+          },
+          {
+            "id": "extra-pressure",
+            "label": "越想证明越紧张，残局胜率反而下降了",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -3,
+              "highPressureChokingRisk": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": "accept-new-role",
+        "label": "接受角色变化转为开路先锋",
+        "detail": "用另一种方式帮助队伍，不再执念残局。",
+        "changes": {
+          "ability": -1,
+          "connections": 3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "advance",
+            "toStage": "redemption-or-acceptance",
+            "branchId": "role-acceptance",
+            "note": "接受角色变化寻找新定位"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "new-role-fits",
+            "label": "转型突破手后队伍的攻击效率提升了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 2,
+              "connections": 6,
+              "teamForm": 4
+            }
+          },
+          {
+            "id": "neither-role-works",
+            "label": "既不是残局选手也不是突破手，定位更尴尬了",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -4,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-015",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "主动降级打低级别赛事重建信心",
+    "briefing": "35岁，你做了一个让所有人都意外的决定——拒绝了T1级别的报价，主动加入了一支T2队伍。记者问你原因，你说'我需要重新学习怎么赢。'新队伍的基地很小，训练室只有四台电脑，墙上有上一任选手留下的外卖单。但你第一次在训练时放松了下来。",
+    "tags": [
+      "worldline:wl-one-step-away:redemption-or-acceptance",
+      "降级",
+      "重建",
+      "信心"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 32,
+    "maxAge": 40,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 65
+          }
+        },
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 70
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 8
+    },
+    "cooldownSeasons": 10,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "redemption-or-acceptance"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "full-commitment",
+        "label": "全身心投入T2水平想杀回T1",
+        "detail": "把T2作为跳板，用统治级表现证明自己。",
+        "changes": {
+          "ability": 3,
+          "fame": -3
+        },
+        "outcomes": [
+          {
+            "id": "dominates-t2",
+            "label": "T2联赛打出了1.35的Rating，引起T1队伍的关注",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 8,
+              "connections": 5
+            }
+          },
+          {
+            "id": "t2-is-t2",
+            "label": "T2的比赛节奏和T1完全不同，并没有那么轻松",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -2,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "enjoy-the-game",
+        "label": "享受比赛找回乐趣不再追逐结果",
+        "detail": "放下功利心，重新发现CS的快乐。",
+        "changes": {
+          "health": 5,
+          "connections": 3,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "passion-returns",
+            "label": "找回了最初打CS的快乐，表现反而更好了",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "health": 8,
+              "ability": 3
+            }
+          },
+          {
+            "id": "too-comfortable",
+            "label": "太放松了失去了竞争心",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "mentor-young",
+        "label": "用老兵经验指导年轻队友",
+        "detail": "把培养下一代作为退役前的目标。",
+        "changes": {
+          "connections": 5,
+          "fame": 3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-one-step-away",
+            "action": "advance",
+            "toStage": "redemption-or-acceptance",
+            "branchId": "mentor-path",
+            "note": "从选手转为导师角色"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "young-improve",
+            "label": "你的经验让两个年轻选手进步神速",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "they-dont-listen",
+            "label": "年轻人觉得你的经验过时了",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-016",
+    "revision": 1,
+    "category": "救赎线",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "心理师帮助彻底复盘心魔起源",
+    "briefing": "36岁，在运动心理师的要求下，你第一次完整地回顾了自己职业生涯中所有关键失误的录像。心理师让你在每个失误画面停顿时说出当时的想法。看到12年前那次1v3失误时，你突然说了一句：'其实我当时的准星已经在他头上了，我只是害怕赢。'心理师按下了暂停键。",
+    "tags": [
+      "worldline:wl-one-step-away:redemption-or-acceptance",
+      "心理",
+      "复盘",
+      "救赎"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 33,
+    "maxAge": 42,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 20
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 50
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 6
+    },
+    "cooldownSeasons": 12,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "redemption-or-acceptance"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "deep-dive",
+        "label": "顺着这个线索深入挖掘",
+        "detail": "直面内心深处的恐惧，过程很痛苦但可能是真正的转机。",
+        "changes": {
+          "health": -3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "root-cause-found",
+            "label": "找到了问题的根源——你在潜意识里害怕成功后要承担更高的期待",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "highPressureChokingRisk": -12,
+              "ability": 5
+            }
+          },
+          {
+            "id": "too-deep-too-fast",
+            "label": "挖掘太深导致情绪崩溃，需要更长的时间来修复",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "health": -8,
+              "highPressureChokingRisk": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "take-it-slow",
+        "label": "循序渐进按治疗师节奏来",
+        "detail": "相信专业，不急于一次解决问题。",
+        "changes": {
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "steady-progress",
+            "label": "三个月的系统治疗后，你的高压局表现明显改善",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "highPressureChokingRisk": -8,
+              "ability": 3,
+              "health": 5
+            }
+          },
+          {
+            "id": "plateau",
+            "label": "治疗进入了平台期",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "highPressureChokingRisk": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-017",
+    "revision": 1,
+    "category": "角色转职",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "放下个人数据执念转为体系辅助",
+    "briefing": "37岁，你找到教练说我想转型辅助。教练看了你三秒钟确认你不是在开玩笑——你的个人数据一直是队里前二。你说'我想用另一种方式赢。'那天下训练课后你第一次主动去练了闪光弹的投掷路线。年轻队友看到后露出了复杂的表情。",
+    "tags": [
+      "worldline:wl-one-step-away:redemption-or-acceptance",
+      "辅助",
+      "转型",
+      "牺牲"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 34,
+    "maxAge": 42,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 70
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 55
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 5
+    },
+    "cooldownSeasons": 15,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "redemption-or-acceptance"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "full-support",
+        "label": "完全放弃个人数据全面转型辅助",
+        "detail": "接受自己的Rating会从1.12降到0.95，但团队会因此受益。",
+        "changes": {
+          "ability": -4,
+          "connections": 5,
+          "positionFamiliarity": 8
+        },
+        "outcomes": [
+          {
+            "id": "support-genius",
+            "label": "你的闪光弹助攻率全联赛第一，队伍的胜率显著提升",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": 8,
+              "teamForm": 6,
+              "fame": 3
+            }
+          },
+          {
+            "id": "identity-loss",
+            "label": "找不到辅助的感觉，个人和团队都别扭",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -5,
+              "connections": -3,
+              "teamForm": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "half-half",
+        "label": "保持部分个人能力同时增加辅助工作",
+        "detail": "折中方案，尝试找到平衡点。",
+        "changes": {
+          "ability": -2,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "balanced-role",
+            "label": "找到了既能保持个人数据又能辅助团队的新定位",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 2,
+              "connections": 5
+            }
+          },
+          {
+            "id": "master-of-none",
+            "label": "两边都不够好",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -3,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-one-step-away-018",
+    "revision": 1,
+    "category": "救赎线",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "最后一次以老将角色帮年轻人夺冠",
+    "briefing": "38岁，你以辅助位身份随一支年轻队伍杀入Major决赛。对手是当年那支三次击败你的队伍。决赛前夜你在酒店对着镜子看自己的脸——眼角的皱纹、花白的鬓角、平静的眼神。你不再是当年那个会在关键局手抖的少年了。你拿起手机给12年前的自己发了一条永远不会发出的短信：'别怕，我们会拿到的。'",
+    "tags": [
+      "worldline:wl-one-step-away:redemption-or-acceptance",
+      "Major",
+      "决赛",
+      "老将",
+      "救赎",
+      "尾声"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 35,
+    "maxAge": 45,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 35
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 60
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 3
+    },
+    "cooldownSeasons": 20,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-one-step-away",
+      "stages": [
+        "redemption-or-acceptance"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "calm-experience",
+        "label": "用经验稳住年轻队友的心态",
+        "detail": "在暂停时告诉年轻人'深呼吸，这只是一场比赛'。",
+        "changes": {
+          "connections": 5,
+          "teamForm": 5
+        },
+        "outcomes": [
+          {
+            "id": "youngsters-thrive",
+            "label": "年轻人因为你的话冷静下来，打出了高水平",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 6,
+              "fame": 10
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "still-tense",
+            "label": "年轻人的紧张不是几句话能解决的",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "teamForm": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "lead-by-example",
+        "label": "在赛场上用关键表现以身作则",
+        "detail": "用自己的残局胜利来证明经验的价值。",
+        "changes": {
+          "health": -3,
+          "fame": 5
+        },
+        "outcomes": [
+          {
+            "id": "vintage-performance",
+            "label": "决赛打出了巅峰时期的数据，像十二年前那个少年一样",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 6,
+              "fame": 18,
+              "connections": 5
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "body-cant-follow",
+            "label": "心有余力不足，身体已经跟不上意识了",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": -3,
+              "health": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "embrace-legacy",
+        "label": "无论输赢这已经是最后的旅程",
+        "detail": "接受结果，享受比赛。",
+        "changes": {
+          "health": 3,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "peaceful-retirement",
+            "label": "职业生涯最后一场比赛，打完和对手全队握手拥抱",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "connections": 8,
+              "fame": 12
+            }
+          },
+          {
+            "id": "one-last-regret",
+            "label": "赛后一个人坐在更衣室里，不知道明天该做什么",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "fame": 5,
+              "health": -3
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

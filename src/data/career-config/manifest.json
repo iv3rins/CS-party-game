@@ -1,0 +1,7 @@
+{
+  "schemaVersion":"1.0",
+  "contentVersion":"career-content-v1",
+  "seedAlgorithmVersion":"career-rng-v1",
+  "locale":"zh-CN",
+  "packs":{"top20Reviews":"top20-reviews.json","careerReviews":"career-reviews.json","careerTitles":"career-titles.json","origins":"origins.json","talents":"talents.json"}
+}

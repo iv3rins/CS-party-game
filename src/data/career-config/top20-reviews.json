@@ -1,0 +1,709 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "career-content-v1",
+  "output": {
+    "sectionOrder": [
+      "honors",
+      "pressure",
+      "comparison"
+    ],
+    "minChars": 150,
+    "maxChars": 340
+  },
+  "templates": {
+    "honorsWithMvp": "{{playerName}} 凭借 {{mvpCount}} 次 MVP、{{evpCount}} 次 EVP 与 {{vpCount}} 次 VP 进入 {{year}} 年度第 {{rank}} 名。",
+    "honorsWithoutMvp": "{{playerName}} 虽然没有拿到 MVP，但依靠 {{evpCount}} 次 EVP 与 {{vpCount}} 次 VP 进入 {{year}} 年度第 {{rank}} 名。",
+    "pressure": "其 Major、精英以上赛事 Rating 分别为 {{majorRating}} 和 {{eliteRating}}，淘汰赛、场馆及总决赛数据达到 {{playoffRating}}、{{arenaRating}} 和 {{finalRating}}，面临淘汰时仍有 {{eliminationRating}}。这些数字说明他的表现并非来自低级赛事堆积，而是在更高压力环境中保持了价值。",
+    "compareAbove": "与前一位 {{aboveNick}} 相比，他在最高级别赛事的奖项厚度仍稍逊一筹；但其淘汰赛表现足以压过{{belowComparison}}。",
+    "compareFirst": "他在同场奖项比较和高压比赛中领先其他候选人，因此最终位居榜首。"
+  },
+  "interview": {
+    "chanceBps": 3500,
+    "suffix": "——游戏生成采访",
+    "quotes": [
+      {
+        "id": "top20-interview-pressure",
+        "text": "APS 只记录已经发生的比赛，真正决定排名的是最高压力下能否维持水平。"
+      },
+      {
+        "id": "top20-interview-team",
+        "text": "个人排名来自很多场比赛，我更在意自己有没有让队伍走得更远。"
+      },
+      {
+        "id": "top20-interview-review",
+        "text": "名次会被讨论，但那些关键回合已经留在服务器和队友的记忆里。"
+      },
+      {
+        "id": "ds-interview-0001",
+        "revision": 1,
+        "text": "我觉得今年的自己证明了，努力是可以追上天赋的。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0002",
+        "revision": 1,
+        "text": "说实话，我没想过自己能进前十。我只是每天做该做的事。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0003",
+        "revision": 1,
+        "text": "这份荣誉属于我的团队，没有他们我什么都不是。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0004",
+        "revision": 1,
+        "text": "从我第一天打CS开始，我就梦想着有一天能站在这里。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0005",
+        "revision": 1,
+        "text": "我知道很多人质疑我，所以我把每个质疑都当作动力。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0006",
+        "revision": 1,
+        "text": "排名只是数字，真正重要的是你在比赛中有没有尽力。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0007",
+        "revision": 1,
+        "text": "能和这些传奇选手并列是我的荣幸。我会继续努力。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0008",
+        "revision": 1,
+        "text": "我不太看排名，我只看下一场比赛。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0009",
+        "revision": 1,
+        "text": "这个赛季最大的收获不是数据，是学会了怎么赢下关键比赛。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0010",
+        "revision": 1,
+        "text": "我还记得去年我甚至不在讨论范围内。所以这一年很特别。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0011",
+        "revision": 1,
+        "text": "粉丝的支持让我在低谷时也没有放弃。这个排名是给他们的。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0012",
+        "revision": 1,
+        "text": "我觉得我才刚刚达到自己的上限，未来还有更多可能。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0013",
+        "revision": 1,
+        "text": "击败那些顶级的对手，是检验自己最好的方式。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0014",
+        "revision": 1,
+        "text": "我在夏天改了自己的练枪方法，效果比预期好。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0015",
+        "revision": 1,
+        "text": "能代表亚洲选手在这个榜单上占有一席之地，我很自豪。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0016",
+        "revision": 1,
+        "text": "每个赛季我都在研究自己的弱点，然后一个个去弥补。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0017",
+        "revision": 1,
+        "text": "我记得小时候看TOP20榜单时的感觉。现在自己进来了。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0018",
+        "revision": 1,
+        "text": "今年最骄傲的不是个人数据，是我们队伍拿到的冠军。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0019",
+        "revision": 1,
+        "text": "我知道很多人觉得我已经过了巅峰。但我觉得最好的还在路上。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0020",
+        "revision": 1,
+        "text": "我要感谢那些在我最困难时没有离开的人。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0021",
+        "revision": 1,
+        "text": "国际赛场和国内赛场完全不一样。适应它花了我两年。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0022",
+        "revision": 1,
+        "text": "今年我改变了打法，变得更团队了。数据反而上来了。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0023",
+        "revision": 1,
+        "text": "每一场比赛前我都会看一遍自己的错误集锦。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0024",
+        "revision": 1,
+        "text": "能和偶像们并列的感觉很不真实。但我配得上这个位置。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0025",
+        "revision": 1,
+        "text": "很多人只看到了比赛中的高光，没看到训练营里凌晨三点的服务器。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0026",
+        "revision": 1,
+        "text": "我不在乎别人怎么评价我的打法，我只在乎赢不赢。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0027",
+        "revision": 1,
+        "text": "今年的Major经历让我明白了一个道理：永远不要提前庆祝。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0028",
+        "revision": 1,
+        "text": "我从不是最被看好的那一个，但我会是最努力的那一个。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0029",
+        "revision": 1,
+        "text": "排名的意义不是证明你比别人强，而是证明你的方向是对的。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0030",
+        "revision": 1,
+        "text": "我还有很多要学习的地方。这个榜单不是终点。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0031",
+        "revision": 1,
+        "text": "能在国际赛场为中国CS发声，是责任也是动力。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0032",
+        "revision": 1,
+        "text": "今年我输了很多不该输的比赛，也赢了很多不该赢的比赛。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0033",
+        "revision": 1,
+        "text": "变强不是一蹴而就的，是一遍又一遍的失败换来的。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0034",
+        "revision": 1,
+        "text": "明年我会更好。因为我知道自己的极限在哪里——现在还没到。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0035",
+        "revision": 1,
+        "text": "在五个人的游戏里拿到个人荣誉，这本身就是团队成功的证明。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0036",
+        "revision": 1,
+        "text": "今年我学会的最重要的事：输得起，才能赢得大。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0037",
+        "revision": 1,
+        "text": "我不会忘记自己从哪里来。那段苦日子塑造了现在的我。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0038",
+        "revision": 1,
+        "text": "每次走上比赛舞台，我都在想：有人为了看我的比赛花了钱。我不能让他们失望。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0039",
+        "revision": 1,
+        "text": "我想证明一件事：年龄只是一个数字，热爱才是真正的资本。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0040",
+        "revision": 1,
+        "text": "那个3年前的我在看着现在的我，我想对那时的自己说：坚持下去。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0041",
+        "revision": 1,
+        "text": "我最大的对手不是别人，是昨天的自己。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0042",
+        "revision": 1,
+        "text": "好的团队让你变得更好，但最终你还是需要自己去面对那些关键枪。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0043",
+        "revision": 1,
+        "text": "今年我打了172张地图，每一张都在提醒我：我有多热爱这个游戏。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0044",
+        "revision": 1,
+        "text": "当一切都按计划进行时，那不是体育。真正的考验是在计划被打乱后你如何应对。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0045",
+        "revision": 1,
+        "text": "我从来不是为了排名打比赛的。但既然进来了，我就要留在这里。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0046",
+        "revision": 1,
+        "text": "今年最大的变化是我学会了不为了数据去打，而是为了胜利去打。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0047",
+        "revision": 1,
+        "text": "我第一次入选TOP20时在酒店哭了。今年是第五次，我还是想哭。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0048",
+        "revision": 1,
+        "text": "被低估是最好的动力。当所有人都不看好你时，你只有一条路可以走——向上。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0049",
+        "revision": 1,
+        "text": "每一年都在变化，但有一个东西从来没有变：比赛开始时，我还是会手心出汗。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0050",
+        "revision": 1,
+        "text": "我配不上'天才'这个词，但我配得上'努力'这两个字。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0051",
+        "revision": 1,
+        "text": "如果我的职业生涯只能教会年轻人一件事，那就是：做正确的事，不要怕慢。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0052",
+        "revision": 1,
+        "text": "今年的成绩告诉我一件事：我没有辜负那些相信我的人。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0053",
+        "revision": 1,
+        "text": "在国际赛场打了六年，我还是会想家。但每次赢球后给家里打电话，一切都值得。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0054",
+        "revision": 1,
+        "text": "那些年复一年枯燥的练枪，那些一遍又一遍的demo复盘，终于在这一年有了回响。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0055",
+        "revision": 1,
+        "text": "MVP奖杯在台上很闪，但在台下它很重。因为它承载了整支队伍的期望。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0056",
+        "revision": 1,
+        "text": "我知道自己不是最有天赋的选手，但我保证我是最不想输的那个。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0057",
+        "revision": 1,
+        "text": "当你的名字出现在年度榜单上时，才真正意识到：时间没有辜负努力的人。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0058",
+        "revision": 1,
+        "text": "我把今年的奖金全部寄回了家。爸爸说'我儿子出息了'。那比我拿MVP还开心。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0059",
+        "revision": 1,
+        "text": "不管明年还能不能在这个榜单上，今年我已经用全力去燃烧了。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0060",
+        "revision": 1,
+        "text": "最难的时刻是第一次输掉Major决赛后。最难能可贵的时刻是第二次再站起来。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      },
+      {
+        "id": "ds-interview-0061",
+        "revision": 1,
+        "text": "电竞选手的生涯很短，但有些瞬间会永远留在服务器里。",
+        "source": {
+          "type": "ai-generated",
+          "generator": "DeepSeek",
+          "promptTemplateVersion": "deepseek-career-v2",
+          "reviewStatus": "draft"
+        }
+      }
+    ]
+  }
+}

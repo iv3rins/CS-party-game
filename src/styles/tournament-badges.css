@@ -1,162 +1,48 @@
-/* 赛事徽章和配色系统 */
-
-/* 徽章基础样式 */
 .tournament-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-weight: 700;
-  font-family: 'Barlow Condensed', sans-serif;
-  letter-spacing: 0.05em;
-  transition: all 0.2s;
-}
-
-.badge-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.badge-label {
-  font-size: 12px;
+  width: max-content;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  background: #242821;
+  color: #f5f1e8;
+  font: 800 12px 'Barlow Condensed';
+  letter-spacing: 0;
   text-transform: uppercase;
 }
+.badge-icon { width: 16px; height: 16px; }
+.badge-major { background:#e86f2c; border-color:#e86f2c; color:#121410; }
+.badge-super-elite { background:#b6d943; border-color:#b6d943; color:#121410; }
+.badge-elite { background:#e8e4d8; border-color:#e8e4d8; color:#121410; }
+.badge-t1 { background:#4eb5c6; border-color:#4eb5c6; color:#121410; }
+.badge-t2 { border-color:#8a9188; color:#f5f1e8; }
+.badge-unranked { border-color:#687067; color:#a8b0a6; }
+.badge-small { padding:4px 7px; font-size:10px; }
+.badge-small .badge-icon { width:12px; height:12px; }
+.badge-large { padding:8px 13px; font-size:14px; }
+.badge-large .badge-icon { width:20px; height:20px; }
+.badge-missed { outline:2px solid #c6483b; outline-offset:2px; }
 
-/* Major - 金色 */
-.badge-major {
-  background: linear-gradient(135deg, #f4c430 0%, #d4a017 100%);
-  border: 2px solid #f4c430;
-  color: #1a1e1a;
-  box-shadow: 0 4px 12px rgba(244, 196, 48, 0.4);
-}
-
-.badge-major:hover {
-  box-shadow: 0 6px 20px rgba(244, 196, 48, 0.6);
-  transform: translateY(-2px);
-}
-
-/* Super-Elite - 银色 */
-.badge-super-elite {
-  background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
-  border: 2px solid #c0c0c0;
-  color: #1a1e1a;
-  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
-}
-
-/* Elite - 铜色 */
-.badge-elite {
-  background: linear-gradient(135deg, #cd7f32 0%, #b8722d 100%);
-  border: 2px solid #cd7f32;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(205, 127, 50, 0.4);
-}
-
-/* T1 - 青色 */
-.badge-t1 {
-  background: linear-gradient(135deg, #4eb5c6 0%, #3a8e9c 100%);
-  border: 2px solid #4eb5c6;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(78, 181, 198, 0.3);
-}
-
-/* T2 - 灰色 */
-.badge-t2 {
-  background: linear-gradient(135deg, #6a7168 0%, #5a615a 100%);
-  border: 2px solid #6a7168;
-  color: #f5f1e8;
-  box-shadow: 0 4px 12px rgba(106, 113, 104, 0.3);
-}
-
-/* Unranked - 暗色 */
-.badge-unranked {
-  background: linear-gradient(135deg, #3a4038 0%, #2a2e28 100%);
-  border: 2px solid #3a4038;
-  color: #a8b0a6;
-  box-shadow: 0 4px 12px rgba(58, 64, 56, 0.3);
-}
-
-/* 尺寸变体 */
-.badge-small {
-  padding: 4px 8px;
-  font-size: 10px;
-}
-
-.badge-small .badge-icon {
-  width: 12px;
-  height: 12px;
-}
-
-.badge-small .badge-label {
-  font-size: 10px;
-}
-
-.badge-large {
-  padding: 8px 16px;
-  font-size: 14px;
-}
-
-.badge-large .badge-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.badge-large .badge-label {
-  font-size: 14px;
-}
-
-/* 行内徽章 - 用于列表中 */
 .inline-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font: 700 10px 'Barlow Condensed';
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  display:inline-grid;
+  place-items:center;
+  min-width:48px;
+  min-height:22px;
+  padding:2px 6px;
+  border:1px solid currentColor;
+  border-radius:2px;
+  background:#242821;
+  color:#f5f1e8;
+  font:800 10px 'Barlow Condensed';
+  letter-spacing:0;
+  text-transform:uppercase;
 }
-
-.inline-major {
-  background: #f4c430;
-  color: #1a1e1a;
-}
-
-.inline-super-elite {
-  background: #c0c0c0;
-  color: #1a1e1a;
-}
-
-.inline-elite {
-  background: #cd7f32;
-  color: #fff;
-}
-
-.inline-t1 {
-  background: #4eb5c6;
-  color: #fff;
-}
-
-.inline-t2 {
-  background: #6a7168;
-  color: #f5f1e8;
-}
-
-.inline-unranked {
-  background: #3a4038;
-  color: #a8b0a6;
-}
-
-/* 赛事卡片背景配色 */
-.tournament-card-major {
-  border-color: #f4c430 !important;
-  background: linear-gradient(135deg, rgba(244, 196, 48, 0.05) 0%, transparent 100%) !important;
-}
-
-.tournament-card-super-elite {
-  border-color: #c0c0c0 !important;
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.05) 0%, transparent 100%) !important;
-}
-
-.tournament-card-elite {
-  border-color: #cd7f32 !important;
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.05) 0%, transparent 100%) !important;
-}
+.inline-major { background:#e86f2c; border-color:#e86f2c; color:#121410; }
+.inline-super-elite { background:#b6d943; border-color:#b6d943; color:#121410; }
+.inline-elite { background:#e8e4d8; border-color:#8a9188; color:#121410; }
+.inline-t1 { background:#4eb5c6; border-color:#4eb5c6; color:#121410; }
+.inline-t2 { border-color:#6a7168; }
+.inline-unranked { border-color:#4d554d; color:#a8b0a6; }
+.inline-missed { outline:2px solid #c6483b; outline-offset:1px; }

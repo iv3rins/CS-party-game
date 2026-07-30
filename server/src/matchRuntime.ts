@@ -26,6 +26,7 @@ export class MatchRuntime {
   constructor(match:MatchRecord,private repository:Repository,private clock:Clock=systemClock){this.match=match;this.rng=createSeededRng(match.seed);const lanes=[0,1,2,3,4];for(let i=lanes.length-1;i>0;i--){const j=this.rng.integer(i+1);[lanes[i],lanes[j]]=[lanes[j],lanes[i]];}this.state=createInitialState(lanes.slice(0,2));this.shops={player:this.rollShop(),ai:this.rollShop()};}
   private rollShop(){return Array.from({length:5},()=>weightedProduct(()=>this.rng.next()));}
   snapshot():RuntimeSnapshot{return structuredClone({sequence:this.sequence,state:this.state,shops:this.shops,connected:this.connected});}
+  projection(principalId:string):RuntimeSnapshot { const side=this.sideFor(principalId); const opponent=side==='player'?'ai':'player'; const state=structuredClone(this.state); state[opponent==='player'?'playerMoney':'aiMoney']=0; state[opponent==='player'?'playerItems':'aiItems']={flash:0,smoke:0,c4:0,defuse:0}; state[opponent==='player'?'playerDefuseCharges':'aiDefuseCharges']=0; return { sequence:this.sequence, state, shops:{ player:side==='player'?structuredClone(this.shops.player):[], ai:side==='ai'?structuredClone(this.shops.ai):[] }, connected:structuredClone(this.connected) }; }
   on(listener:(event:RuntimeEvent)=>void){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   private emit(event:RuntimeEvent){for(const listener of this.listeners)listener(event);}
   start(){if(!this.timer&&!this.finished)this.timer=this.clock.setInterval(()=>{void this.tick();},100);}

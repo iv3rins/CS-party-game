@@ -1,0 +1,614 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "career-content-v1",
+  "titles": [
+    {
+      "id": "investigated",
+      "name": "被调查者",
+      "priority": 1000,
+      "conditions": [
+        {
+          "field": "integrity",
+          "op": "lt",
+          "value": 25
+        }
+      ]
+    },
+    {
+      "id": "sharpshooter",
+      "name": "一代枪男",
+      "priority": 900,
+      "conditions": [
+        {
+          "field": "trophies",
+          "op": "gte",
+          "value": 3
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.12
+        }
+      ]
+    },
+    {
+      "id": "tactical-brain",
+      "name": "战术大脑",
+      "priority": 800,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gt",
+          "value": 75
+        },
+        {
+          "field": "role",
+          "op": "eq",
+          "value": "igl"
+        }
+      ]
+    },
+    {
+      "id": "traffic-star",
+      "name": "流量巨星",
+      "priority": 700,
+      "conditions": [
+        {
+          "field": "fame",
+          "op": "gt",
+          "value": 80
+        }
+      ]
+    },
+    {
+      "id": "clean-professional",
+      "name": "干净的职业人",
+      "priority": 600,
+      "conditions": [
+        {
+          "field": "integrity",
+          "op": "gt",
+          "value": 82
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 29
+        }
+      ]
+    },
+    {
+      "id": "uncrowned",
+      "name": "无冕强者",
+      "priority": 500,
+      "conditions": [
+        {
+          "field": "trophies",
+          "op": "eq",
+          "value": 0
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.1
+        }
+      ]
+    },
+    {
+      "id": "professional-journey",
+      "name": "职业旅程",
+      "priority": 0,
+      "conditions": []
+    },
+    {
+      "id": "major-champion",
+      "name": "Major冠军",
+      "priority": 950,
+      "conditions": [
+        {
+          "field": "trophies",
+          "op": "gte",
+          "value": 1
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.15
+        }
+      ]
+    },
+    {
+      "id": "cncs-pioneer",
+      "name": "CNCS先驱",
+      "priority": 750,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 70
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "id": "international-star",
+      "name": "国际巨星",
+      "priority": 720,
+      "conditions": [
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 75
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.1
+        }
+      ]
+    },
+    {
+      "id": "survivor",
+      "name": "不灭老兵",
+      "priority": 650,
+      "conditions": [
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 30
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "id": "team-player",
+      "name": "团队基石",
+      "priority": 600,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 75
+        },
+        {
+          "field": "trophies",
+          "op": "gte",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "igl-genius",
+      "name": "战术天才",
+      "priority": 580,
+      "conditions": [
+        {
+          "field": "role",
+          "op": "eq",
+          "value": "igl"
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.05
+        }
+      ]
+    },
+    {
+      "id": "comeback-king",
+      "name": "王者归来",
+      "priority": 550,
+      "conditions": [
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 60
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.12
+        }
+      ]
+    },
+    {
+      "id": "late-bloomer",
+      "name": "大器晚成",
+      "priority": 520,
+      "conditions": [
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 28
+        },
+        {
+          "field": "trophies",
+          "op": "gte",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "rookie-sensation",
+      "name": "新秀轰动",
+      "priority": 500,
+      "conditions": [
+        {
+          "field": "age",
+          "op": "lte",
+          "value": 20
+        },
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "id": "calm-head",
+      "name": "冷静头脑",
+      "priority": 480,
+      "conditions": [
+        {
+          "field": "integrity",
+          "op": "gte",
+          "value": 80
+        },
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 60
+        }
+      ]
+    },
+    {
+      "id": "awper-legend",
+      "name": "狙神",
+      "priority": 460,
+      "conditions": [
+        {
+          "field": "role",
+          "op": "eq",
+          "value": "awper"
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.15
+        }
+      ]
+    },
+    {
+      "id": "entry-fragger",
+      "name": "突破尖刀",
+      "priority": 440,
+      "conditions": [
+        {
+          "field": "role",
+          "op": "eq",
+          "value": "entry"
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.1
+        }
+      ]
+    },
+    {
+      "id": "support-hero",
+      "name": "幕后英雄",
+      "priority": 420,
+      "conditions": [
+        {
+          "field": "role",
+          "op": "eq",
+          "value": "support"
+        },
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 65
+        }
+      ]
+    },
+    {
+      "id": "comeback-kid",
+      "name": "二世归来的少年",
+      "priority": 400,
+      "conditions": [
+        {
+          "field": "age",
+          "op": "lte",
+          "value": 22
+        },
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 55
+        }
+      ]
+    },
+    {
+      "id": "carry-machine",
+      "name": "Carry机器",
+      "priority": 380,
+      "conditions": [
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.18
+        },
+        {
+          "field": "trophies",
+          "op": "lte",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "triple-core",
+      "name": "三人核心",
+      "priority": 360,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 70
+        },
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 40
+        }
+      ]
+    },
+    {
+      "id": "academy-product",
+      "name": "青训骄子",
+      "priority": 340,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 60
+        },
+        {
+          "field": "age",
+          "op": "lte",
+          "value": 23
+        }
+      ]
+    },
+    {
+      "id": "veteran-coach",
+      "name": "选手转教练",
+      "priority": 320,
+      "conditions": [
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 28
+        },
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 65
+        }
+      ]
+    },
+    {
+      "id": "free-agent",
+      "name": "漂泊者",
+      "priority": 300,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "lte",
+          "value": 40
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 25
+        }
+      ]
+    },
+    {
+      "id": "tragic-hero",
+      "name": "悲剧英雄",
+      "priority": 280,
+      "conditions": [
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.1
+        },
+        {
+          "field": "trophies",
+          "op": "eq",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "one-club-man",
+      "name": "一队终老",
+      "priority": 260,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 80
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "id": "young-gun",
+      "name": "少年枪王",
+      "priority": 240,
+      "conditions": [
+        {
+          "field": "age",
+          "op": "lte",
+          "value": 20
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.08
+        }
+      ]
+    },
+    {
+      "id": "mentor",
+      "name": "导师",
+      "priority": 220,
+      "conditions": [
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 75
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 27
+        }
+      ]
+    },
+    {
+      "id": "brand-ambassador",
+      "name": "品牌大使",
+      "priority": 200,
+      "conditions": [
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 80
+        },
+        {
+          "field": "integrity",
+          "op": "gte",
+          "value": 70
+        }
+      ]
+    },
+    {
+      "id": "two-way-player",
+      "name": "全能选手",
+      "priority": 180,
+      "conditions": [
+        {
+          "field": "role",
+          "op": "eq",
+          "value": "igl"
+        },
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.08
+        }
+      ]
+    },
+    {
+      "id": "redemption-story",
+      "name": "救赎者",
+      "priority": 160,
+      "conditions": [
+        {
+          "field": "integrity",
+          "op": "gte",
+          "value": 60
+        },
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "id": "struggler",
+      "name": "抗争者",
+      "priority": 140,
+      "conditions": [
+        {
+          "field": "rating",
+          "op": "lte",
+          "value": 1.0
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 26
+        }
+      ]
+    },
+    {
+      "id": "champion-builder",
+      "name": "冠军制造者",
+      "priority": 120,
+      "conditions": [
+        {
+          "field": "trophies",
+          "op": "gte",
+          "value": 3
+        },
+        {
+          "field": "connections",
+          "op": "gte",
+          "value": 70
+        }
+      ]
+    },
+    {
+      "id": "mr-consistent",
+      "name": "铁人",
+      "priority": 100,
+      "conditions": [
+        {
+          "field": "rating",
+          "op": "gte",
+          "value": 1.08
+        },
+        {
+          "field": "age",
+          "op": "gte",
+          "value": 26
+        }
+      ]
+    },
+    {
+      "id": "streamer-king",
+      "name": "直播皇帝",
+      "priority": 80,
+      "conditions": [
+        {
+          "field": "fame",
+          "op": "gte",
+          "value": 70
+        },
+        {
+          "field": "rating",
+          "op": "lte",
+          "value": 1.0
+        }
+      ]
+    }
+  ]
+}

@@ -8,6 +8,7 @@ const schema = z.object({
   COOKIE_SECRET: z.string().min(32),
   SESSION_DAYS: z.coerce.number().int().positive().default(30),
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
+  WORKER_INTERVAL_MS: z.coerce.number().int().positive().default(1000),
 });
 
 export type Config = z.infer<typeof schema>;

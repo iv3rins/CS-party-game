@@ -1,0 +1,49 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "rising-star",
+    "revision": 1,
+    "title": "骤然成名",
+    "description": "一段围绕年轻选手迅速获得关注、资源与压力的长期世界线。它没有固定成功结局，选择只改变资源、关系和后续局面。",
+    "tags": ["新人", "市场", "舆论"],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-design"
+    },
+    "entry": {
+      "op": "all",
+      "args": [
+        { "op": "lte", "left": { "var": "career.age" }, "right": { "const": 22 } },
+        { "op": "gte", "left": { "var": "player.ability" }, "right": { "const": 70 } },
+        { "op": "gte", "left": { "var": "player.fame" }, "right": { "const": 35 } }
+      ]
+    },
+    "initialStage": "attention",
+    "stages": [
+      {
+        "id": "attention",
+        "title": "注意力涌入",
+        "description": "媒体、教练和经纪人开始集中观察玩家。",
+        "eventTags": ["worldline:rising-star:attention"]
+      },
+      {
+        "id": "pressure",
+        "title": "资源与压力",
+        "description": "更多资源伴随更高要求，队内定位开始变化。",
+        "eventTags": ["worldline:rising-star:pressure"]
+      },
+      {
+        "id": "identity",
+        "title": "确定自己的位置",
+        "description": "玩家需要在多方期待中形成自己的职业路径。",
+        "eventTags": ["worldline:rising-star:identity"]
+      }
+    ],
+    "endings": [
+      { "id": "new-core", "title": "成为新核心", "description": "资源与责任同时留在玩家身上。" },
+      { "id": "measured-growth", "title": "降温成长", "description": "热度下降，但职业结构更加稳定。" },
+      { "id": "changed-route", "title": "转向另一条道路", "description": "玩家将关注转化为新的赛场或定位。" }
+    ]
+  }
+]

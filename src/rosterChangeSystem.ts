@@ -1,170 +1,77 @@
 /**
  * 队友变阵系统
- * 基于战队表现、负面爆冷和赛季结果触发换人
+ * 基于战队表现、负面爆冷和赛季结果触发换人。
+ * 该模块只提供纯函数；所有随机结果都由生涯种子和赛季确定。
  */
 
 import type { CareerState, Decision } from './careerEngine';
-import { seeded } from './careerEngine';
+import type { PlayerRole } from './careerData';
+import { getDecisionTemplate } from './careerDecisionTemplates';
 
-/**
- * 检查是否触发队友变阵
- * 触发条件：
- * 1. 连续负面爆冷 >= 2
- * 2. 战队状态 < 50
- * 3. 阵容稳定度 < 40
- * 4. 赛季末排名大幅下滑（>= 15名）
- */
+const makeRng = (seed: number) => () => { let value = seed += 0x6D2B79F5; value = Math.imul(value ^ value >>> 15, value | 1); value ^= value + Math.imul(value ^ value >>> 7, value | 61); return ((value ^ value >>> 14) >>> 0) / 4294967296; };
+const hash = (text: string) => [...text].reduce((value, char) => Math.imul(value ^ char.charCodeAt(0), 16777619), 2166136261) >>> 0;
+const rosterRng = (state: Pick<CareerState, 'seed' | 'season'>, key: string) => makeRng(hash(`${state.seed}:${state.season}:${key}`));
+
+export interface RosterChangePlan {
+  kind: 'adjustment' | 'rebuild';
+  leaving: Array<{ nick: string; role: PlayerRole }>;
+}
+
 export function shouldTriggerRosterChange(state: CareerState): boolean {
-  if (state.employmentStatus !== 'signed' || state.roster.length < 5) return false;
-  
-  const recentReport = state.history.at(-1);
-  if (!recentReport) return false;
-  
-  // 检查触发条件
-  const hasNegativeStreak = state.negativeUpsetStreak >= 2;
-  const lowTeamForm = state.teamForm < 50;
-  const lowStability = state.rosterStability < 40;
-  const majorRankDrop = recentReport.rankingDelta <= -15;
-  
-  const triggerCount = [hasNegativeStreak, lowTeamForm, lowStability, majorRankDrop].filter(Boolean).length;
-  
-  // 至少满足2个条件才触发
-  return triggerCount >= 2;
+  if (state.employmentStatus !== 'signed' || state.roster.length !== 5 || !state.history.at(-1)) return false;
+  if (state.negativeUpsetStreak >= 3) return true;
+  const signals = [
+    state.negativeUpsetStreak >= 2,
+    state.teamForm < 50,
+    state.rosterStability < 40,
+    state.history.at(-1)!.rankingDelta <= -15,
+  ].filter(Boolean).length;
+  return signals >= 2;
 }
 
-/**
- * 生成队友变阵事件
- */
+export function rosterChangePlan(state: CareerState): RosterChangePlan {
+  const teammates = state.roster.filter(player => !player.isPlayer);
+  const rebuild = state.negativeUpsetStreak >= 3 || (state.teamForm < 45 && state.rosterStability < 35);
+  const leavingCount = rebuild ? 2 + Math.floor(rosterRng(state, 'roster-change-plan')() * 2) : 1;
+  return { kind: rebuild ? 'rebuild' : 'adjustment', leaving: teammates.slice(0, leavingCount) };
+}
+
 export function createRosterChangeEvent(state: CareerState): Decision {
-  const isPlayer = state.roster.find(p => p.isPlayer);
-  const teammates = state.roster.filter(p => !p.isPlayer);
-  
-  // 根据情况选择变阵类型
-  const isMajorRebuild = state.teamForm < 45 && state.rosterStability < 35;
-  const rng = seeded(state, `roster-change-${state.season}`);
-  
-  if (isMajorRebuild) {
-    // 大规模重建：2-3人离队
-    const leavingCount = Math.floor(rng() * 2) + 2; // 2或3人
-    const leaving = teammates.slice(0, leavingCount);
-    
-    return {
-      id: `roster-rebuild-${state.season}`,
-      kind: 'offseason',
-      category: '队内体系',
-      title: '战队重建计划',
-      briefing: `管理层决定启动大规模重建。${leaving.map(p => p.nick).join('、')} 将离队，新阵容即将公布。你是否愿意留队参与重建？`,
-      options: [
-        {
-          id: 'stay-rebuild',
-          label: '留队参与重建',
-          detail: '阵容稳定 -20 / 战队状态 +15 / 关系 +8',
-          changes: {
-            rosterStability: -20,
-            teamForm: 15,
-            connections: 8,
-          },
-        },
-        {
-          id: 'leave-rebuild',
-          label: '寻找转会机会',
-          detail: '进入自由市场 / 可能获得更好报价',
-          changes: {
-            employmentStatus: 'free-agent',
-            noOfferWindows: 0,
-          },
-        },
-      ],
-    };
-  } else {
-    // 小规模调整：1人离队
-    const leaving = teammates[0];
-    
-    return {
-      id: `roster-adjustment-${state.season}`,
-      kind: 'offseason',
-      category: '队内体系',
-      title: '阵容微调',
-      briefing: `管理层决定让 ${leaving.nick} 离队，引入新选手。这次调整可能改善战队氛围。`,
-      options: [
-        {
-          id: 'support-change',
-          label: '支持管理层决定',
-          detail: '阵容稳定 -12 / 战队状态 +8 / 关系 +4',
-          changes: {
-            rosterStability: -12,
-            teamForm: 8,
-            connections: 4,
-          },
-        },
-        {
-          id: 'oppose-change',
-          label: '反对这次换人',
-          detail: '战队状态 +3 / 关系 -6 / 可能引发内部矛盾',
-          changes: {
-            teamForm: 3,
-            connections: -6,
-            rosterStability: -5,
-          },
-        },
-      ],
-    };
-  }
+  const plan = rosterChangePlan(state);
+  const template=getDecisionTemplate(plan.kind==='rebuild'?'roster-rebuild':'roster-adjustment',{leavers:plan.leaving.map(player=>player.nick).join('、'),leaver:plan.leaving[0]?.nick??''});
+  const effects=plan.kind==='rebuild'?{ 'stay-rebuild':{rosterStability:-20,teamForm:15,connections:8},'leave-rebuild':{employmentStatus:'free-agent' as const,noOfferWindows:0}}:{'support-change':{rosterStability:-12,teamForm:8,connections:4},'oppose-change':{teamForm:3,connections:-6,rosterStability:-5}};
+  return {id:`roster-${plan.kind}-${state.season}`,kind:template.kind,timing:template.timing,category:template.category,rosterChange:plan,title:template.title,briefing:template.briefing,options:template.options.map(option=>{const changes=effects[option.id as keyof typeof effects];if(!changes)throw new Error(`阵容模板缺少选项逻辑 ${option.id}`);return {id:option.id,label:option.label,detail:option.detail,result:option.result,changes};})};
 }
 
-/**
- * 应用变阵结果到状态
- * 更新 roster 数组，替换离队的队友
- */
-export function applyRosterChange(state: CareerState, optionId: string): CareerState {
+export function applyRosterChange(state: CareerState, decision: Decision, optionId: string): CareerState {
+  if (!decision.id.startsWith('roster-') || !decision.options.some(option => option.id === optionId)) return state;
   if (optionId === 'leave-rebuild') {
-    // 玩家选择离队，进入自由市场
     return {
       ...state,
-      employmentStatus: 'free-agent',
-      contractHalfSeasonsRemaining: 0,
-      noOfferWindows: 0,
+      teamId: '', team: '自由人', roster: [], salary: 0,
+      employmentStatus: 'free-agent', contractHalfSeasonsRemaining: 0, noOfferWindows: 0,
+      vrsActive: false, rankingPoints: 0, rebuildPoints: 0, globalRank: 101, tier: '未入榜', coreMemberIds: [],
     };
   }
-  
-  // 生成新队友
-  const rng = seeded(state, `new-roster-${state.season}`);
-  const playerRole = state.role;
-  const existingRoles = state.roster.filter(p => !p.isPlayer).map(p => p.role);
-  
-  // 确定需要替换的位置
-  const isMajorRebuild = optionId === 'stay-rebuild';
-  const replaceCount = isMajorRebuild ? Math.floor(rng() * 2) + 2 : 1;
-  
-  // 生成新队友
-  const newTeammates: Array<{ nick: string; role: typeof existingRoles[number]; isPlayer?: boolean }> = [];
-  const usedNicks = new Set(state.roster.map(p => p.nick));
-  
-  for (let i = 0; i < replaceCount; i++) {
-    const roleIndex = Math.floor(rng() * existingRoles.length);
-    const role = existingRoles[roleIndex];
-    
-    // 生成唯一昵称
-    let nick: string;
-    let attempts = 0;
-    do {
-      nick = `Player${state.season}_${Math.floor(rng() * 1000)}`;
-      attempts++;
-    } while (usedNicks.has(nick) && attempts < 100);
-    
+
+  const plan = decision.rosterChange;
+  if(!plan)return state;
+  const rng = rosterRng(state, 'roster-change-replacements');
+  const leavingNames = new Set(plan.leaving.map(player => player.nick));
+  const usedNicks = new Set(state.roster.map(player => player.nick));
+  const replacements = plan.leaving.map((player, index) => {
+    let nick = '';
+    do nick = `Rookie-${state.season}-${index + 1}-${Math.floor(rng() * 1000)}`; while (usedNicks.has(nick));
     usedNicks.add(nick);
-    newTeammates.push({ nick, role });
-  }
-  
-  // 更新阵容：保留玩家，替换队友
-  const newRoster = [
-    state.roster.find(p => p.isPlayer)!,
-    ...state.roster.filter(p => !p.isPlayer).slice(replaceCount),
-    ...newTeammates,
-  ].slice(0, 5);
-  
+    return { id:`generated-${state.seed}-${state.season}-${index}`,nick,role:player.role,ability:Math.max(55,Math.min(96,Math.round(68+(101-Math.min(100,state.globalRank))*.18+(rng()-.5)*14))),fame:Math.round(20+rng()*35),seasonPerformances:[],top20History:[] };
+  });
+  const roster = [...state.roster.filter(player => !leavingNames.has(player.nick)), ...replacements];
+  const losesCore = plan.leaving.length >= 3;
   return {
     ...state,
-    roster: newRoster,
+    roster,
+    coreMemberIds: losesCore ? [] : state.coreMemberIds.slice(0, 3),
+    ...(losesCore ? { vrsActive: false, rankingPoints: 0, rebuildPoints: 0, globalRank: 101, tier: '三线赛场' } : {}),
+    log: [`阵容更新：${plan.leaving.map(player => player.nick).join('、')} 离队，${replacements.map(player => player.nick).join('、')} 加入${losesCore ? '；三人核心不足，模拟 VRS 积分清零' : ''}`, ...state.log],
   };
 }

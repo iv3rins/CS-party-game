@@ -10,9 +10,10 @@ export interface TournamentBadgeProps {
   honorClass?: HonorClass;
   name: string;
   size?: 'small' | 'medium' | 'large';
+  missed?: boolean;
 }
 
-export function TournamentBadge({ tier, honorClass, name, size = 'medium' }: TournamentBadgeProps) {
+export function TournamentBadge({ tier, honorClass, name, size = 'medium', missed = false }: TournamentBadgeProps) {
   const isMajor = tier === 'Major';
   const isSuperElite = honorClass === 'super-elite' || honorClass === 'major';
   const isElite = honorClass === 'elite';
@@ -41,10 +42,10 @@ export function TournamentBadge({ tier, honorClass, name, size = 'medium' }: Tou
     badgeClass += ' badge-unranked';
   }
   
-  badgeClass += ` badge-${size}`;
+  badgeClass += ` badge-${size}${missed ? ' badge-missed' : ''}`;
   
   return (
-    <div className={badgeClass} title={name}>
+    <div className={badgeClass} role="img" aria-label={`${name} · ${label}`}>
       {icon}
       <span className="badge-label">{label}</span>
     </div>
@@ -54,7 +55,7 @@ export function TournamentBadge({ tier, honorClass, name, size = 'medium' }: Tou
 /**
  * 赛事行内联徽章 - 用于赛事列表中的紧凑显示
  */
-export function InlineTournamentBadge({ tier, honorClass }: Pick<TournamentBadgeProps, 'tier' | 'honorClass'>) {
+export function InlineTournamentBadge({ tier, honorClass, missed = false }: Pick<TournamentBadgeProps, 'tier' | 'honorClass' | 'missed'>) {
   const isMajor = tier === 'Major';
   const isSuperElite = honorClass === 'super-elite' || honorClass === 'major';
   const isElite = honorClass === 'elite';
@@ -82,5 +83,5 @@ export function InlineTournamentBadge({ tier, honorClass }: Pick<TournamentBadge
     label = 'Unranked';
   }
   
-  return <span className={className}>{label}</span>;
+  return <span className={`${className}${missed ? ' inline-missed' : ''}`}>{label}</span>;
 }

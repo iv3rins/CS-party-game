@@ -1,0 +1,594 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-001",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "每天比别人多练两小时录像复盘",
+    "briefing": "18岁，你的天赋在同龄人中只能算中游。教练说你的枪法上限大概在70分左右。那天之后你每天训练结束后都会留在战术室看两小时demo复盘——对手的走位习惯、队友的闪光弹轨迹、自己的每一个死亡镜头。三个月后你的Rating从0.92涨到了1.01。",
+    "tags": [
+      "worldline:wl-mortal-road:discipline-path",
+      "训练",
+      "复盘",
+      "努力"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 16,
+    "maxAge": 21,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 70
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 70
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "discipline-path"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "systematic-study",
+        "label": "建立系统化的复盘模板",
+        "detail": "不只是看录像，而是做标注和分类。",
+        "changes": {
+          "ability": 4,
+          "health": -3
+        },
+        "outcomes": [
+          {
+            "id": "template-works",
+            "label": "三个月后建立了一套自己的复盘系统",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 5,
+              "connections": 2
+            }
+          },
+          {
+            "id": "over-engineered",
+            "label": "太追求系统性反而效率下降了",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 1,
+              "health": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "quantity-over-quality",
+        "label": "不怕多就怕不练大量积累",
+        "detail": "每天看三小时不挑内容就是堆量。",
+        "changes": {
+          "ability": 3,
+          "health": -5
+        },
+        "outcomes": [
+          {
+            "id": "volume-pays",
+            "label": "大量积累后形成了肌肉记忆",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 4
+            }
+          },
+          {
+            "id": "burnout-risk",
+            "label": "过度疲劳导致训练状态下降",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -2,
+              "health": -6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-002",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "拒绝捷径坚持基础训练",
+    "briefing": "19岁，你的队友们都在练花哨的连杀操作和极限身法，因为那些看起来更酷。但你在每天的基础瞄准训练里又多投入了一小时。有人笑你还在打bot，你关掉语音继续练。一个月后你的单发爆头率从11%升到了17%。",
+    "tags": [
+      "worldline:wl-mortal-road:discipline-path",
+      "基础",
+      "训练",
+      "自律"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 16,
+    "maxAge": 22,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 72
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 60
+    },
+    "cooldownSeasons": 5,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "discipline-path"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "stick-to-basics",
+        "label": "坚持基础训练不动摇",
+        "detail": "虽然枯燥但最扎实。",
+        "changes": {
+          "ability": 3,
+          "connections": -1
+        },
+        "outcomes": [
+          {
+            "id": "basics-pay",
+            "label": "三个月后你的稳定性和可靠性成了队伍最大优势",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": 4,
+              "connections": 3
+            }
+          },
+          {
+            "id": "slow-progress-3",
+            "label": "进步确实很慢",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "mix-basics-and-advanced",
+        "label": "基础为主偶尔练练花哨操作",
+        "detail": "保持基础的同时拓展上限。",
+        "changes": {
+          "ability": 2,
+          "fame": 2
+        },
+        "outcomes": [
+          {
+            "id": "balanced-approach",
+            "label": "稳步提升全面性",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 3
+            }
+          },
+          {
+            "id": "jack-of-all",
+            "label": "什么都没练到顶尖",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-003",
+    "revision": 1,
+    "category": "教练管理",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "教练私下说你的天赋不够但态度最好",
+    "briefing": "20岁，一次训练结束后你无意间听到了教练和助教的对话。教练说'他的天赋上线大概就这样了，但他是我带过最努力的选手。每次训练他都是第一个到最后一个走。'你站在门外不知道该不该进去。",
+    "tags": [
+      "worldline:wl-mortal-road:discipline-path",
+      "教练",
+      "评价",
+      "努力"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 18,
+    "maxAge": 23,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 72
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 50
+    },
+    "cooldownSeasons": 5,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "discipline-path"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "act-normal",
+        "label": "假装没听见继续努力",
+        "detail": "装作不知道，用时间证明自己。",
+        "changes": {
+          "ability": 3,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "silent-proof",
+            "label": "半年后你用表现让教练改口了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 4,
+              "connections": 5
+            }
+          },
+          {
+            "id": "gnawing-doubt",
+            "label": "那些话像一根刺一直在心里",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -2,
+              "health": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "confront-coach",
+        "label": "进去和教练开诚布公谈",
+        "detail": "直面质疑，展示自己的决心。",
+        "changes": {
+          "connections": 3,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "coach-respects",
+            "label": "教练欣赏你的坦诚，说那就用行动证明给我看",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "connections": 6,
+              "ability": 3
+            }
+          },
+          {
+            "id": "awkward-after",
+            "label": "之后两人之间有些尴尬",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-004",
+    "revision": 1,
+    "category": "角色转职",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "主动要求打闪光弹和信息位",
+    "briefing": "23岁，你的枪法上限明显不如队里的年轻选手。在一次战术会议上你主动跟教练说：让我打辅助位吧，我的枪法可能不够好，但我对地图的理解和道具使用是队里最好的。教练看了你一会儿说：你知道吗，这是你说的最成熟的一句话。",
+    "tags": [
+      "worldline:wl-mortal-road:support-value",
+      "辅助",
+      "转型",
+      "道具"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 27,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 50
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "support-value"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "full-support-commit",
+        "label": "全力钻研道具体系",
+        "detail": "花大量时间练习每个地图的投掷物。",
+        "changes": {
+          "ability": -2,
+          "connections": 3,
+          "positionFamiliarity": 8
+        },
+        "outcomes": [
+          {
+            "id": "flash-master",
+            "label": "一个月后你的闪光弹助攻率排进联赛前三",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 2,
+              "connections": 5,
+              "fame": 3
+            }
+          },
+          {
+            "id": "still-grenading",
+            "label": "道具练了很多但实战中用不出来",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": -3,
+              "positionFamiliarity": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "utility-plus-rifle",
+        "label": "辅助为主但保持步枪实力",
+        "detail": "在辅助和步枪之间找平衡。",
+        "changes": {
+          "ability": -1,
+          "positionFamiliarity": 4
+        },
+        "outcomes": [
+          {
+            "id": "balanced-support",
+            "label": "找到了兼顾辅助和步枪的节奏",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 2
+            }
+          },
+          {
+            "id": "mediocre-at-both",
+            "label": "两头都不够突出",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-mortal-road-005",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "牺牲击杀数据换队友生存空间",
+    "briefing": "24岁，你在比赛中主动承担了最危险的位置——去断后、拉枪线、吸引火力。你的击杀数据从1.06降到了0.94，但队伍的胜率从43%升到了58%。赛后数据板上你排在倒数第二，但两个年轻突破手都打出了赛季最佳数据。",
+    "tags": [
+      "worldline:wl-mortal-road:support-value",
+      "牺牲",
+      "数据",
+      "团队"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 28,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 40
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-mortal-road",
+      "stages": [
+        "support-value"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "embrace-sacrifice",
+        "label": "接受这个角色继续打",
+        "detail": "认可自己的牺牲价值。",
+        "changes": {
+          "ability": -2,
+          "connections": 5,
+          "teamForm": 3
+        },
+        "outcomes": [
+          {
+            "id": "team-success",
+            "label": "队伍在你牺牲的掩护下打出了成绩",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 6,
+              "teamForm": 5
+            }
+          },
+          {
+            "id": "nobody-notices",
+            "label": "没人注意到你的牺牲",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -3,
+              "connections": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "ask-for-more",
+        "label": "要求更多资源打出数据",
+        "detail": "不想只当绿叶。",
+        "changes": {
+          "fame": 3,
+          "connections": -3
+        },
+        "outcomes": [
+          {
+            "id": "data-improves",
+            "label": "个人数据提升但团队配合出了问题",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 3,
+              "teamForm": -3
+            }
+          },
+          {
+            "id": "team-suffers",
+            "label": "团队整体表现下滑",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "teamForm": -5,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,336 @@
+[
+  {
+    "templateId": "international-offer",
+    "kind": "offseason",
+    "category": "国际转会",
+    "title": "国际纵队正式报价",
+    "briefing": "你的年轻高潜状态和国际履历进入海外队伍视野。更高赛事上限伴随语言、体系和首发竞争。",
+    "options": [
+      {
+        "id": "join-international",
+        "label": "接受国际纵队轮换合同",
+        "detail": "1–2 年合同 / 初期关系 -6、战队状态 -5 / 国际机会提高"
+      },
+      {
+        "id": "stay-cn",
+        "label": "留在当前体系继续首发",
+        "detail": "保持现阵容 / 关系 +6 / 等待下一次国际窗口"
+      }
+    ]
+  },
+  {
+    "templateId": "market-inbox",
+    "kind": "offseason",
+    "category": "合同转会",
+    "title": "转会市场收件箱",
+    "briefing": "你的表现引起市场关注：{{marketHeat}}。每份报价都显示了层级、角色、期限、签字费和接受代价。",
+    "options": [
+      {
+        "id": "market-stay",
+        "label": "拒绝报价，留在当前队伍",
+        "detail": "保持现合同和首发默契 / 关闭本次市场热度",
+        "result": "你决定先把当前体系打磨到更高水平。"
+      }
+    ],
+    "dynamicOptions": {
+      "offer": {
+        "label": "接受 {{team}} · {{role}}",
+        "detail": "模拟 VRS #{{rank}} / {{tier}} / {{salary}} 万/月 / {{years}} 年 / 签字费 {{signingBonus}} 万",
+        "result": "触发原因：{{reason}}；代价：{{cost}}"
+      }
+    }
+  },
+  {
+    "templateId": "free-agent",
+    "kind": "offseason",
+    "category": "合同转会",
+    "title": "自由人窗口",
+    "briefing": "原队合同已经结束。报价会明确显示相对当前履历的升降级、合同期限和首发保障。",
+    "options": [
+      {
+        "id": "accept-market-offer",
+        "label": "接受当前职业报价",
+        "detail": "65% {{t2Label}}首发 / 35% {{t3Label}}首发",
+        "outcomes": [
+          {
+            "id": "market-t2",
+            "label": "获得{{t2Label}}首发合同"
+          },
+          {
+            "id": "market-t3",
+            "label": "获得{{t3Label}}首发合同"
+          }
+        ]
+      },
+      {
+        "id": "wait-better-offer",
+        "label": "继续等待更高层级队伍",
+        "detail": "24% 等到二线强队 / 76% 本窗口没有报价",
+        "outcomes": [
+          {
+            "id": "wait-success",
+            "label": "二线强队临时出现首发空缺"
+          },
+          {
+            "id": "wait-fail",
+            "label": "窗口关闭，仍然没有职业队报价；你转为直播维持曝光并继续等待"
+          }
+        ]
+      },
+      {
+        "id": "become-streamer",
+        "label": "暂别赛场，直播等待机会",
+        "detail": "进入半年主播窗口 / 保留复出资格 / 可用资产承担生活成本",
+        "outcomes": [
+          {
+            "id": "stream-start",
+            "label": "直播间开始稳定运营，你仍在维持职业训练"
+          },
+          {
+            "id": "stream-slow",
+            "label": "直播起步缓慢，但你保留了继续等待的空间"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "templateId": "contract-breach",
+    "kind": "offseason",
+    "category": "合同转会",
+    "title": "违约加盟争冠队",
+    "briefing": "一支顶级队伍出现临时空缺，但转会窗口即将关闭。对方暗示你先与原队撕破合同，再解决买断问题。",
+    "options": [
+      {
+        "id": "breach-for-superteam",
+        "label": "主动违约抱团争冠",
+        "detail": "32% 加盟成功 / 43% 被原队冷藏 / 25% 两边都不要",
+        "outcomes": [
+          {
+            "id": "breach-success",
+            "label": "争冠队支付后续费用，你进入一线阵容，但背负违约口碑"
+          },
+          {
+            "id": "breach-benched",
+            "label": "争冠队撤回承诺，原队将你冷藏到合同结束"
+          },
+          {
+            "id": "breach-free",
+            "label": "合同解除，但市场认为风险过高，没有队伍立即报价"
+          }
+        ]
+      },
+      {
+        "id": "honor-contract",
+        "label": "履行合同等待正式报价",
+        "detail": "76% 保住首发 / 24% 错过窗口后资源下降",
+        "outcomes": [
+          {
+            "id": "stay-starting",
+            "label": "原队认可职业态度，继续给你首发资源"
+          },
+          {
+            "id": "stay-cost",
+            "label": "争冠机会消失，原队也开始培养替代者"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "templateId": "dream-agent",
+    "kind": "offseason",
+    "category": "合同转会",
+    "title": "经纪人来信：{{route}}",
+    "briefing": "你最近的表现让圈内人开始用更高的标准讨论你。这个机会低概率出现，但失败不会结束职业生涯。",
+    "options": [
+      {
+        "id": "dream-push",
+        "label": "抓住这次罕见窗口",
+        "detail": "能力与市场热度提高，但训练、关系或健康会承受代价"
+      },
+      {
+        "id": "dream-steady",
+        "label": "先把当前队伍打磨好",
+        "detail": "保留稳定性，未来仍可能重新收到邀请"
+      }
+    ]
+  },
+  {
+    "templateId": "streamer-window",
+    "kind": "offseason",
+    "category": "退役转型",
+    "title": "主播待业窗口",
+    "briefing": "半年预计直播收入 {{income}} 万、生活成本 {{livingCost}} 万。当前可用资产 {{assets}} 万，职业报价基础概率 {{offerChance}}%。",
+    "options": [
+      {
+        "id": "stream-focus",
+        "label": "专注直播积累观众",
+        "detail": "预计净资产 {{netIncome}} 万 / 能力 -3 / 报价概率较低",
+        "outcomes": [
+          {
+            "id": "stream-no-offer",
+            "label": "直播数据增长，但暂时没有合适的职业报价"
+          },
+          {
+            "id": "stream-t3",
+            "label": "一支三线队提供首发复出合同"
+          }
+        ]
+      },
+      {
+        "id": "stream-train",
+        "label": "自费训练保持竞技状态",
+        "detail": "训练与生活净支出 {{trainingCost}} 万 / 能力 -1 / 报价概率提高",
+        "outcomes": [
+          {
+            "id": "train-no-offer",
+            "label": "训练状态尚可，但本窗口没有合适位置"
+          },
+          {
+            "id": "train-t2",
+            "label": "一支二线队提供首发复出合同"
+          }
+        ]
+      },
+      {
+        "id": "stream-tryout",
+        "label": "主动联系队伍参加试训",
+        "detail": "差旅与团队费用 {{tryoutCost}} 万 / 关系 -2 / 高层级报价概率提高",
+        "outcomes": [
+          {
+            "id": "tryout-no-offer",
+            "label": "试训结束后没有队伍立即签约"
+          },
+          {
+            "id": "tryout-t1",
+            "label": "{{tryoutOfferLabel}}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "templateId": "dynasty-meta",
+    "kind": "field",
+    "timing": "post-report",
+    "category": "教练管理",
+    "title": "王朝危机：战术被摸透",
+    "briefing": "连续三个半年赛季位列世界前三后，对手已经建立完整针对数据库。隐藏的战术疲劳让战队基础表现下降 15%。",
+    "options": [
+      {
+        "id": "meta-demo-grind",
+        "label": "熬夜重构全部战术",
+        "detail": "健康 -12 / 100% 清除战术疲劳",
+        "outcomes": [
+          {
+            "id": "meta-clear",
+            "label": "新体系按期完成，战术疲劳被清除"
+          }
+        ]
+      },
+      {
+        "id": "meta-discipline",
+        "label": "依靠纪律完成体系重置",
+        "detail": "清白达到 85 / 健康 -3 / 85% 清除 / 15% 延迟一赛季",
+        "outcomes": [
+          {
+            "id": "meta-discipline-clear",
+            "label": "严格纪律让全队完成版本更新"
+          },
+          {
+            "id": "meta-discipline-delay",
+            "label": "更新不彻底，战术疲劳延续下一赛季"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "templateId": "dynasty-ego",
+    "kind": "field",
+    "timing": "post-report",
+    "category": "队内体系",
+    "title": "王朝危机：更衣室炸弹",
+    "briefing": "明星队友 {{starNick}}（能力 {{starAbility}} / 名气 {{starFame}}）要求更多战术特权。你与他的关系冲突已经影响冠军阵容。",
+    "options": [
+      {
+        "id": "ego-suppress",
+        "label": "强硬打压并推动换人",
+        "detail": "成功率 {{success}}% / 成功后阵痛 Rating -0.05 / 失败则你被下放",
+        "outcomes": [
+          {
+            "id": "ego-win",
+            "label": "管理层支持你，{{starNick}} 被移出核心阵容"
+          },
+          {
+            "id": "ego-lose",
+            "label": "明星获得管理层支持，你被下放至替补并进入下一窗口评估"
+          }
+        ]
+      },
+      {
+        "id": "ego-compromise",
+        "label": "妥协并让出部分战术资源",
+        "detail": "关系恢复 / 下一赛季 Rating 强制 -0.05",
+        "outcomes": [
+          {
+            "id": "ego-peace",
+            "label": "更衣室暂时恢复稳定，明星获得更多资源"
+          }
+        ]
+      },
+      {
+        "id": "ego-leave",
+        "label": "主动离队保留个人名气",
+        "detail": "进入自由人市场 / 可用资产损失 {{assetLoss}} 万",
+        "outcomes": [
+          {
+            "id": "ego-exit",
+            "label": "你离开冠军阵容，市场开始重新评估下一站"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "templateId": "roster-rebuild",
+    "kind": "offseason",
+    "timing": "post-report",
+    "category": "阵容变更",
+    "title": "战队重建计划",
+    "briefing": "管理层决定启动大规模重建。{{leavers}} 将离队，新阵容会在休赛期完成注册。",
+    "options": [
+      {
+        "id": "stay-rebuild",
+        "label": "留队参与重建",
+        "detail": "阵容稳定 -20 / 战队状态 +15 / 关系 +8"
+      },
+      {
+        "id": "leave-rebuild",
+        "label": "寻找转会机会",
+        "detail": "离开当前阵容 / 进入自由市场"
+      }
+    ]
+  },
+  {
+    "templateId": "roster-adjustment",
+    "kind": "offseason",
+    "timing": "post-report",
+    "category": "阵容变更",
+    "title": "阵容微调",
+    "briefing": "管理层决定让 {{leaver}} 离队，并引入同位置的新选手。",
+    "options": [
+      {
+        "id": "support-change",
+        "label": "支持管理层决定",
+        "detail": "阵容稳定 -12 / 战队状态 +8 / 关系 +4"
+      },
+      {
+        "id": "oppose-change",
+        "label": "反对这次换人",
+        "detail": "阵容稳定 -5 / 战队状态 +3 / 关系 -6"
+      }
+    ]
+  }
+]

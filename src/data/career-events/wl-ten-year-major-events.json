@@ -1,0 +1,792 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-001",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "在二线队打出高Rating获得T1试训机会",
+    "briefing": "19岁，你在T2队伍连续三个月打出Rating 1.18以上。一家T1队伍的球探在赛后找到了你的教练，说想邀请你去线下试训。那家队伍就是你卧室海报上贴的那一支。",
+    "tags": [
+      "worldline:wl-ten-year-major:promising-start",
+      "试训",
+      "二线",
+      "机会"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 17,
+    "maxAge": 21,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 21
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 65
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 80
+    },
+    "cooldownSeasons": 10,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "promising-start"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-trial",
+        "label": "接受试训邀请全力准备",
+        "detail": "暂停当前赛程全力准备试训，可能错过现有比赛。",
+        "changes": {
+          "ability": 3,
+          "connections": 5,
+          "health": -2
+        },
+        "outcomes": [
+          {
+            "id": "trial-passed",
+            "label": "试训表现出色成功拿到试训合同",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 10,
+              "earnings": 5
+            }
+          },
+          {
+            "id": "trial-failed",
+            "label": "试训中太紧张表现失常，被评价差一点意思",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -5,
+              "connections": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "decline-prepare",
+        "label": "婉拒邀请先在T2积累经验",
+        "detail": "觉得自己还没准备好，想再练一年。",
+        "changes": {
+          "ability": 3,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "better-next-year",
+            "label": "一年后以更强的姿态再次吸引T1关注",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 5
+            }
+          },
+          {
+            "id": "missed-window",
+            "label": "一年后他们签了别人",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "connections": -3,
+              "fame": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-002",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "试训通过但被当成备胎最后一刻被拒",
+    "briefing": "20岁，你通过了那支T1队伍的三轮试训。经纪人告诉你教练组很满意，让你等待正式合同。你等了两个月，推掉了另外两个队伍的邀请。然后经纪人打电话说——他们签了另一个欧洲回来的自由人。",
+    "tags": [
+      "worldline:wl-ten-year-major:promising-start",
+      "试训",
+      "备胎",
+      "挫折"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 18,
+    "maxAge": 22,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 22
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 60
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "promising-start"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "angry-join-rival",
+        "label": "加入那支队伍的竞争对手证明自己",
+        "detail": "赌一口气加入死对头，用表现打脸。",
+        "changes": {
+          "fame": 5,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "revenge-season",
+            "label": "对阵旧主时打出统治级表现",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 12
+            }
+          },
+          {
+            "id": "bitter-downturn",
+            "label": "愤怒没有转化为比赛表现",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "stay-humble",
+        "label": "留在原队继续打磨技术",
+        "detail": "把挫折当成动力，默默提升自己。",
+        "changes": {
+          "ability": 3,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "humble-pays",
+            "label": "一年后你的数据全面提升了",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 3
+            }
+          },
+          {
+            "id": "opportunity-cost",
+            "label": "等太久失去了最佳转会窗口",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": -2,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-003",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "emergency",
+    "timing": "in-season",
+    "title": "俱乐部财务危机队伍突然解散",
+    "briefing": "21岁，训练到一半经理走进来说俱乐部投资方撤资了。下个月起所有人的工资发不出来。愿意自己找下家的人可以提前解约。训练室里的空气凝固了十秒，然后有人开始打电话。你没有存款，这个月房租还没交。",
+    "tags": [
+      "worldline:wl-ten-year-major:promising-start",
+      "俱乐部",
+      "解散",
+      "财务"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 19,
+    "maxAge": 24,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "career.age"
+          },
+          "right": {
+            "const": 18
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 40
+    },
+    "cooldownSeasons": 15,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "promising-start"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "find-new-team-fast",
+        "label": "立刻联系经纪人找新队伍",
+        "detail": "快速行动保住职业生涯，但可能签不到好合同。",
+        "changes": {
+          "connections": 3,
+          "fame": -2,
+          "earnings": -3
+        },
+        "outcomes": [
+          {
+            "id": "quick-transfer",
+            "label": "两周内找到了新队伍",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": 5
+            }
+          },
+          {
+            "id": "market-cold",
+            "label": "市场上同样位置的选手太多了",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -3,
+              "connections": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "team-up-with-teammates",
+        "label": "和几个队友抱团找下家",
+        "detail": "以三人核心形式打包转会更有议价权但门槛更高。",
+        "changes": {
+          "connections": 5,
+          "fame": 3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-ten-year-major",
+            "action": "advance",
+            "toStage": "wandering-years",
+            "branchId": "dissolution-start",
+            "note": "队伍解散开始漂泊之旅"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "package-deal-works",
+            "label": "有队伍愿意收留三人核心",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "package-too-expensive",
+            "label": "愿意同时签三个人的队伍太少",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "connections": -2,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "consider-retirement",
+        "label": "考虑是否该放弃职业回去读书",
+        "detail": "这条路太不稳定了，也许现在退出还来得及。",
+        "changes": {
+          "fame": -5,
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "decides-to-stay",
+            "label": "最终还是放不下CS",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": 2,
+              "fame": -2
+            }
+          },
+          {
+            "id": "quit-cs",
+            "label": "暂时离开CS回去读书",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -5
+            },
+            "delayed": {
+              "tag": "comeback-later",
+              "riskHint": "如果放不下CS可能会在1-3赛季后复出",
+              "minSeasons": 2,
+              "maxSeasons": 5,
+              "changes": {
+                "ability": -8
+              },
+              "revealText": "离开赛场两年后你发现自己还是放不下CS"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-004",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "in-season",
+    "title": "成为自由人后三个月没有收到报价",
+    "briefing": "22岁，合同到期后你以为凭借过去的数据很快能找到新队伍。但一个月过去了，两个月过去了，经纪人那边的消息越来越少。第三个月时你开始睡不着。你算了算存款还能撑半年。有一天你甚至打开招聘网站看了客服岗位。",
+    "tags": [
+      "worldline:wl-ten-year-major:wandering-years",
+      "自由人",
+      "失业",
+      "焦虑"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 20,
+    "maxAge": 26,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "const": 1
+          },
+          "right": {
+            "const": 1
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 40
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "wandering-years"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "lower-standard",
+        "label": "降低要价去二线队伍",
+        "detail": "接受不如预期的合同先保持状态。",
+        "changes": {
+          "fame": -3,
+          "earnings": -5
+        },
+        "outcomes": [
+          {
+            "id": "t2-contract",
+            "label": "T2队伍给了你一份底薪合同",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "connections": 3,
+              "fame": -2
+            }
+          },
+          {
+            "id": "no-takers",
+            "label": "连T2队伍都在犹豫",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": -5,
+              "connections": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "stream-to-survive",
+        "label": "靠直播维持收入等机会",
+        "detail": "用直播保持曝光但训练时间会减少。",
+        "changes": {
+          "fame": 3,
+          "ability": -2,
+          "earnings": 3
+        },
+        "outcomes": [
+          {
+            "id": "stream-helps",
+            "label": "直播火了吸引了队伍注意",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "fame": 10,
+              "connections": 5
+            }
+          },
+          {
+            "id": "stream-distracts",
+            "label": "直播分散了太多精力",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": -4,
+              "fame": 3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-005",
+    "revision": 1,
+    "category": "伤病健康",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "手腕伤病被迫休养半年",
+    "briefing": "24岁，你正在职业低谷期手腕却出了问题。医生说腕管综合征需要至少休养六个月。你在医院走廊里坐着，看着诊断报告上'建议停止高强度训练'几个字。隔壁床位一个老人在打点滴，你忽然想给他看你的职业ID——但你又觉得他大概不知道这是什么。",
+    "tags": [
+      "worldline:wl-ten-year-major:wandering-years",
+      "伤病",
+      "手腕",
+      "休养"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 28,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.health"
+          },
+          "right": {
+            "const": 65
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 30
+    },
+    "cooldownSeasons": 10,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "wandering-years"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "full-recovery",
+        "label": "遵医嘱完全休养",
+        "detail": "完全停止训练六个月，但回来时可能跟不上版本。",
+        "changes": {
+          "health": 12,
+          "ability": -5
+        },
+        "outcomes": [
+          {
+            "id": "healed-fully",
+            "label": "手腕完全恢复，但竞技状态大幅下滑",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "health": 15,
+              "ability": -4
+            }
+          },
+          {
+            "id": "rehab-success",
+            "label": "休养期间看大量demo，战术理解反而提升了",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "health": 12,
+              "ability": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "train-through-pain",
+        "label": "减少强度但保持训练",
+        "detail": "不完全休养，但可能延长恢复周期。",
+        "changes": {
+          "health": 3,
+          "ability": -2
+        },
+        "outcomes": [
+          {
+            "id": "manageable",
+            "label": "控制住了伤病同时保持了手感",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "health": 5,
+              "ability": 1
+            }
+          },
+          {
+            "id": "worsened",
+            "label": "手腕问题更严重了",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "health": -8,
+              "ability": -5
+            },
+            "delayed": {
+              "tag": "chronic-wrist",
+              "riskHint": "旧伤会在压力下反复发作",
+              "minSeasons": 2,
+              "maxSeasons": 4,
+              "changes": {
+                "health": -10
+              },
+              "revealText": "手腕成了你职业生涯的隐患"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-ten-year-006",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "合同纠纷与前俱乐部对簿公堂",
+    "briefing": "25岁，你发现前俱乐部在你离队后还冒用你的名义签了三个月直播合同。你要求俱乐部支付本该属于你的分成。俱乐部说你已经解约了没有权利。你咨询了律师，律师说可以打官司但可能要打大半年。",
+    "tags": [
+      "worldline:wl-ten-year-major:wandering-years",
+      "合同",
+      "纠纷",
+      "法律"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 29,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "const": 1
+          },
+          "right": {
+            "const": 1
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 20
+    },
+    "cooldownSeasons": 12,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-ten-year-major",
+      "stages": [
+        "wandering-years"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "sue-them",
+        "label": "提起诉讼追讨分成",
+        "detail": "维护权益但要花时间和律师费。",
+        "changes": {
+          "earnings": -3,
+          "integrity": 3,
+          "connections": -3
+        },
+        "outcomes": [
+          {
+            "id": "win-case",
+            "label": "赢了官司拿到了分成和赔偿",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "earnings": 10,
+              "integrity": 5
+            }
+          },
+          {
+            "id": "long-drawn",
+            "label": "官司拖了很久最后庭外和解",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "earnings": 3,
+              "integrity": 3,
+              "connections": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "let-it-go",
+        "label": "算了不追究了专注比赛",
+        "detail": "省心但便宜了对方。",
+        "changes": {
+          "integrity": -2,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "focus-benefits",
+            "label": "省下的精力让训练状态提升了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": 3
+            }
+          },
+          {
+            "id": "galls-you",
+            "label": "每次想到这件事都很不爽",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -3,
+              "health": -2
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

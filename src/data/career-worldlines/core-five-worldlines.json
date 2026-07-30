@@ -1,0 +1,264 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "wl-demon-king",
+    "revision": 1,
+    "title": "魔王降世",
+    "description": "少年期迅速进入顶级赛场，面对资源倾斜、媒体造神、队内嫉妒、版本针对、健康透支和长期统治压力。最终可能建立王朝、被版本淘汰、或因伤病早退。",
+    "tags": ["天才", "统治", "压力", "版本"],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-worldline-design"
+    },
+    "entry": {
+      "op": "all",
+      "args": [
+        { "op": "lte", "left": { "var": "career.age" }, "right": { "const": 20 } },
+        { "op": "gte", "left": { "var": "player.ability" }, "right": { "const": 75 } },
+        { "op": "gte", "left": { "var": "player.fame" }, "right": { "const": 40 } }
+      ]
+    },
+    "initialStage": "breakout",
+    "stages": [
+      {
+        "id": "breakout",
+        "title": "少年成名",
+        "description": "16-18岁快速获得顶级赛场首发位置，媒体和市场快速涌入。",
+        "eventTags": ["worldline:wl-demon-king:breakout"]
+      },
+      {
+        "id": "domination",
+        "title": "统治期",
+        "description": "19-22岁连续拿下冠军和MVP，成为版本核心和队伍绝对资源位。",
+        "eventTags": ["worldline:wl-demon-king:domination"]
+      },
+      {
+        "id": "pressure",
+        "title": "统治压力",
+        "description": "23-25岁面对版本针对、对手研究、队内资源冲突和健康透支。",
+        "eventTags": ["worldline:wl-demon-king:pressure"]
+      },
+      {
+        "id": "sustain-or-fall",
+        "title": "延续或衰落",
+        "description": "26岁后要么适应版本继续统治，要么被新人取代或因伤病退出巅峰。",
+        "eventTags": ["worldline:wl-demon-king:sustain-or-fall"]
+      }
+    ],
+    "endings": [
+      { "id": "dynasty", "title": "建立王朝", "description": "持续统治多个赛季，留下不可复制的荣誉记录。" },
+      { "id": "version-victim", "title": "版本受害者", "description": "游戏更新削弱了你的打法，新人用新版本取代了你的位置。" },
+      { "id": "injury-early-exit", "title": "伤病早退", "description": "长期高强度透支健康，在巅峰期被迫提前退役。" },
+      { "id": "transform", "title": "成功转型", "description": "主动调整打法和定位，从超级明星转为体系核心。" }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "wl-one-step-away",
+    "revision": 1,
+    "title": "一步之遥",
+    "description": "多次在Major预选、淘汰赛、决赛或关键残局接近冠军，留下可被修复也可能恶化的遗憾。最终可能无冠退役、迟到圆梦或转型帮助队伍夺冠。",
+    "tags": ["遗憾", "Major", "心魔", "救赎"],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-worldline-design"
+    },
+    "entry": {
+      "op": "all",
+      "args": [
+        { "op": "gte", "left": { "var": "career.age" }, "right": { "const": 19 } },
+        { "op": "gte", "left": { "var": "player.ability" }, "right": { "const": 70 } }
+      ]
+    },
+    "initialStage": "first-near-miss",
+    "stages": [
+      {
+        "id": "first-near-miss",
+        "title": "第一次接近",
+        "description": "首次打进Major决赛或四强，在关键局失利，留下职业生涯第一个重大遗憾。",
+        "eventTags": ["worldline:wl-one-step-away:first-near-miss"]
+      },
+      {
+        "id": "repeated-heartbreak",
+        "title": "重复的遗憾",
+        "description": "连续多次在不同赛事的关键阶段失利，开始被贴上'无冠核心'标签。",
+        "eventTags": ["worldline:wl-one-step-away:repeated-heartbreak"]
+      },
+      {
+        "id": "mental-burden",
+        "title": "心理负担",
+        "description": "遗憾累积成心魔，关键局会紧张、犹豫或过度补偿，队友和教练开始担心你的心态。",
+        "eventTags": ["worldline:wl-one-step-away:mental-burden"]
+      },
+      {
+        "id": "redemption-or-acceptance",
+        "title": "救赎或接受",
+        "description": "要么通过心理复健和战术调整完成救赎，要么接受无冠现实并转型为辅助角色。",
+        "eventTags": ["worldline:wl-one-step-away:redemption-or-acceptance"]
+      }
+    ],
+    "endings": [
+      { "id": "late-champion", "title": "迟到的冠军", "description": "在职业生涯末期终于突破心魔，拿下Major冠军。" },
+      { "id": "uncrowned-legend", "title": "无冕传奇", "description": "职业生涯没有冠军，但数据和影响力让人尊重。" },
+      { "id": "support-champion", "title": "辅助夺冠", "description": "放下个人执念，转为辅助角色帮助队友夺冠。" },
+      { "id": "trauma-retire", "title": "心魔退役", "description": "心理压力过大，在又一次失利后选择提前退役。" }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "wl-ten-year-major",
+    "revision": 1,
+    "title": "十年一冠",
+    "description": "早期天赋不是冠军保证，经历换队、阵容解体、伤病、低谷、角色转型、自由人窗口和高龄复出后才可能夺冠。",
+    "tags": ["坚持", "低谷", "转型", "复出"],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-worldline-design"
+    },
+    "entry": {
+      "op": "all",
+      "args": [
+        { "op": "gte", "left": { "var": "career.age" }, "right": { "const": 18 } },
+        { "op": "gte", "left": { "var": "player.ability" }, "right": { "const": 65 } }
+      ]
+    },
+    "initialStage": "promising-start",
+    "stages": [
+      {
+        "id": "promising-start",
+        "title": "有前途的开局",
+        "description": "18-21岁在二线或三线队伍打出不错数据，获得转会机会，但第一次冲击失败。",
+        "eventTags": ["worldline:wl-ten-year-major:promising-start"]
+      },
+      {
+        "id": "wandering-years",
+        "title": "漂泊期",
+        "description": "22-25岁多次换队、经历阵容解体、自由人窗口、替补期和伤病，职业前景不明朗。",
+        "eventTags": ["worldline:wl-ten-year-major:wandering-years"]
+      },
+      {
+        "id": "transformation",
+        "title": "转型期",
+        "description": "26-28岁主动或被动改变定位，从枪男转辅助、从明星转体系、或学习指挥。",
+        "eventTags": ["worldline:wl-ten-year-major:transformation"]
+      },
+      {
+        "id": "final-push",
+        "title": "最后冲刺",
+        "description": "29-31岁找到合适的拼图位置，用经验和牺牲帮助年轻队友冲击Major。",
+        "eventTags": ["worldline:wl-ten-year-major:final-push"]
+      }
+    ],
+    "endings": [
+      { "id": "veteran-champion", "title": "老将夺冠", "description": "在职业生涯第10年或更晚，终于以拼图角色拿下Major。" },
+      { "id": "respected-veteran", "title": "受尊重的老将", "description": "没有Major，但用十年坚持赢得行业尊重。" },
+      { "id": "mentor-transition", "title": "导师转型", "description": "退役前两年转为年轻人的导师和教练助手。" },
+      { "id": "quiet-exit", "title": "安静离场", "description": "合同到期后没有续约，低调退役。" }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "wl-mortal-road",
+    "revision": 1,
+    "title": "凡人长路",
+    "description": "没有超高初始能力，依靠训练纪律、战术理解、辅助价值、阵容稳定、职业信誉和正确转会逐渐获得EVP、冠军、TOP20边缘席位或国内传奇地位。",
+    "tags": ["努力", "纪律", "辅助", "体系"],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-worldline-design"
+    },
+    "entry": {
+      "op": "all",
+      "args": [
+        { "op": "gte", "left": { "var": "career.age" }, "right": { "const": 18 } },
+        { "op": "lte", "left": { "var": "player.ability" }, "right": { "const": 70 } },
+        { "op": "gte", "left": { "var": "player.connections" }, "right": { "const": 50 } }
+      ]
+    },
+    "initialStage": "discipline-path",
+    "stages": [
+      {
+        "id": "discipline-path",
+        "title": "纪律之路",
+        "description": "18-22岁用稳定训练、作息管理和录像复盘逐步提升，数据增长缓慢但稳定。",
+        "eventTags": ["worldline:wl-mortal-road:discipline-path"]
+      },
+      {
+        "id": "support-value",
+        "title": "辅助价值",
+        "description": "23-26岁确立辅助或体系角色，不争夺资源，用闪光、补枪和信息帮助队友。",
+        "eventTags": ["worldline:wl-mortal-road:support-value"]
+      },
+      {
+        "id": "system-core",
+        "title": "体系核心",
+        "description": "27-29岁成为阵容稳定器，虽然Rating不高，但教练和队友认可你的价值。",
+        "eventTags": ["worldline:wl-mortal-road:system-core"]
+      },
+      {
+        "id": "recognition",
+        "title": "获得认可",
+        "description": "30岁后可能获得EVP、冠军拼图身份、TOP20边缘席位或区域传奇地位。",
+        "eventTags": ["worldline:wl-mortal-road:recognition"]
+      }
+    ],
+    "endings": [
+      { "id": "evp-winner", "title": "EVP获得者", "description": "用体系价值拿到Major的EVP，证明冠军不只是明星的功劳。" },
+      { "id": "regional-legend", "title": "区域传奇", "description": "在CN或亚洲赛区留下长期影响力。" },
+      { "id": "coaching-path", "title": "教练之路", "description": "退役后自然转为教练或分析师。" },
+      { "id": "journeyman", "title": "职业旅人", "description": "用十年以上职业生涯证明凡人也能在这个行业生存。" }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "wl-uncrowned-king",
+    "revision": 1,
+    "title": "无冕强者",
+    "description": "个人Rating和APS很高，但队伍状态、阵容稳定、合同选择或关键局失败导致长期无冠。这条线允许改善队友、主动换队、牺牲数据建立体系，也允许成为'无冕强者'。",
+    "tags": ["数据", "无冠", "选择", "遗憾"],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-worldline-design"
+    },
+    "entry": {
+      "op": "all",
+      "args": [
+        { "op": "gte", "left": { "var": "career.age" }, "right": { "const": 21 } },
+        { "op": "gte", "left": { "var": "player.ability" }, "right": { "const": 75 } },
+        { "op": "lte", "left": { "var": "team.globalRank" }, "right": { "const": 40 } }
+      ]
+    },
+    "initialStage": "high-stats-low-trophies",
+    "stages": [
+      {
+        "id": "high-stats-low-trophies",
+        "title": "高数据低荣誉",
+        "description": "21-24岁连续打出高Rating，但队伍止步四强或八强，开始被质疑'数据刷子'。",
+        "eventTags": ["worldline:wl-uncrowned-king:high-stats-low-trophies"]
+      },
+      {
+        "id": "contract-crossroads",
+        "title": "合同十字路口",
+        "description": "25-27岁面对选择：留在弱队继续刷数据，还是降薪加入强队争冠但可能坐替补。",
+        "eventTags": ["worldline:wl-uncrowned-king:contract-crossroads"]
+      },
+      {
+        "id": "sacrifice-or-persist",
+        "title": "牺牲或坚持",
+        "description": "28-30岁要么牺牲个人数据建立体系，要么坚持打法接受无冠标签。",
+        "eventTags": ["worldline:wl-uncrowned-king:sacrifice-or-persist"]
+      }
+    ],
+    "endings": [
+      { "id": "late-title", "title": "迟到的奖杯", "description": "降低数据执念后，终于以辅助身份拿下冠军。" },
+      { "id": "stat-king", "title": "数据之王", "description": "职业生涯无冠，但Rating和APS足够高，进入TOP20多次。" },
+      { "id": "what-if", "title": "永恒假设", "description": "退役后被反复讨论'如果当年选择另一支队伍'。" },
+      { "id": "team-builder", "title": "建队者", "description": "后期转为指挥或体系核心，帮助年轻队友夺冠。" }
+    ]
+  }
+]

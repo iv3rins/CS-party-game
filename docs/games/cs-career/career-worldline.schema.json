@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://cs-party-arena.local/schemas/career-worldline.schema.json",
+  "title":"CS Career Worldline Pack v1",
+  "type":"array",
+  "minItems":1,
+  "items":{"$ref":"#/$defs/worldline"},
+  "$defs":{
+    "value":{"oneOf":[{"type":"object","required":["const"],"properties":{"const":{"type":["number","string","boolean"]}},"additionalProperties":false},{"type":"object","required":["var"],"properties":{"var":{"type":"string"}},"additionalProperties":false}]},
+    "condition":{"oneOf":[{"type":"object","required":["op","args"],"properties":{"op":{"enum":["all","any"]},"args":{"type":"array","minItems":1,"maxItems":12,"items":{"$ref":"#/$defs/condition"}}},"additionalProperties":false},{"type":"object","required":["op","arg"],"properties":{"op":{"const":"not"},"arg":{"$ref":"#/$defs/condition"}},"additionalProperties":false},{"type":"object","required":["op","left","right"],"properties":{"op":{"enum":["eq","ne","lt","lte","gt","gte"]},"left":{"$ref":"#/$defs/value"},"right":{"$ref":"#/$defs/value"}},"additionalProperties":false}]},
+    "source":{"type":"object","required":["type","reviewStatus"],"properties":{"type":{"enum":["built-in","human-authored","ai-generated"]},"generator":{"type":"string"},"promptTemplateVersion":{"type":"string"},"reviewStatus":{"enum":["draft","approved","rejected"]},"reviewer":{"type":"string"},"contentHash":{"type":"string"}},"additionalProperties":false},
+    "stage":{"type":"object","required":["id","title","description"],"properties":{"id":{"type":"string","pattern":"^[a-z0-9][a-z0-9-]*$"},"title":{"type":"string","minLength":2,"maxLength":60},"description":{"type":"string","minLength":4,"maxLength":240},"eventIds":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"eventTags":{"type":"array","uniqueItems":true,"items":{"type":"string"}}},"additionalProperties":false},
+    "worldline":{"type":"object","required":["schemaVersion","worldlineId","revision","title","description","source","entry","initialStage","stages"],"properties":{"schemaVersion":{"const":"1.0"},"worldlineId":{"type":"string","pattern":"^[a-z0-9][a-z0-9-]*$"},"revision":{"type":"integer","minimum":1},"title":{"type":"string","minLength":2,"maxLength":60},"description":{"type":"string","minLength":4,"maxLength":300},"tags":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"source":{"$ref":"#/$defs/source"},"entry":{"$ref":"#/$defs/condition"},"initialStage":{"type":"string"},"stages":{"type":"array","minItems":2,"maxItems":20,"items":{"$ref":"#/$defs/stage"}},"endings":{"type":"array","maxItems":12,"items":{"type":"object","required":["id","title","description"],"properties":{"id":{"type":"string"},"title":{"type":"string"},"description":{"type":"string"}},"additionalProperties":false}}},"additionalProperties":false}
+  }
+}

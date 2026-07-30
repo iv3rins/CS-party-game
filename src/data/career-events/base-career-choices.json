@@ -1,0 +1,766 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-offseason-training",
+    "revision": 2,
+    "category": "训练状态",
+    "kind": "offseason",
+    "title": "休赛期封闭集训",
+    "briefing": "新赛季前有六周空档。教练希望全队参加高强度封闭训练。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-offseason-training-ethical",
+        "label": "按计划参加集训",
+        "detail": "休赛期封闭集训：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "ability": 6,
+          "connections": 3,
+          "health": -4
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-training-ethical-stable",
+            "label": "休赛期封闭集训的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-offseason-training-ethical-slow",
+            "label": "休赛期封闭集训的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-offseason-training-dark",
+        "label": "私下超量训练抢进步",
+        "detail": "休赛期封闭集训：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "ability": 8,
+          "health": -11,
+          "connections": -4
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-training-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-offseason-training-dark-risk",
+            "label": "休赛期封闭集训的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-offseason-contract",
+    "revision": 2,
+    "category": "合同转会",
+    "kind": "offseason",
+    "title": "合同与转会窗口",
+    "briefing": "现队愿意续约，另一支更强的队伍只保证轮换位置。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-offseason-contract-ethical",
+        "label": "按合同谈正式转会",
+        "detail": "合同与转会窗口：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "connections": 5,
+          "integrity": 4,
+          "fame": -1
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-contract-ethical-stable",
+            "label": "合同与转会窗口的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-offseason-contract-ethical-slow",
+            "label": "合同与转会窗口的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-offseason-contract-dark",
+        "label": "私下绕过原队接触强队",
+        "detail": "合同与转会窗口：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "fame": 9,
+          "ability": 4,
+          "connections": -9,
+          "integrity": -12
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-contract-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-offseason-contract-dark-risk",
+            "label": "合同与转会窗口的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-offseason-role",
+    "revision": 2,
+    "category": "队内体系",
+    "kind": "offseason",
+    "title": "队内定位调整",
+    "briefing": "教练准备重做体系，你可以争夺核心位置，也可以承担更多团队职责。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-offseason-role-ethical",
+        "label": "在授权下争取核心",
+        "detail": "队内定位调整：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "ability": 5,
+          "connections": 2,
+          "teamForm": 3,
+          "fame": -1
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-role-ethical-stable",
+            "label": "队内定位调整的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-offseason-role-ethical-slow",
+            "label": "队内定位调整的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-offseason-role-dark",
+        "label": "拉拢队友抢夺资源",
+        "detail": "队内定位调整：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "ability": 7,
+          "fame": 8,
+          "connections": -10,
+          "rosterStability": -7
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-role-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-offseason-role-dark-risk",
+            "label": "队内定位调整的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-offseason-commercial",
+    "revision": 2,
+    "category": "商业赞助",
+    "kind": "offseason",
+    "title": "直播与商务档期",
+    "briefing": "平台给出独家直播合约，但会占用一部分训练时间。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-offseason-commercial-ethical",
+        "label": "申报后签合约",
+        "detail": "直播与商务档期：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "fame": 6,
+          "earnings": 8,
+          "integrity": 5,
+          "ability": -2
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-commercial-ethical-stable",
+            "label": "直播与商务档期的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-offseason-commercial-ethical-slow",
+            "label": "直播与商务档期的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-offseason-commercial-dark",
+        "label": "私下接受不透明邀约",
+        "detail": "直播与商务档期：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "fame": 12,
+          "earnings": 20,
+          "ability": -6,
+          "integrity": -15,
+          "connections": -5
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-commercial-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-offseason-commercial-dark-risk",
+            "label": "直播与商务档期的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-offseason-rest",
+    "revision": 2,
+    "category": "伤病健康",
+    "kind": "offseason",
+    "title": "完整休息还是加练",
+    "briefing": "漫长赛季结束后，你的身体需要恢复，但个人教练已经排好加练计划。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-offseason-rest-ethical",
+        "label": "遵循队医恢复",
+        "detail": "完整休息还是加练：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "health": 11,
+          "ability": -2,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-rest-ethical-stable",
+            "label": "完整休息还是加练的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-offseason-rest-ethical-slow",
+            "label": "完整休息还是加练的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-offseason-rest-dark",
+        "label": "隐瞒伤情继续加练",
+        "detail": "完整休息还是加练：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "ability": 8,
+          "health": -12,
+          "fame": 5,
+          "integrity": -5
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-rest-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-offseason-rest-dark-risk",
+            "label": "完整休息还是加练的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-offseason-risk",
+    "revision": 2,
+    "category": "合规风险",
+    "kind": "offseason",
+    "title": "来源不明的训练赛",
+    "briefing": "熟人邀请你参加一场高额训练赛，奖金来源和对手安排都说不清楚。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-offseason-risk-ethical",
+        "label": "拒绝并留存证据",
+        "detail": "来源不明的训练赛：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "integrity": 9,
+          "connections": -5,
+          "fame": -1
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-risk-ethical-stable",
+            "label": "来源不明的训练赛的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-offseason-risk-ethical-slow",
+            "label": "来源不明的训练赛的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-offseason-risk-dark",
+        "label": "收钱后假装不知情",
+        "detail": "来源不明的训练赛：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "earnings": 18,
+          "connections": 6,
+          "integrity": -15
+        },
+        "outcomes": [
+          {
+            "id": "base-offseason-risk-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-offseason-risk-dark-risk",
+            "label": "来源不明的训练赛的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-annual-team",
+    "revision": 2,
+    "category": "合同转会",
+    "kind": "annual",
+    "title": "下一年的战队方向",
+    "briefing": "一整年结束后，你需要决定下一年留在熟悉体系，还是转会冲击更高目标。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-annual-team-ethical",
+        "label": "和队友一起评估去留",
+        "detail": "下一年的战队方向：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "connections": 7,
+          "rosterStability": 3,
+          "ability": 2,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-team-ethical-stable",
+            "label": "下一年的战队方向的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-annual-team-ethical-slow",
+            "label": "下一年的战队方向的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-annual-team-dark",
+        "label": "独自截胡更高报价",
+        "detail": "下一年的战队方向：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "ability": 7,
+          "fame": 9,
+          "connections": -10,
+          "rosterStability": -6
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-team-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-annual-team-dark-risk",
+            "label": "下一年的战队方向的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-annual-focus",
+    "revision": 2,
+    "category": "商业赞助",
+    "kind": "annual",
+    "title": "竞技还是商业",
+    "briefing": "新的年度规划只能有一个重心。商业团队和个人教练都在等你的答复。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-annual-focus-ethical",
+        "label": "全年公开训练计划",
+        "detail": "竞技还是商业：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "ability": 8,
+          "health": -4,
+          "fame": -2,
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-focus-ethical-stable",
+            "label": "竞技还是商业的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-annual-focus-ethical-slow",
+            "label": "竞技还是商业的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-annual-focus-dark",
+        "label": "把训练时间卖给流量",
+        "detail": "竞技还是商业：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "fame": 12,
+          "earnings": 20,
+          "ability": -7,
+          "health": -5
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-focus-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-annual-focus-dark-risk",
+            "label": "竞技还是商业的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-annual-role",
+    "revision": 2,
+    "category": "角色转职",
+    "kind": "annual",
+    "title": "定位转型计划",
+    "briefing": "年龄和版本变化都在迫使你重新评估打法。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-annual-role-ethical",
+        "label": "接受完整转型周期",
+        "detail": "定位转型计划：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "connections": 6,
+          "positionFamiliarity": 6,
+          "ability": 2,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-role-ethical-stable",
+            "label": "定位转型计划的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-annual-role-ethical-slow",
+            "label": "定位转型计划的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-annual-role-dark",
+        "label": "要求立刻抢走新定位",
+        "detail": "定位转型计划：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "ability": 8,
+          "fame": 9,
+          "connections": -9,
+          "rosterStability": -7
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-role-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-annual-role-dark-risk",
+            "label": "定位转型计划的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "base-annual-health",
+    "revision": 2,
+    "category": "伤病健康",
+    "kind": "annual",
+    "title": "年度身体管理",
+    "briefing": "连续两个赛季后，你必须在系统休养和高强度冬训之间做选择。",
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "draft",
+      "generator": "content-rebalance"
+    },
+    "options": [
+      {
+        "id": "base-annual-health-ethical",
+        "label": "系统休养并接受替补安排",
+        "detail": "年度身体管理：守住长期信用，但牺牲部分即时收益。",
+        "changes": {
+          "health": 12,
+          "ability": -3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-health-ethical-stable",
+            "label": "年度身体管理的合规路线获得认可，但机会窗口没有完全兑现",
+            "probability": 70,
+            "changes": {
+              "connections": 2,
+              "integrity": 2
+            }
+          },
+          {
+            "id": "base-annual-health-ethical-slow",
+            "label": "年度身体管理的高风险路线暂时奏效，个人曝光上升",
+            "probability": 30,
+            "changes": {
+              "fame": -2,
+              "ability": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "base-annual-health-dark",
+        "label": "隐瞒疲劳争取继续首发",
+        "detail": "年度身体管理：换取短期个人收益，同时承担可追溯的队内、健康或合规风险。",
+        "changes": {
+          "ability": 8,
+          "health": -12,
+          "fame": 6,
+          "integrity": -6
+        },
+        "outcomes": [
+          {
+            "id": "base-annual-health-dark-win",
+            "label": "冒险暂时成功，个人收益和曝光快速上升",
+            "probability": 45,
+            "changes": {
+              "fame": 5
+            }
+          },
+          {
+            "id": "base-annual-health-dark-risk",
+            "label": "年度身体管理的风险被发现，队伍开始重新评估你的可靠性",
+            "probability": 55,
+            "changes": {
+              "connections": -6,
+              "integrity": -4
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

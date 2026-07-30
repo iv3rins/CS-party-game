@@ -1,0 +1,525 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-001",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "field",
+    "timing": "post-report",
+    "title": "连续三年Rating 1.15+但被质疑数据刷子",
+    "briefing": "23岁，你连续三年在联赛中打出Rating 1.15以上的数据，但队伍始终止步四强。一个知名主播在直播中翻着你的比赛数据说：'这个人的数据都是虐菜刷出来的，你看他对阵TOP5队伍时的Rating——1.02。'弹幕里在刷'数据刷子'。",
+    "tags": [
+      "worldline:wl-uncrowned-king:high-stats-low-trophies",
+      "舆论",
+      "质疑",
+      "数据"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 27,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 55
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "high-stats-low-trophies"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "ignore-and-play",
+        "label": "不去回应用下一场比赛证明",
+        "detail": "不被舆论干扰专注比赛。",
+        "changes": {
+          "ability": 2,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "silent-proof-uc",
+            "label": "一周后在对阵TOP5队伍时打出了1.22的Rating",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 8
+            }
+          },
+          {
+            "id": "under-pressure-uc",
+            "label": "越想证明越不顺利",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "data-counterattack",
+        "label": "发布详细的数据分析报告自证",
+        "detail": "把详细的对阵数据公开，但显得很在意评价。",
+        "changes": {
+          "fame": 5,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "data-convinces",
+            "label": "详细数据让部分质疑者闭嘴了",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": 8,
+              "connections": 3
+            }
+          },
+          {
+            "id": "defensive-look",
+            "label": "被说急了更坐实了数据刷子的名声",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": -5,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-002",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "弱队核心一人撑起整支队伍",
+    "briefing": "24岁，你在弱队打了一年。每次比赛你都要承担最多的工作——打突破、打残局、指挥、甚至帮队友报钱。分析师评价你们是'一人战队'。你知道这不是夸奖。因为当你发挥不好的时候，队伍就是一支垫底队。",
+    "tags": [
+      "worldline:wl-uncrowned-king:high-stats-low-trophies",
+      "弱队",
+      "核心",
+      "负重"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 27,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 45
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "high-stats-low-trophies"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "keep-carrying",
+        "label": "继续一个人扛下去",
+        "detail": "累但队伍没有你不行。",
+        "changes": {
+          "ability": 3,
+          "health": -5,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "hero-status",
+            "label": "个人英雄主义的表现吸引了强队关注",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 10,
+              "connections": 5
+            }
+          },
+          {
+            "id": "burnout-continues",
+            "label": "长期高强度消耗让状态开始波动",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "health": -6,
+              "ability": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "demand-reinforcements",
+        "label": "向管理层施压要求补强阵容",
+        "detail": "公开说队伍需要更好的队友，可能让关系变僵。",
+        "changes": {
+          "connections": -4,
+          "fame": 5
+        },
+        "outcomes": [
+          {
+            "id": "management-listens",
+            "label": "管理层在休赛期引进了两个强力选手",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "connections": 3,
+              "teamForm": 6
+            }
+          },
+          {
+            "id": "management-angry",
+            "label": "管理层认为你不够忠诚",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "connections": -6,
+              "rosterStability": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-003",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "timing": "post-report",
+    "title": "弱队开出顶薪续约请求留队",
+    "briefing": "25岁，你的合同还剩半年。现在所在的中游队伍给你开出了一份顶薪续约合同——工资翻倍、三年长约、核心地位保证。但同时有一支争冠级别的队伍表示对你感兴趣——但他们只能给底薪和轮换位置。经纪人说你必须做出选择。",
+    "tags": [
+      "worldline:wl-uncrowned-king:contract-crossroads",
+      "续约",
+      "顶薪",
+      "争冠"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 23,
+    "maxAge": 29,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 35
+    },
+    "cooldownSeasons": 10,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "contract-crossroads"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "stay-big-fish",
+        "label": "留在弱队当核心拿高薪",
+        "detail": "稳定但放弃争冠希望。",
+        "changes": {
+          "earnings": 10,
+          "fame": 3,
+          "connections": 3
+        },
+        "outcomes": [
+          {
+            "id": "good-money-no-title",
+            "label": "收入丰厚但年年无缘冠军",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "earnings": 8,
+              "fame": 3
+            }
+          },
+          {
+            "id": "team-improves",
+            "label": "队伍利用资金引援变强了",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": 5,
+              "teamForm": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": "take-pay-cut",
+        "label": "降薪加入争冠队伍当替补",
+        "detail": "放弃收入和地位去赌一个冠军。",
+        "changes": {
+          "earnings": -8,
+          "fame": -3,
+          "connections": -3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-uncrowned-king",
+            "action": "advance",
+            "toStage": "contract-crossroads",
+            "branchId": "championship-gamble",
+            "note": "降薪赌冠军"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "gamble-works",
+            "label": "赌对了——队伍夺冠你拿到了一枚奖牌",
+            "weight": {
+              "const": 30
+            },
+            "changes": {
+              "fame": 15,
+              "connections": 5
+            }
+          },
+          {
+            "id": "sat-on-bench",
+            "label": "坐了两年冷板凳",
+            "weight": {
+              "const": 70
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -5,
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "demand-starting-spot",
+        "label": "要求争冠队给出首发承诺",
+        "detail": "谈判要求更高的地位保障。",
+        "changes": {
+          "connections": 3,
+          "fame": 2
+        },
+        "outcomes": [
+          {
+            "id": "guaranteed-starter",
+            "label": "对方承诺了轮换首发位置",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "fame": 5,
+              "connections": 5
+            }
+          },
+          {
+            "id": "offer-withdrawn",
+            "label": "对方不愿承诺——收回报价了",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "fame": -3,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-uncrowned-004",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "面对旧主带着复仇情绪表现失常",
+    "briefing": "26岁，转会后的第一场比赛就是对阵老东家。老东家的经理赛前接受采访时说'放走他是正确的决定'。你看到这条新闻后整晚没睡好。第二天比赛你打得毫无章法——太想证明自己反而把手感全丢了。全队因为你输掉了比赛。",
+    "tags": [
+      "worldline:wl-uncrowned-king:contract-crossroads",
+      "复仇",
+      "情绪",
+      "失常"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 24,
+    "maxAge": 30,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 70
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 30
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-uncrowned-king",
+      "stages": [
+        "contract-crossroads"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "channel-anger",
+        "label": "把愤怒转化成训练动力",
+        "detail": "把情绪投入到训练中。",
+        "changes": {
+          "ability": 4,
+          "health": -3
+        },
+        "outcomes": [
+          {
+            "id": "revenge-match",
+            "label": "下次交手时打出了统治级表现",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 10
+            }
+          },
+          {
+            "id": "still-too-emotional",
+            "label": "下次遇到还是控制不住情绪",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "ability": -2,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "let-it-go-uc",
+        "label": "放下复仇心专注执行战术",
+        "detail": "职业态度对待每一场比赛。",
+        "changes": {
+          "connections": 3,
+          "ability": 2
+        },
+        "outcomes": [
+          {
+            "id": "professional-response",
+            "label": "冷静地打出了自己的正常水平",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": 3,
+              "connections": 5
+            }
+          },
+          {
+            "id": "suppressed-emotions",
+            "label": "压抑的情绪在训练中爆发了",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "connections": -3,
+              "health": -3
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

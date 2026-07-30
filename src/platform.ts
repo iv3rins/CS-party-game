@@ -5,6 +5,7 @@ export const CAREER_SEASON_ID = 'career-v1';
 
 export type GameAvailability = 'available' | 'coming-soon' | 'maintenance';
 export type RoomVisibility = 'public' | 'private';
+export type RoomType = 'Private' | 'Matchmade' | 'PVE';
 export type RoomStatus = 'waiting' | 'ready' | 'started' | 'closed';
 export type QueueStatus = 'searching' | 'matched' | 'accepted' | 'playing' | 'cancelled' | 'expired';
 
@@ -127,6 +128,7 @@ export interface QueueTicket {
 
 export interface RoomConfig {
   name: string;
+  type?: RoomType;
   visibility: RoomVisibility;
   roundSeconds: 180;
   allowSpectators: boolean;
@@ -414,13 +416,13 @@ export class LocalPlatformAdapter implements PlatformAdapter {
     const account = await this.getAccount();
     const game = await this.getGame(input.gameId);
     if (game.availability !== 'available') throw new Error(`${game.name} 尚未部署`);
-    if (game.maxPlayers < 2) throw new Error(`${game.name} 是单人游戏，进度不会创建为平台房间`);
+    if (game.maxPlayers < 2 && input.config.type !== 'PVE') throw new Error(`${game.name} 是单人游戏，进度不会创建为平台房间`);
     const room: GameRoom = {
       roomId: crypto.randomUUID(),
       inviteCode: makeInviteCode(),
       gameId: input.gameId,
       seasonId: input.seasonId,
-      config: { ...input.config, name: input.config.name.trim().slice(0, 30) || `${account.displayName} 的房间`, roundSeconds: 180 },
+      config: { ...input.config, type: input.config.type ?? 'Private', name: input.config.name.trim().slice(0, 30) || `${account.displayName} 的房间`, roundSeconds: 180 },
       status: 'waiting',
       hostAccountId: account.accountId,
       members: [{ accountId: account.accountId, displayName: account.displayName, ready: true, isHost: true }],
@@ -574,10 +576,10 @@ export class OnlinePlatformAdapter extends LocalPlatformAdapter {
 
   async createRoom(input: { gameId: string; seasonId: string; config: RoomConfig }): Promise<GameRoom> {
     const game = await this.getGame(input.gameId);
-    if (game.maxPlayers < 2) throw new Error(`${game.name} 是单人游戏，不能创建房间`);
+    if (game.maxPlayers < 2 && input.config.type !== 'PVE') throw new Error(`${game.name} 是单人游戏，不能创建房间`);
     await this.ensureServerSession();
-    const room = await this.request<ServerRoom>('/api/rooms', { method: 'POST', body: JSON.stringify({ gameId: input.gameId, seasonId: input.seasonId }) });
-    this.roomConfigs.set(room.id, { ...input.config, visibility: 'private', roundSeconds: 180, allowSpectators: false });
+    const room = await this.request<ServerRoom>('/api/rooms', { method: 'POST', body: JSON.stringify({ gameId: input.gameId, seasonId: input.seasonId, type: input.config.type ?? 'Private' }) });
+    this.roomConfigs.set(room.id, { ...input.config, type: input.config.type ?? 'Private', visibility: 'private', roundSeconds: 180, allowSpectators: false });
     return this.room(room);
   }
 

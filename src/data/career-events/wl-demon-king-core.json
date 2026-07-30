@@ -1,0 +1,2593 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-001",
+    "revision": 1,
+    "category": "合同转会",
+    "kind": "offseason",
+    "title": "16岁天梯第一被顶级队伍注意",
+    "briefing": "你在天梯连续三个月保持区服第一，一支世界排名前15的队伍向你发出试训邀请。他们的主力狙击手刚刚退役，教练认为你可以直接接班。但你还在读高中，父母希望你先完成学业。",
+    "tags": [
+      "worldline:wl-demon-king:breakout",
+      "天才",
+      "试训"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 16,
+    "maxAge": 17,
+    "roles": [
+      "awper"
+    ],
+    "eligibility": {
+      "op": "gte",
+      "left": {
+        "var": "player.ability"
+      },
+      "right": {
+        "const": 75
+      }
+    },
+    "triggerWeight": {
+      "const": 100
+    },
+    "cooldownSeasons": 99,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "breakout"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-trial",
+        "label": "接受试训并休学",
+        "detail": "抓住职业窗口，但会失去正常学业和青少年生活",
+        "changes": {
+          "ability": 4,
+          "fame": 8,
+          "health": -3,
+          "connections": -2
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "advance",
+            "toStage": "domination",
+            "branchId": "early-success",
+            "note": "通过试训进入顶级队伍首发"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "trial-success",
+            "label": "试训表现出色，直接获得首发合同",
+            "weight": {
+              "op": "add",
+              "args": [
+                {
+                  "const": 30
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "const": 0.6
+                    },
+                    {
+                      "var": "player.ability"
+                    }
+                  ]
+                }
+              ]
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 12,
+              "earnings": 8
+            }
+          },
+          {
+            "id": "trial-rotation",
+            "label": "试训合格但只给轮换位置，需要继续证明",
+            "weight": {
+              "op": "sub",
+              "left": {
+                "const": 100
+              },
+              "right": {
+                "op": "add",
+                "args": [
+                  {
+                    "const": 30
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "const": 0.6
+                      },
+                      {
+                        "var": "player.ability"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "changes": {
+              "ability": 2,
+              "fame": 5,
+              "health": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "finish-school",
+        "label": "完成高中学业再考虑职业",
+        "detail": "保留正常成长但可能错过最佳窗口",
+        "changes": {
+          "health": 3,
+          "connections": 2,
+          "fame": -2
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "pause",
+            "toStage": "breakout",
+            "branchId": "delayed-entry",
+            "note": "推迟职业化，但保留天赋标签"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "school-patience",
+            "label": "一年后毕业，仍然收到多支队伍报价",
+            "probability": 65,
+            "changes": {
+              "ability": 1,
+              "connections": 3,
+              "fame": 2
+            }
+          },
+          {
+            "id": "school-missed",
+            "label": "窗口关闭，顶级队伍已经签下其他新人",
+            "probability": 35,
+            "changes": {
+              "fame": -4,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-002",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "首次打进Major决赛关键残局",
+    "briefing": "17岁，你在Major决赛决胜图拿到一个1v2残局，C4已放下，时间15秒。赢了就是史上最年轻Major冠军，输了也是亚军。全世界都在看这个回合。队友语音里只有呼吸声。",
+    "tags": [
+      "worldline:wl-demon-king:domination",
+      "Major",
+      "残局",
+      "历史"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 17,
+    "maxAge": 19,
+    "roles": [
+      "awper"
+    ],
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 78
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.tier"
+          },
+          "right": {
+            "const": "Major"
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.isPlayoff"
+          },
+          "right": {
+            "const": true
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 100
+    },
+    "cooldownSeasons": 99,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "domination"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "aggressive-peek",
+        "label": "主动拉出去用AWP对狙",
+        "detail": "赌反应速度和准星，高风险高回报",
+        "changes": {
+          "health": -2
+        },
+        "outcomes": [
+          {
+            "id": "peek-god",
+            "label": "连狙两枪全中，史上最年轻Major冠军诞生",
+            "weight": {
+              "op": "add",
+              "args": [
+                {
+                  "const": 20
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "const": 0.5
+                    },
+                    {
+                      "var": "player.ability"
+                    }
+                  ]
+                }
+              ]
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 20,
+              "earnings": 15,
+              "health": -4
+            },
+            "resultPatch": {
+              "placementDelta": 2,
+              "honorPatch": {
+                "kind": "MVP",
+                "confirmed": true
+              }
+            }
+          },
+          {
+            "id": "peek-fail",
+            "label": "第一枪空了，被交叉火力击杀，亚军",
+            "weight": {
+              "op": "sub",
+              "left": {
+                "const": 100
+              },
+              "right": {
+                "op": "add",
+                "args": [
+                  {
+                    "const": 20
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "const": 0.5
+                      },
+                      {
+                        "var": "player.ability"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "changes": {
+              "fame": 8,
+              "highPressureChokingRisk": 6,
+              "health": -2
+            },
+            "resultPatch": {
+              "placementDelta": 0
+            },
+            "delayed": {
+              "tag": "major-final-miss",
+              "riskHint": "这个残局失利可能成为长期心魔",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "highPressureChokingRisk": 4,
+                "connections": -3
+              },
+              "revealText": "Major决赛的那个残局，在后续的关键比赛中反复出现在你的回忆里。"
+            }
+          }
+        ]
+      },
+      {
+        "id": "time-pressure",
+        "label": "利用时间压力打信息差",
+        "detail": "不主动peek，用脚步和假动作逼对手交叉",
+        "changes": {},
+        "outcomes": [
+          {
+            "id": "info-win",
+            "label": "成功骗出对手位置，拆包拿下Major冠军",
+            "probability": 45,
+            "changes": {
+              "ability": 4,
+              "fame": 18,
+              "earnings": 15,
+              "connections": 3
+            },
+            "resultPatch": {
+              "placementDelta": 2,
+              "honorPatch": {
+                "kind": "冠军",
+                "confirmed": true
+              }
+            }
+          },
+          {
+            "id": "info-fail",
+            "label": "对手没有上当，时间耗尽爆炸，亚军",
+            "probability": 55,
+            "changes": {
+              "fame": 6,
+              "highPressureChokingRisk": 3
+            },
+            "resultPatch": {
+              "placementDelta": 0
+            }
+          }
+        ]
+      },
+      {
+        "id": "ask-coach",
+        "label": "请求教练暂停获得指导",
+        "detail": "放下个人英雄主义，用团队智慧解决问题",
+        "changes": {
+          "connections": 2
+        },
+        "outcomes": [
+          {
+            "id": "coach-plan-works",
+            "label": "教练方案奏效，拿下Major但高光被分散",
+            "probability": 58,
+            "changes": {
+              "fame": 12,
+              "earnings": 15,
+              "connections": 5,
+              "teamForm": 4
+            },
+            "resultPatch": {
+              "placementDelta": 2
+            }
+          },
+          {
+            "id": "coach-plan-fails",
+            "label": "教练方案被对手读透，亚军",
+            "probability": 42,
+            "changes": {
+              "fame": 5,
+              "connections": -2,
+              "teamForm": -3
+            },
+            "resultPatch": {
+              "placementDelta": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-003",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "offseason",
+    "title": "媒体称你为'新时代魔王'",
+    "briefing": "18岁，你在连续三个Major都打进决赛，拿下两个冠军。媒体开始把你和历史传奇相提并论，称你为'新时代魔王'。但老一代选手在采访中暗示你只是版本受益者，等游戏更新就会现原形。",
+    "tags": [
+      "worldline:wl-demon-king:domination",
+      "媒体",
+      "对立",
+      "压力"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 18,
+    "maxAge": 20,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 60
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 80
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 80
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "domination"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "embrace-villain",
+        "label": "拥抱反派标签，用比赛回应质疑",
+        "detail": "把压力转化为动力，但会制造更多对立",
+        "changes": {
+          "fame": 10,
+          "ability": 3,
+          "connections": -4,
+          "integrity": -2
+        },
+        "outcomes": [
+          {
+            "id": "villain-dominate",
+            "label": "用更强的表现让质疑者闭嘴，名气暴涨",
+            "probability": 65,
+            "changes": {
+              "fame": 8,
+              "ability": 2,
+              "health": -3
+            }
+          },
+          {
+            "id": "villain-pressure",
+            "label": "对立情绪影响心态，关键局开始犹豫",
+            "probability": 35,
+            "changes": {
+              "highPressureChokingRisk": 5,
+              "health": -4,
+              "fame": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "humble-response",
+        "label": "谦虚回应，强调团队和运气",
+        "detail": "保持低调减少对立，但可能被认为缺乏自信",
+        "changes": {
+          "connections": 4,
+          "integrity": 3,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "humble-respected",
+            "label": "谦虚赢得老将尊重，行业口碑上升",
+            "probability": 70,
+            "changes": {
+              "connections": 5,
+              "teamForm": 3,
+              "fame": 2
+            }
+          },
+          {
+            "id": "humble-questioned",
+            "label": "部分媒体认为你缺乏冠军气质",
+            "probability": 30,
+            "changes": {
+              "fame": -4,
+              "highPressureChokingRisk": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "ignore-media",
+        "label": "拒绝所有采访，专注训练",
+        "detail": "避开舆论战，但会失去商业价值和粉丝互动",
+        "changes": {
+          "ability": 4,
+          "health": 2,
+          "fame": -5,
+          "earnings": -3
+        },
+        "outcomes": [
+          {
+            "id": "focus-works",
+            "label": "专注带来更稳定的比赛状态",
+            "probability": 75,
+            "changes": {
+              "ability": 3,
+              "teamForm": 2
+            }
+          },
+          {
+            "id": "focus-isolated",
+            "label": "失去曝光后商业价值下降",
+            "probability": 25,
+            "changes": {
+              "fame": -6,
+              "earnings": -5,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-004",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "offseason",
+    "title": "队友要求分配更多资源",
+    "briefing": "19岁，你已经连续两年拿到队伍80%以上的AWP经济。一名有潜力的年轻突破手在队内会议上提出，他需要更多首发机会和资源才能成长。教练让你权衡：继续垄断资源保持统治，还是分配资源培养未来。",
+    "tags": [
+      "worldline:wl-demon-king:domination",
+      "资源",
+      "队内",
+      "选择"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 19,
+    "maxAge": 22,
+    "roles": [
+      "awper"
+    ],
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 80
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "team.form"
+          },
+          "right": {
+            "const": 70
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 70
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "domination",
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "keep-resources",
+        "label": "坚持现有资源分配",
+        "detail": "保持个人统治力，但可能制造队内矛盾",
+        "changes": {
+          "ability": 2,
+          "fame": 3,
+          "connections": -5,
+          "rosterStability": -4
+        },
+        "outcomes": [
+          {
+            "id": "solo-carry-continue",
+            "label": "继续用个人能力carry队伍",
+            "probability": 55,
+            "changes": {
+              "ability": 2,
+              "fame": 5,
+              "teamForm": -2
+            }
+          },
+          {
+            "id": "teammate-leave",
+            "label": "年轻队友转会，阵容稳定性下降",
+            "probability": 45,
+            "changes": {
+              "rosterStability": -8,
+              "connections": -4,
+              "teamForm": -5
+            },
+            "delayed": {
+              "tag": "resource-conflict",
+              "riskHint": "队内资源争夺可能在未来爆发更大矛盾",
+              "minSeasons": 2,
+              "maxSeasons": 4,
+              "changes": {
+                "connections": -6,
+                "rosterStability": -10
+              },
+              "revealText": "当年没有分配资源的决定，让队内派系矛盾在后续赛季爆发。"
+            }
+          }
+        ]
+      },
+      {
+        "id": "share-resources",
+        "label": "主动让出部分资源位",
+        "detail": "牺牲个人数据培养队友，长期阵容更稳定",
+        "changes": {
+          "ability": -2,
+          "fame": -3,
+          "connections": 6,
+          "rosterStability": 5,
+          "teamForm": 3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "advance",
+            "toStage": "sustain-or-fall",
+            "branchId": "team-builder",
+            "note": "从个人统治转向团队建设"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "share-success",
+            "label": "队友成长分担压力，阵容上限提高",
+            "probability": 70,
+            "changes": {
+              "teamForm": 5,
+              "rosterStability": 6,
+              "connections": 4
+            }
+          },
+          {
+            "id": "share-regression",
+            "label": "队友成长缓慢，你的统治力下降",
+            "probability": 30,
+            "changes": {
+              "ability": -3,
+              "fame": -5,
+              "teamForm": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "compromise-rotation",
+        "label": "提出轮换制度",
+        "detail": "部分地图让队友主AWP，平衡个人与团队",
+        "changes": {
+          "ability": -1,
+          "connections": 3,
+          "rosterStability": 2
+        },
+        "outcomes": [
+          {
+            "id": "rotation-balanced",
+            "label": "轮换制度运转良好，队伍战术更丰富",
+            "probability": 60,
+            "changes": {
+              "teamForm": 4,
+              "rosterStability": 3,
+              "fame": 2
+            }
+          },
+          {
+            "id": "rotation-chaos",
+            "label": "轮换导致定位不清，比赛执行混乱",
+            "probability": 40,
+            "changes": {
+              "teamForm": -4,
+              "ability": -2,
+              "rosterStability": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-005",
+    "revision": 1,
+    "category": "伤病健康",
+    "kind": "offseason",
+    "title": "手腕出现慢性疼痛",
+    "briefing": "20岁，连续三年每天训练12小时以上，你的右手腕开始持续疼痛。队医建议休养三个月，但下个赛季有两个Major，教练暗示如果你休养，替补可能抢走首发位置。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "伤病",
+      "健康",
+      "选择"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 20,
+    "maxAge": 23,
+    "eligibility": {
+      "op": "lte",
+      "left": {
+        "var": "player.health"
+      },
+      "right": {
+        "const": 60
+      }
+    },
+    "triggerWeight": {
+      "const": 90
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "rest-treatment",
+        "label": "接受完整治疗休养三个月",
+        "detail": "保护职业寿命，但可能失去首发位置",
+        "changes": {
+          "health": 15,
+          "ability": -4,
+          "fame": -3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "advance",
+            "toStage": "sustain-or-fall",
+            "branchId": "health-first",
+            "note": "优先健康，延长职业寿命"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "rest-comeback",
+            "label": "恢复后重新夺回首发，职业寿命延长",
+            "probability": 65,
+            "changes": {
+              "health": 10,
+              "ability": 2,
+              "connections": 3
+            }
+          },
+          {
+            "id": "rest-replaced",
+            "label": "替补表现出色，你只能打轮换",
+            "probability": 35,
+            "changes": {
+              "fame": -8,
+              "earnings": -5,
+              "connections": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "painkillers-continue",
+        "label": "服用止痛药继续比赛",
+        "detail": "保住首发和统治力，但会积累慢性伤病",
+        "changes": {
+          "ability": 2,
+          "fame": 3,
+          "health": -8,
+          "integrity": -3
+        },
+        "outcomes": [
+          {
+            "id": "painkiller-sustain",
+            "label": "勉强维持状态，但健康持续恶化",
+            "probability": 55,
+            "changes": {
+              "ability": 1,
+              "health": -6,
+              "highPressureChokingRisk": 3
+            },
+            "delayed": {
+              "tag": "chronic-injury",
+              "riskHint": "未治疗的伤病会在未来严重爆发",
+              "minSeasons": 2,
+              "maxSeasons": 4,
+              "changes": {
+                "health": -15,
+                "ability": -8
+              },
+              "revealText": "手腕的慢性伤病终于爆发，医生说如果当年好好治疗就不会这么严重。"
+            }
+          },
+          {
+            "id": "painkiller-fail",
+            "label": "止痛药失效，比赛中突然无法握鼠标",
+            "probability": 45,
+            "changes": {
+              "health": -12,
+              "ability": -6,
+              "fame": -5
+            },
+            "resultPatch": {
+              "placementDelta": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "secret-treatment",
+        "label": "使用未经批准的快速恢复方案",
+        "detail": "可能快速回归，但存在合规和健康双重风险",
+        "changes": {
+          "health": 5,
+          "integrity": -8,
+          "earnings": -3
+        },
+        "outcomes": [
+          {
+            "id": "secret-works",
+            "label": "快速恢复，暂时保住首发",
+            "probability": 40,
+            "changes": {
+              "health": 6,
+              "ability": 1,
+              "fame": 2
+            },
+            "delayed": {
+              "tag": "compliance-risk",
+              "riskHint": "未经批准的治疗方案可能触发调查",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "integrity": -12,
+                "fame": -8,
+                "earnings": -10
+              },
+              "revealText": "当年使用的快速恢复方案被举报，触发合规调查。"
+            }
+          },
+          {
+            "id": "secret-fails",
+            "label": "方案无效，伤病加重且被发现",
+            "probability": 60,
+            "changes": {
+              "health": -10,
+              "integrity": -15,
+              "fame": -10,
+              "connections": -6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "catalogId": "wl-demon-king-006",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "offseason",
+    "title": "游戏版本更新削弱AWP",
+    "briefing": "21岁，新版本更新大幅削弱了AWP的移动速度和开镜时间。过去三年你依赖的快速peek打法突然失效。教练建议你学习新的慢节奏狙击风格，但这需要推翻过去的肌肉记忆。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "版本",
+      "适应"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 24,
+    "roles": [
+      "awper"
+    ],
+    "eligibility": {
+      "op": "gte",
+      "left": {
+        "var": "player.ability"
+      },
+      "right": {
+        "const": 78
+      }
+    },
+    "triggerWeight": {
+      "const": 85
+    },
+    "cooldownSeasons": 99,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "adapt-new-style",
+        "label": "投入全部时间学习新风格",
+        "detail": "重建肌肉记忆，短期数据会下降",
+        "changes": {
+          "ability": -4,
+          "health": -5,
+          "fame": -3
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "advance",
+            "toStage": "sustain-or-fall",
+            "branchId": "version-adapt",
+            "note": "成功适应版本变化"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "adapt-success",
+            "label": "三个月后掌握新风格，重回巅峰",
+            "probability": 55,
+            "changes": {
+              "ability": 5,
+              "fame": 6,
+              "health": 3
+            }
+          },
+          {
+            "id": "adapt-struggle",
+            "label": "新风格始终不顺手，统治力下降",
+            "probability": 45,
+            "changes": {
+              "ability": -3,
+              "fame": -8,
+              "highPressureChokingRisk": 4
+            }
+          }
+        ]
+      },
+      {
+        "id": "insist-old-style",
+        "label": "坚持旧风格等待版本回调",
+        "detail": "赌开发商会回调，但可能被版本淘汰",
+        "changes": {
+          "ability": -2,
+          "fame": 2
+        },
+        "outcomes": [
+          {
+            "id": "version-rollback",
+            "label": "半年后版本回调，你重新统治",
+            "probability": 25,
+            "changes": {
+              "ability": 4,
+              "fame": 10
+            }
+          },
+          {
+            "id": "version-victim",
+            "label": "版本没有回调,你被新一代取代",
+            "probability": 75,
+            "changes": {
+              "ability": -6,
+              "fame": -12,
+              "earnings": -8
+            },
+            "worldlineTransitions": [
+              {
+                "worldlineId": "wl-demon-king",
+                "action": "complete",
+                "ending": "version-victim",
+                "note": "成为版本受害者"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "role-transform",
+        "label": "转型为步枪手保留职业寿命",
+        "detail": "放弃AWP专精，转为更灵活的定位",
+        "changes": {
+          "ability": -3,
+          "positionFamiliarity": -8,
+          "fame": -5
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "advance",
+            "toStage": "sustain-or-fall",
+            "branchId": "role-change",
+            "note": "从狙击手转型"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "transform-success",
+            "label": "步枪手转型成功，职业生涯延长",
+            "probability": 40,
+            "changes": {
+              "ability": 3,
+              "positionFamiliarity": 6,
+              "connections": 4
+            }
+          },
+          {
+            "id": "transform-fail",
+            "label": "失去AWP优势后泯然众人",
+            "probability": 60,
+            "changes": {
+              "ability": -5,
+              "fame": -10,
+              "earnings": -6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "catalogId": "wl-demon-king-007",
+    "revision": 1,
+    "category": "队内体系",
+    "kind": "field",
+    "timing": "post-report",
+    "title": "队友在赛后公开批评你独占资源",
+    "briefing": "22岁，BURST总决赛输给对手后，一名队友在赛后采访中暗示你独占经济导致其他人无法发挥。更衣室气氛紧张，教练让你决定如何回应。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "队内",
+      "舆论"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 24,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 70
+          }
+        },
+        {
+          "op": "lte",
+          "left": {
+            "var": "team.rosterStability"
+          },
+          "right": {
+            "const": 60
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 75
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "public-defense",
+        "label": "公开反击，用数据证明自己的价值",
+        "detail": "维护个人名誉但会加剧队内裂痕",
+        "changes": {
+          "fame": 5,
+          "connections": -8,
+          "rosterStability": -6
+        },
+        "outcomes": [
+          {
+            "id": "defense-fan-support",
+            "label": "粉丝支持你，但队友关系破裂",
+            "probability": 60,
+            "changes": {
+              "fame": 8,
+              "connections": -10,
+              "rosterStability": -10
+            },
+            "delayed": {
+              "tag": "roster-split",
+              "riskHint": "队内裂痕可能导致阵容解体",
+              "minSeasons": 1,
+              "maxSeasons": 2,
+              "changes": {
+                "rosterStability": -15,
+                "connections": -8
+              },
+              "revealText": "当年的公开冲突最终导致队伍解散重组。"
+            }
+          },
+          {
+            "id": "defense-backfire",
+            "label": "反击被认为缺乏团队精神",
+            "probability": 40,
+            "changes": {
+              "fame": -8,
+              "connections": -12,
+              "integrity": -5
+            }
+          }
+        ]
+      },
+      {
+        "id": "private-reconcile",
+        "label": "私下找队友和解",
+        "detail": "避免舆论战，保护队伍长期稳定",
+        "changes": {
+          "connections": 5,
+          "rosterStability": 3,
+          "fame": -2
+        },
+        "outcomes": [
+          {
+            "id": "reconcile-success",
+            "label": "队友接受和解，阵容稳定",
+            "probability": 65,
+            "changes": {
+              "connections": 6,
+              "rosterStability": 6,
+              "teamForm": 4
+            }
+          },
+          {
+            "id": "reconcile-fail",
+            "label": "队友拒绝和解，矛盾转入地下",
+            "probability": 35,
+            "changes": {
+              "connections": -4,
+              "rosterStability": -5,
+              "teamForm": -6
+            }
+          }
+        ]
+      },
+      {
+        "id": "coach-mediate",
+        "label": "让教练和管理层介入调解",
+        "detail": "使用正式流程，但会暴露队内问题",
+        "changes": {
+          "integrity": 3,
+          "fame": -3
+        },
+        "outcomes": [
+          {
+            "id": "mediate-restructure",
+            "label": "管理层重组阵容，部分队友离队",
+            "probability": 50,
+            "changes": {
+              "rosterStability": -8,
+              "teamForm": -4,
+              "connections": -2
+            }
+          },
+          {
+            "id": "mediate-rules",
+            "label": "建立明确的资源分配规则",
+            "probability": 50,
+            "changes": {
+              "rosterStability": 5,
+              "teamForm": 3,
+              "connections": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-008",
+    "revision": 1,
+    "category": "商业赞助",
+    "kind": "offseason",
+    "title": "外设品牌要求独家代言",
+    "briefing": "22岁，你是世界第一AWPer，一家国际外设品牌提出五年独家代言，年薪200万但要求你只能使用他们的产品并参加大量商业活动。教练担心这会影响训练时间和比赛状态。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "商业",
+      "时间"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 24,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 75
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 78
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 70
+    },
+    "cooldownSeasons": 99,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure",
+        "sustain-or-fall"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-exclusive",
+        "label": "接受独家代言",
+        "detail": "巨额收入但会挤压训练时间",
+        "changes": {
+          "earnings": 50,
+          "fame": 12,
+          "ability": -5,
+          "health": -4
+        },
+        "outcomes": [
+          {
+            "id": "exclusive-balance",
+            "label": "成功平衡商业与竞技",
+            "probability": 35,
+            "changes": {
+              "earnings": 30,
+              "fame": 8,
+              "ability": -2
+            }
+          },
+          {
+            "id": "exclusive-distract",
+            "label": "商业活动严重影响竞技状态",
+            "probability": 65,
+            "changes": {
+              "ability": -6,
+              "health": -6,
+              "fame": -4,
+              "teamForm": -5
+            },
+            "delayed": {
+              "tag": "commercial-burnout",
+              "riskHint": "过度商业化可能导致竞技倦怠",
+              "minSeasons": 1,
+              "maxSeasons": 3,
+              "changes": {
+                "ability": -8,
+                "health": -10,
+                "fame": -6
+              },
+              "revealText": "长期的商业活动透支让你在关键赛事中状态持续下滑。"
+            }
+          }
+        ]
+      },
+      {
+        "id": "reject-focus-game",
+        "label": "拒绝代言专注比赛",
+        "detail": "保护竞技状态但失去巨额收入",
+        "changes": {
+          "ability": 3,
+          "health": 2,
+          "earnings": -10,
+          "fame": -3
+        },
+        "outcomes": [
+          {
+            "id": "focus-dominate",
+            "label": "专注带来更稳定的统治力",
+            "probability": 70,
+            "changes": {
+              "ability": 4,
+              "teamForm": 4,
+              "fame": 5
+            }
+          },
+          {
+            "id": "focus-regret",
+            "label": "队友靠代言赚钱，你开始后悔",
+            "probability": 30,
+            "changes": {
+              "connections": -3,
+              "earnings": -8
+            }
+          }
+        ]
+      },
+      {
+        "id": "negotiate-flexible",
+        "label": "谈判更灵活的合作方案",
+        "detail": "降低代言费换取时间自主权",
+        "changes": {
+          "earnings": 20,
+          "fame": 5,
+          "integrity": 2
+        },
+        "outcomes": [
+          {
+            "id": "flexible-works",
+            "label": "灵活方案让商业与竞技共赢",
+            "probability": 60,
+            "changes": {
+              "earnings": 15,
+              "fame": 6,
+              "ability": 1,
+              "connections": 2
+            }
+          },
+          {
+            "id": "flexible-neither",
+            "label": "两边都不满意，最终取消合作",
+            "probability": 40,
+            "changes": {
+              "earnings": -5,
+              "fame": -4,
+              "connections": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-009",
+    "revision": 1,
+    "category": "伤病健康",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "Major半决赛前夜严重失眠",
+    "briefing": "23岁，Major半决赛前一晚，你躺在床上辗转反侧完全无法入睡。明天要对阵世界第二，媒体都在讨论你是否能延续统治。凌晨4点你仍然醒着，6小时后就要比赛。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "心理",
+      "健康"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 25,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "lte",
+          "left": {
+            "var": "player.health"
+          },
+          "right": {
+            "const": 65
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.highPressureChokingRisk"
+          },
+          "right": {
+            "const": 3
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.tier"
+          },
+          "right": {
+            "const": "Major"
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.isPlayoff"
+          },
+          "right": {
+            "const": true
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 80
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure",
+        "sustain-or-fall"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "sleeping-pills",
+        "label": "服用安眠药强制入睡",
+        "detail": "能睡着但可能影响比赛反应",
+        "changes": {
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "pills-groggy",
+            "label": "睡着了但比赛时头脑昏沉",
+            "probability": 60,
+            "changes": {
+              "ability": -5,
+              "health": -2
+            },
+            "resultPatch": {
+              "placementDelta": -1
+            }
+          },
+          {
+            "id": "pills-ok",
+            "label": "成功休息，状态正常",
+            "probability": 40,
+            "changes": {
+              "health": 2,
+              "ability": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "stay-awake",
+        "label": "放弃睡眠，复盘对手录像到天亮",
+        "detail": "用准备代替休息",
+        "changes": {
+          "health": -6,
+          "ability": 2
+        },
+        "outcomes": [
+          {
+            "id": "awake-focused",
+            "label": "虽然疲惫但战术准备充分",
+            "probability": 45,
+            "changes": {
+              "ability": 3,
+              "teamForm": 2
+            },
+            "resultPatch": {
+              "placementDelta": 1
+            }
+          },
+          {
+            "id": "awake-exhausted",
+            "label": "严重缺觉导致比赛失误连连",
+            "probability": 55,
+            "changes": {
+              "ability": -6,
+              "health": -4,
+              "fame": -5
+            },
+            "resultPatch": {
+              "placementDelta": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "call-psychologist",
+        "label": "联系队内心理师求助",
+        "detail": "承认压力，寻求专业帮助",
+        "changes": {
+          "health": 2,
+          "connections": 2,
+          "highPressureChokingRisk": -2
+        },
+        "outcomes": [
+          {
+            "id": "psych-breakthrough",
+            "label": "心理辅导打开心结，状态恢复",
+            "probability": 55,
+            "changes": {
+              "health": 4,
+              "highPressureChokingRisk": -3,
+              "ability": 2
+            }
+          },
+          {
+            "id": "psych-insufficient",
+            "label": "一次辅导不够，仍然紧张",
+            "probability": 45,
+            "changes": {
+              "health": 1,
+              "ability": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-010",
+    "revision": 1,
+    "category": "退役转型",
+    "kind": "offseason",
+    "title": "24岁收到教练岗位邀请",
+    "briefing": "24岁，虽然你仍是世界前五AWPer，但一支顶级青训队伍邀请你担任主教练，承诺给你建队自主权和长期合同。这意味着提前结束巅峰期的球员生涯。",
+    "tags": [
+      "worldline:wl-demon-king:sustain-or-fall",
+      "转型",
+      "选择"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 24,
+    "maxAge": 26,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 75
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.connections"
+          },
+          "right": {
+            "const": 60
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 60
+    },
+    "cooldownSeasons": 99,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "sustain-or-fall"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "continue-playing",
+        "label": "拒绝教练邀请继续打球员",
+        "detail": "延续竞技生涯，但转型窗口可能不再有",
+        "changes": {
+          "ability": 2,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "play-extend",
+            "label": "又打了三年保持高水平",
+            "probability": 40,
+            "changes": {
+              "ability": 3,
+              "fame": 5,
+              "earnings": 10
+            }
+          },
+          {
+            "id": "play-decline",
+            "label": "状态快速下滑，退役后没有好去处",
+            "probability": 60,
+            "changes": {
+              "ability": -6,
+              "health": -8,
+              "earnings": -5
+            },
+            "worldlineTransitions": [
+              {
+                "worldlineId": "wl-demon-king",
+                "action": "complete",
+                "ending": "injury-early-exit",
+                "note": "错过转型窗口后被迫退役"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "become-coach",
+        "label": "接受教练岗位",
+        "detail": "提前结束球员生涯，开启教练之路",
+        "changes": {
+          "ability": -10,
+          "earnings": 5,
+          "connections": 8
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "complete",
+            "ending": "transform",
+            "note": "成功转型为教练"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "coach-success",
+            "label": "用球员经验带出冠军队伍",
+            "probability": 55,
+            "changes": {
+              "fame": 10,
+              "earnings": 15,
+              "connections": 10
+            }
+          },
+          {
+            "id": "coach-struggle",
+            "label": "教练角色不适应，成绩平平",
+            "probability": 45,
+            "changes": {
+              "fame": -5,
+              "earnings": -3,
+              "connections": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "player-coach",
+        "label": "提出球员兼教练方案",
+        "detail": "同时做两份工作，压力和回报都翻倍",
+        "changes": {
+          "health": -8,
+          "earnings": 8,
+          "connections": 4
+        },
+        "outcomes": [
+          {
+            "id": "dual-burnout",
+            "label": "两边都做不好，最终被迫选择一边",
+            "probability": 70,
+            "changes": {
+              "health": -10,
+              "ability": -6,
+              "connections": -5
+            }
+          },
+          {
+            "id": "dual-legend",
+            "label": "罕见地同时做好两个角色",
+            "probability": 30,
+            "changes": {
+              "fame": 15,
+              "earnings": 12,
+              "ability": 2,
+              "health": -6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-011",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "卫冕冠军决赛被针对",
+    "briefing": "22岁，Major决赛对手在每个关键回合都用三人夹A针对你的狙击位。教练暂停后建议你转B区让队友接管A点，但这意味着承认被针对成功。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "Major",
+      "战术"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 24,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.tier"
+          },
+          "right": {
+            "const": "Major"
+          }
+        },
+        {
+          "op": "eq",
+          "left": {
+            "var": "tournament.isPlayoff"
+          },
+          "right": {
+            "const": true
+          }
+        },
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 78
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 75
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-rotate",
+        "label": "接受教练建议转B区",
+        "detail": "承认被针对，但给队伍更好的胜率",
+        "changes": {
+          "fame": -3,
+          "connections": 3,
+          "teamForm": 4
+        },
+        "outcomes": [
+          {
+            "id": "rotate-win",
+            "label": "转区后队伍赢下决赛，你获得EVP",
+            "probability": 60,
+            "changes": {
+              "fame": 10,
+              "earnings": 12,
+              "connections": 4
+            },
+            "resultPatch": {
+              "placementDelta": 2,
+              "honorPatch": {
+                "kind": "EVP",
+                "confirmed": true
+              }
+            }
+          },
+          {
+            "id": "rotate-lose",
+            "label": "转区后仍然输了，被质疑逃避压力",
+            "probability": 40,
+            "changes": {
+              "fame": -8,
+              "highPressureChokingRisk": 5
+            },
+            "resultPatch": {
+              "placementDelta": 0
+            }
+          }
+        ]
+      },
+      {
+        "id": "insist-a-site",
+        "label": "坚持守A区证明自己",
+        "detail": "用个人能力突破针对，高风险高回报",
+        "changes": {
+          "health": -3
+        },
+        "outcomes": [
+          {
+            "id": "breakthrough-hero",
+            "label": "连续三回合破解针对，拿下MVP",
+            "weight": {
+              "op": "add",
+              "args": [
+                {
+                  "const": 25
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "const": 0.4
+                    },
+                    {
+                      "var": "player.ability"
+                    }
+                  ]
+                }
+              ]
+            },
+            "changes": {
+              "ability": 4,
+              "fame": 18,
+              "earnings": 15,
+              "health": -4
+            },
+            "resultPatch": {
+              "placementDelta": 2,
+              "honorPatch": {
+                "kind": "MVP",
+                "confirmed": true
+              }
+            }
+          },
+          {
+            "id": "breakthrough-fail",
+            "label": "针对太严密，连续失误输掉决赛",
+            "weight": {
+              "op": "sub",
+              "left": {
+                "const": 100
+              },
+              "right": {
+                "op": "add",
+                "args": [
+                  {
+                    "const": 25
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "const": 0.4
+                      },
+                      {
+                        "var": "player.ability"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "changes": {
+              "fame": -12,
+              "highPressureChokingRisk": 8
+            },
+            "resultPatch": {
+              "placementDelta": -1
+            },
+            "delayed": {
+              "tag": "pressure-trauma",
+              "riskHint": "决赛失利可能留下长期心理阴影",
+              "minSeasons": 2,
+              "maxSeasons": 4,
+              "changes": {
+                "highPressureChokingRisk": 6,
+                "ability": -4
+              },
+              "revealText": "Major决赛被针对的失利，成为后续关键局挥之不去的心魔。"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mid-game-adjust",
+        "label": "灵活换位打游击",
+        "detail": "不固定位置，根据对手调整",
+        "changes": {
+          "positionFamiliarity": -2
+        },
+        "outcomes": [
+          {
+            "id": "flexible-works",
+            "label": "游击战术打乱对手节奏",
+            "probability": 50,
+            "changes": {
+              "ability": 3,
+              "teamForm": 5,
+              "fame": 8
+            },
+            "resultPatch": {
+              "placementDelta": 1
+            }
+          },
+          {
+            "id": "flexible-chaos",
+            "label": "频繁换位导致队内混乱",
+            "probability": 50,
+            "changes": {
+              "teamForm": -6,
+              "rosterStability": -4
+            },
+            "resultPatch": {
+              "placementDelta": -1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-012",
+    "revision": 1,
+    "category": "舆论媒体",
+    "kind": "offseason",
+    "title": "纪录片团队想拍摄你的日常",
+    "briefing": "23岁，一家知名电竞媒体想拍摄你的赛季纪录片，承诺全球发行。但需要在训练、比赛和私人时间安装摄像头，教练担心这会影响队伍保密性。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "媒体",
+      "隐私"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 25,
+    "eligibility": {
+      "op": "gte",
+      "left": {
+        "var": "player.fame"
+      },
+      "right": {
+        "const": 75
+      }
+    },
+    "triggerWeight": {
+      "const": 65
+    },
+    "cooldownSeasons": 99,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure",
+        "sustain-or-fall"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "accept-documentary",
+        "label": "接受纪录片拍摄",
+        "detail": "扩大影响力但失去隐私和战术保密",
+        "changes": {
+          "fame": 15,
+          "earnings": 10,
+          "connections": -3,
+          "teamForm": -3
+        },
+        "outcomes": [
+          {
+            "id": "doc-success",
+            "label": "纪录片大获成功，成为电竞文化符号",
+            "probability": 55,
+            "changes": {
+              "fame": 20,
+              "earnings": 15,
+              "connections": 5
+            }
+          },
+          {
+            "id": "doc-leak",
+            "label": "拍摄过程泄露战术，被对手研究透",
+            "probability": 45,
+            "changes": {
+              "teamForm": -8,
+              "rosterStability": -5,
+              "ability": -3
+            },
+            "delayed": {
+              "tag": "tactical-exposure",
+              "riskHint": "战术泄露可能在未来赛季被持续针对",
+              "minSeasons": 1,
+              "maxSeasons": 2,
+              "changes": {
+                "teamForm": -6,
+                "ability": -4
+              },
+              "revealText": "纪录片暴露的战术细节，让对手在后续赛季针对性加强。"
+            }
+          }
+        ]
+      },
+      {
+        "id": "reject-documentary",
+        "label": "拒绝拍摄保护隐私",
+        "detail": "保护队伍和个人，但失去传播机会",
+        "changes": {
+          "teamForm": 3,
+          "connections": 2,
+          "fame": -5,
+          "earnings": -3
+        },
+        "outcomes": [
+          {
+            "id": "reject-respect",
+            "label": "队友感激你保护团队利益",
+            "probability": 70,
+            "changes": {
+              "connections": 5,
+              "rosterStability": 4,
+              "teamForm": 3
+            }
+          },
+          {
+            "id": "reject-regret",
+            "label": "纪录片找了其他选手，你的商业价值下降",
+            "probability": 30,
+            "changes": {
+              "fame": -8,
+              "earnings": -8
+            }
+          }
+        ]
+      },
+      {
+        "id": "controlled-access",
+        "label": "谈判限制拍摄范围",
+        "detail": "只开放部分内容，平衡曝光与保密",
+        "changes": {
+          "fame": 8,
+          "earnings": 5,
+          "integrity": 2
+        },
+        "outcomes": [
+          {
+            "id": "controlled-balance",
+            "label": "有限拍摄达到双赢",
+            "probability": 60,
+            "changes": {
+              "fame": 10,
+              "earnings": 6,
+              "connections": 2
+            }
+          },
+          {
+            "id": "controlled-neither",
+            "label": "双方都不满意，最终取消项目",
+            "probability": 40,
+            "changes": {
+              "fame": -3,
+              "connections": -2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-013",
+    "revision": 1,
+    "category": "赛事内关键局",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "BURST淘汰赛被克星队伍完全研究透",
+    "briefing": "23岁，BURST淘汰赛对阵去年在决赛击败你的队伍。比赛开始后你发现对手完全了解你的每一个习惯——你打A点时他们总在正确的位置等你，你换弹时他们总能拉出来。分析师后来说，对手的研究团队花了三个月分析你过去两年的所有比赛录像。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "BURST",
+      "克星",
+      "被研究"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 21,
+    "maxAge": 26,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 60
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 40
+    },
+    "cooldownSeasons": 4,
+    "maxOccurrences": 2,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "change-all-habits",
+        "label": "临时改变所有常用站位和路线",
+        "detail": "放弃自己的优势习惯来迷惑对手，但自己也变得陌生。",
+        "changes": {
+          "ability": -3,
+          "connections": -2
+        },
+        "outcomes": [
+          {
+            "id": "confuses-everyone",
+            "label": "对手也被你的变化搞懵了，打乱了他们的部署",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "ability": 3,
+              "fame": 8
+            }
+          },
+          {
+            "id": "lost-myself",
+            "label": "你自己比对手更不适应新打法",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "ability": -5,
+              "teamForm": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "trust-instincts",
+        "label": "再被研究也是实力对决",
+        "detail": "相信自己的枪法可以克服战术上的劣势。",
+        "changes": {
+          "ability": 2,
+          "fame": 2
+        },
+        "outcomes": [
+          {
+            "id": "raw-talent-wins",
+            "label": "三局打出了超越战术研究的个人英雄主义表现",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": 5,
+              "fame": 12
+            }
+          },
+          {
+            "id": "study-defeats-talent",
+            "label": "研究确实有用，你被完全限制住了",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": -3,
+              "fame": -5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-014",
+    "revision": 1,
+    "category": "商业赞助",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "粉丝见面会现场发生推挤冲突",
+    "briefing": "24岁，你的商业价值达到巅峰，俱乐部安排了一场大型粉丝见面会。排队队伍太长导致商场内发生推挤，一名粉丝被挤倒受伤。安保人员试图控制场面，但现场混乱中有人拍到你的表情——疲惫、烦躁、心不在焉。照片上了热搜第一。",
+    "tags": [
+      "worldline:wl-demon-king:pressure",
+      "商业",
+      "粉丝",
+      "丑闻"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 22,
+    "maxAge": 28,
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.fame"
+          },
+          "right": {
+            "const": 70
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 30
+    },
+    "cooldownSeasons": 6,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "pressure"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "sincere-apology",
+        "label": "发文道歉并去医院看望受伤粉丝",
+        "detail": "诚恳处理危机，但需要中断训练调整。",
+        "changes": {
+          "integrity": 5,
+          "ability": -2,
+          "fame": 5
+        },
+        "outcomes": [
+          {
+            "id": "forgiven",
+            "label": "粉丝接受道歉，伤者也不追究了",
+            "weight": {
+              "const": 55
+            },
+            "changes": {
+              "integrity": 8,
+              "fame": 8
+            }
+          },
+          {
+            "id": "apology-backfires",
+            "label": "被质疑'公关作秀'",
+            "weight": {
+              "const": 45
+            },
+            "changes": {
+              "fame": -5,
+              "integrity": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "radio-silence",
+        "label": "让俱乐部公关处理不亲自回应",
+        "detail": "保护自己的情绪，但显得冷漠。",
+        "changes": {
+          "fame": -5,
+          "health": 3
+        },
+        "outcomes": [
+          {
+            "id": "blow-over",
+            "label": "公关稿冷处理一周后热度降下来了",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": -3
+            }
+          },
+          {
+            "id": "public-pressure-grows",
+            "label": "沉默被解读为傲慢，舆论持续发酵",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": -10,
+              "connections": -4
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0",
+    "catalogId": "wl-demon-king-015",
+    "revision": 1,
+    "category": "训练状态",
+    "kind": "field",
+    "timing": "in-season",
+    "title": "新版本AWP被史诗级削弱",
+    "briefing": "26岁，游戏更新了年度大版本。你的AWP开镜速度被降低了15%，弹道散布增加了8%。你在训练场试了半小时，空掉了连续五枪应该命中的远距离狙击。你靠在椅背上，看着更新公告发呆——这是你从16岁起就赖以生存的武器。",
+    "tags": [
+      "worldline:wl-demon-king:sustain-or-fall",
+      "版本",
+      "AWP",
+      "削弱"
+    ],
+    "source": {
+      "type": "human-authored",
+      "reviewStatus": "approved",
+      "reviewer": "career-event-design"
+    },
+    "minAge": 24,
+    "maxAge": 30,
+    "roles": [
+      "awper"
+    ],
+    "eligibility": {
+      "op": "all",
+      "args": [
+        {
+          "op": "gte",
+          "left": {
+            "var": "player.ability"
+          },
+          "right": {
+            "const": 80
+          }
+        }
+      ]
+    },
+    "triggerWeight": {
+      "const": 25
+    },
+    "cooldownSeasons": 8,
+    "maxOccurrences": 1,
+    "worldline": {
+      "worldlineId": "wl-demon-king",
+      "stages": [
+        "sustain-or-fall"
+      ],
+      "statuses": [
+        "active"
+      ]
+    },
+    "options": [
+      {
+        "id": "master-new-awp",
+        "label": "用大量训练适应新AWP参数",
+        "detail": "重新建立肌肉记忆，但需要两个月以上的高强度训练。",
+        "changes": {
+          "ability": -3,
+          "health": -5
+        },
+        "outcomes": [
+          {
+            "id": "adapts-quickly",
+            "label": "六周后新AWP的训练数据超过了版本更新前5%",
+            "weight": {
+              "const": 40
+            },
+            "changes": {
+              "ability": 6,
+              "fame": 5
+            }
+          },
+          {
+            "id": "cant-adapt",
+            "label": "AWP的手感一直找不回来",
+            "weight": {
+              "const": 60
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -5,
+              "health": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "switch-to-rifle",
+        "label": "放弃AWP转型打步枪",
+        "detail": "放弃十年狙击手定位，重新学习完全不同的武器体系。",
+        "changes": {
+          "ability": -6,
+          "positionFamiliarity": -10
+        },
+        "worldlineTransitions": [
+          {
+            "worldlineId": "wl-demon-king",
+            "action": "branch",
+            "toStage": "sustain-or-fall",
+            "branchId": "awp-to-rifle",
+            "note": "放弃狙击手身份转型步枪手"
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "rifle-prodigy",
+            "label": "隐藏的天赋——你的步枪瞄准基础也很好",
+            "weight": {
+              "const": 35
+            },
+            "changes": {
+              "ability": 4,
+              "positionFamiliarity": 5,
+              "fame": 8
+            }
+          },
+          {
+            "id": "lost-identity",
+            "label": "放下AWP后你的价值大打折扣",
+            "weight": {
+              "const": 65
+            },
+            "changes": {
+              "ability": -5,
+              "fame": -8,
+              "connections": -3
+            }
+          }
+        ]
+      },
+      {
+        "id": "become-coach",
+        "label": "考虑转型教练或分析师",
+        "detail": "趁荣誉还在选择退出选手身份。",
+        "changes": {
+          "connections": 3,
+          "fame": 3
+        },
+        "outcomes": [
+          {
+            "id": "coaching-path",
+            "label": "转型教练后发现自己的战术理解比枪法更出色",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "connections": 8,
+              "fame": 5
+            }
+          },
+          {
+            "id": "too-early",
+            "label": "退役太早，看着老对手们还在打心里不甘",
+            "weight": {
+              "const": 50
+            },
+            "changes": {
+              "fame": -3,
+              "health": -3
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

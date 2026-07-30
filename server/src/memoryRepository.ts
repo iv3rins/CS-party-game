@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import type { Account, Activity, CommandLog, MatchRecord, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
+import type { Account, Activity, ChatMessage, CommandLog, MatchRecord, PersistedProposal, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
 import type { Repository } from './repository.js';
+import { defaultGlickoRating, settleGlicko2 } from './glicko2.js';
 
 const copy = <T>(value: T): T => structuredClone(value);
 
@@ -10,6 +11,8 @@ export class MemoryRepository implements Repository {
   private activities = new Map<string, Activity>();
   private queues = new Map<string, QueueEntry>();
   private rooms = new Map<string, Room>();
+  private proposals = new Map<string, PersistedProposal>();
+  private chat = new Map<string, ChatMessage[]>();
   private matches = new Map<string, MatchRecord>();
   private commands = new Map<string, CommandLog>();
   private ratings = new Map<string, Rating>();
@@ -46,9 +49,15 @@ export class MemoryRepository implements Repository {
   async getQueue(principalId: string) { return copy(this.queues.get(principalId) ?? null); }
   async listQueues(mode: 'casual' | 'ranked') { return copy([...this.queues.values()].filter(entry => entry.mode === mode)); }
   async deleteQueue(principalId: string) { this.queues.delete(principalId); }
-  async saveRoom(room: Room) { this.rooms.set(room.id, copy(room)); }
+  async saveProposal(proposal: PersistedProposal) { this.proposals.set(proposal.matchId, copy(proposal)); }
+  async getProposal(matchId: string) { return copy(this.proposals.get(matchId) ?? null); }
+  async listDueProposals(now: Date) { return copy([...this.proposals.values()].filter(proposal => proposal.deadline <= now)); }
+  async deleteProposal(matchId: string) { this.proposals.delete(matchId); }
+  async saveRoom(room: Room, expectedVersion?: number) { const current = this.rooms.get(room.id); if (expectedVersion !== undefined && (current?.version ?? 0) !== expectedVersion) return false; this.rooms.set(room.id, copy({ ...room, version: (current?.version ?? room.version ?? 0) + 1 })); return true; }
   async getRoom(roomId: string) { return copy(this.rooms.get(roomId) ?? null); }
   async getRoomByCode(inviteCode: string) { return copy([...this.rooms.values()].find(room => room.inviteCode === inviteCode) ?? null); }
+  async appendChatMessage(message: ChatMessage) { const messages = this.chat.get(message.roomId) ?? []; messages.push(copy(message)); this.chat.set(message.roomId, messages.slice(-100)); }
+  async listChatMessages(roomId: string, limit = 50) { return copy((this.chat.get(roomId) ?? []).slice(-limit)); }
   async saveMatch(match: MatchRecord) { this.matches.set(match.id, copy(match)); }
   async getMatch(matchId: string) { return copy(this.matches.get(matchId) ?? null); }
   async appendCommand(command: CommandLog) {
@@ -60,7 +69,7 @@ export class MemoryRepository implements Repository {
   async getCommand(matchId: string, commandId: string) { return copy(this.commands.get(`${matchId}:${commandId}`) ?? null); }
   async getRating(accountId: string, seasonId: string) {
     const key = `${accountId}:${seasonId}`;
-    const rating = this.ratings.get(key) ?? { accountId, seasonId, elo: 1000, wins: 0, losses: 0, draws: 0 };
+    const rating = this.ratings.get(key) ?? defaultGlickoRating(accountId, seasonId);
     this.ratings.set(key, rating);
     return copy(rating);
   }
@@ -68,15 +77,12 @@ export class MemoryRepository implements Repository {
     const existing = this.settlements.get(matchId);
     if (existing) return copy(existing);
     const [a, b] = await Promise.all(accountIds.map(id => this.getRating(id, seasonId))) as [Rating, Rating];
-    const expectedA = 1 / (1 + 10 ** ((b.elo - a.elo) / 400));
     const scoreA = winnerAccountId === null ? .5 : winnerAccountId === a.accountId ? 1 : 0;
-    const scoreB = 1 - scoreA;
-    const nextA = Math.round(a.elo + (a.wins + a.losses + a.draws < 10 ? 40 : 20) * (scoreA - expectedA));
-    const nextB = Math.round(b.elo + (b.wins + b.losses + b.draws < 10 ? 40 : 20) * (scoreB - (1 - expectedA)));
-    const update = (rating: Rating, score: number, elo: number) => ({ ...rating, elo, wins: rating.wins + (score === 1 ? 1 : 0), losses: rating.losses + (score === 0 ? 1 : 0), draws: rating.draws + (score === .5 ? 1 : 0) });
-    this.ratings.set(`${a.accountId}:${seasonId}`, update(a, scoreA, nextA));
-    this.ratings.set(`${b.accountId}:${seasonId}`, update(b, scoreB, nextB));
-    const result = [{ matchId, accountId: a.accountId, oldElo: a.elo, newElo: nextA }, { matchId, accountId: b.accountId, oldElo: b.elo, newElo: nextB }];
+    const [nextA, nextB, settlements] = settleGlicko2(a, b, scoreA as 0 | 0.5 | 1);
+    settlements.forEach(settlement => { settlement.matchId = matchId; });
+    this.ratings.set(`${a.accountId}:${seasonId}`, nextA);
+    this.ratings.set(`${b.accountId}:${seasonId}`, nextB);
+    const result = settlements;
     this.settlements.set(matchId, result);
     return copy(result);
   }

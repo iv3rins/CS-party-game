@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "career-content-v1",
+  "origins": [
+    {
+      "id": "northeast",
+      "name": "东北网吧队",
+      "place": "沈阳",
+      "description": "线下赛经验多，出枪不怕硬碰硬。",
+      "baseStats": {
+        "ability": 61,
+        "connections": 38,
+        "integrity": 72,
+        "fame": 18,
+        "health": 82,
+        "internationalAdaptation": 25
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-028-lynn-vision",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "mechanics",
+        "grit"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "offline-experience": 135,
+        "equipment-limited": 120
+      },
+      "earlyOpportunityTags": [
+        "offline-experience",
+        "equipment-limited"
+      ]
+    },
+    {
+      "id": "academy",
+      "name": "京津青训营",
+      "place": "北京",
+      "description": "教练和试训资源更近，同龄竞争也更早开始。",
+      "baseStats": {
+        "ability": 56,
+        "connections": 58,
+        "integrity": 70,
+        "fame": 24,
+        "health": 82,
+        "internationalAdaptation": 35
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-029-tyloo",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "tactics",
+        "network"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "academy-access": 135,
+        "peer-competition": 120
+      },
+      "earlyOpportunityTags": [
+        "academy-access",
+        "peer-competition"
+      ]
+    },
+    {
+      "id": "campus",
+      "name": "上海电竞学院",
+      "place": "上海",
+      "description": "职业素养和商务资源起点更高，也更早面对公众期待。",
+      "baseStats": {
+        "ability": 52,
+        "connections": 43,
+        "integrity": 81,
+        "fame": 17,
+        "health": 82,
+        "internationalAdaptation": 30
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-030-rare-atom",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "discipline",
+        "learning"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "professional-discipline": 135,
+        "commercial-exposure": 120
+      },
+      "earlyOpportunityTags": [
+        "professional-discipline",
+        "commercial-exposure"
+      ]
+    },
+    {
+      "id": "overseas",
+      "name": "海外华人社区",
+      "place": "温哥华",
+      "description": "较早接触国际赛场，也要适应陌生体系和跨文化沟通。",
+      "baseStats": {
+        "ability": 57,
+        "connections": 35,
+        "integrity": 74,
+        "fame": 29,
+        "health": 82,
+        "internationalAdaptation": 68
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-027-flyquest",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "adaptation",
+        "communication"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "international-access": 135,
+        "language-pressure": 120
+      },
+      "earlyOpportunityTags": [
+        "international-access",
+        "language-pressure"
+      ]
+    },
+    {
+      "id": "southwest",
+      "name": "江浙校园赛",
+      "place": "杭州",
+      "description": "学习适应能力和备选退路更稳定，但高强度赛事经验有限。",
+      "baseStats": {
+        "ability": 58,
+        "connections": 48,
+        "integrity": 76,
+        "fame": 20,
+        "health": 82,
+        "internationalAdaptation": 28
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-049-steel-helmet",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "learning",
+        "discipline"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "learning-speed": 135,
+        "campus-route": 120
+      },
+      "earlyOpportunityTags": [
+        "learning-speed",
+        "campus-route"
+      ]
+    },
+    {
+      "id": "south",
+      "name": "广东港澳圈",
+      "place": "广州",
+      "description": "商业和跨赛区接触更早，本地顶级竞技资源相对有限。",
+      "baseStats": {
+        "ability": 54,
+        "connections": 52,
+        "integrity": 68,
+        "fame": 32,
+        "health": 82,
+        "internationalAdaptation": 30
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-048-jijiehao",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "network",
+        "adaptation"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "cross-region-access": 135,
+        "local-resource-gap": 120
+      },
+      "earlyOpportunityTags": [
+        "cross-region-access",
+        "local-resource-gap"
+      ]
+    },
+    {
+      "id": "central",
+      "name": "中部草根队",
+      "place": "武汉",
+      "description": "愿意投入高强度练习，曝光与稳定试训渠道相对有限。",
+      "baseStats": {
+        "ability": 55,
+        "connections": 45,
+        "integrity": 79,
+        "fame": 19,
+        "health": 82,
+        "internationalAdaptation": 25
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-028-lynn-vision",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "grit",
+        "tactics"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "practice-volume": 135,
+        "exposure-limited": 120
+      },
+      "earlyOpportunityTags": [
+        "practice-volume",
+        "exposure-limited"
+      ]
+    },
+    {
+      "id": "northwest",
+      "name": "西北线下赛",
+      "place": "西安",
+      "description": "身体与线下心态更稳定，但长途参赛和曝光成本更高。",
+      "baseStats": {
+        "ability": 59,
+        "connections": 36,
+        "integrity": 77,
+        "fame": 16,
+        "health": 84,
+        "internationalAdaptation": 22
+      },
+      "variance": {
+        "ability": 8,
+        "connections": 8,
+        "integrity": 8,
+        "fame": 8
+      },
+      "initialTeamId": "team-045-atox",
+      "startingAssets": 5,
+      "contractHalfSeasons": 4,
+      "talentPoolTags": [
+        "grit",
+        "pressure"
+      ],
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      },
+      "eventWeightTags": {
+        "offline-mentality": 135,
+        "travel-cost": 120
+      },
+      "earlyOpportunityTags": [
+        "offline-mentality",
+        "travel-cost"
+      ]
+    }
+  ]
+}

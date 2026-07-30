@@ -1,4 +1,4 @@
-import type { Account, Activity, CommandLog, MatchRecord, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
+import type { Account, Activity, ChatMessage, CommandLog, MatchRecord, PersistedProposal, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
 
 export interface Repository {
   createAccount(username: string, usernameNormalized: string, passwordHash: string): Promise<Account>;
@@ -13,9 +13,15 @@ export interface Repository {
   getQueue(principalId: string): Promise<QueueEntry | null>;
   listQueues(mode: 'casual' | 'ranked'): Promise<QueueEntry[]>;
   deleteQueue(principalId: string): Promise<void>;
-  saveRoom(room: Room): Promise<void>;
+  saveProposal(proposal: PersistedProposal): Promise<void>;
+  getProposal(matchId: string): Promise<PersistedProposal | null>;
+  listDueProposals(now: Date): Promise<PersistedProposal[]>;
+  deleteProposal(matchId: string): Promise<void>;
+  saveRoom(room: Room, expectedVersion?: number): Promise<boolean>;
   getRoom(roomId: string): Promise<Room | null>;
   getRoomByCode(inviteCode: string): Promise<Room | null>;
+  appendChatMessage(message: ChatMessage): Promise<void>;
+  listChatMessages(roomId: string, limit?: number): Promise<ChatMessage[]>;
   saveMatch(match: MatchRecord): Promise<void>;
   getMatch(matchId: string): Promise<MatchRecord | null>;
   appendCommand(command: CommandLog): Promise<boolean>;
