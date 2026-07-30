@@ -22,21 +22,33 @@ export class QueueService {
     if (!activity) return { status: 'idle' as const };
     if (activity.kind === 'queue') {
       const entry = await this.repository.getQueue(principalId);
-      return entry ? { status: 'searching' as const, queueId: entry.id, joinedAt: entry.joinedAt, estimatedWaitSeconds: 10 } : { status: 'idle' as const };
+      if (entry) return { status: 'searching' as const, queueId: entry.id, joinedAt: entry.joinedAt, estimatedWaitSeconds: 10 };
+      await this.repository.releaseActivity(principalId, activity.referenceId);
+      return { status: 'idle' as const };
     }
     if (activity.kind === 'ready_check') {
       const check = this.readyChecks.get(activity.referenceId);
-      if (!check) return { status: 'idle' as const };
+      if (!check) {
+        await this.repository.releaseActivity(principalId, activity.referenceId);
+        return { status: 'idle' as const };
+      }
       return { status: 'ready_check' as const, matchId: check.matchId, accepted: check.accepted.has(principalId), deadline: check.deadline };
     }
     if (activity.kind === 'match') {
       const match = await this.repository.getMatch(activity.referenceId);
       const participant = match?.participants.find(item => item.principal.id === principalId);
-      return match && participant ? { status: 'playing' as const, matchId: match.id, side: participant.side } : { status: 'idle' as const };
+      if (match && participant) return { status: 'playing' as const, matchId: match.id, side: participant.side };
+      await this.repository.releaseActivity(principalId, activity.referenceId);
+      return { status: 'idle' as const };
     }
+    await this.repository.releaseActivity(principalId, activity.referenceId);
     return { status: 'idle' as const };
   }
-  async leave(principalId: string) { const entry=await this.repository.getQueue(principalId); if(entry){await this.repository.deleteQueue(principalId);await this.repository.releaseActivity(principalId,entry.id);} }
+  async leave(principalId: string) {
+    const entry = await this.repository.getQueue(principalId);
+    if (entry) await this.repository.deleteQueue(principalId);
+    await this.repository.releaseActivity(principalId, entry?.id);
+  }
   searchRange(entry: QueueEntry, at = this.now()) { return 100 + Math.floor(Math.max(0, at.getTime()-entry.joinedAt.getTime())/10_000)*50; }
   async match(mode: QueueMode) {
     const entries = await this.repository.listQueues(mode);
