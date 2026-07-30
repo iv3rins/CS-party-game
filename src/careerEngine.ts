@@ -89,11 +89,14 @@ const declineAtAge = (age: number) => {
 const peakAgeBonus = (age: number) => age === 21 ? 2 : age === 22 ? 1 : 0;
 export const ageDecline = (fromAge: number, toAge: number) => { let total = 0; for (let age = fromAge + 1; age <= toAge; age += 1) total += declineAtAge(age); return total; };
 
-const fallbackOutcomes = (option: DecisionOption): ProbabilityOutcome[] => [
-  { id:`${option.id}-expected`, label:option.result??'决定按预期执行，但付出了相应代价', probability:62, changes:{} },
-  { id:`${option.id}-variance`, label:'执行过程出现偏差，收益与代价发生变化', probability:38, changes:{ ability:(option.changes.ability??0)>0?-2:1, connections:(option.changes.connections??0)>0?-2:1, health:(option.changes.health??0)>0?-2:0 } },
-];
-const instantiateDecision = (template: Omit<Decision, 'id'>, id: string): Decision => ({ ...template, id, options: template.options.map(option => ({ ...option, outcomes:(option.outcomes?.length?option.outcomes:fallbackOutcomes(option)).map((outcome,index) => ({ ...outcome, id:outcome.id??`${id}-${option.id}-${index}` })) })) });
+const fallbackOutcomes = (option: DecisionOption, decisionId='decision'): ProbabilityOutcome[] => {
+  const expected=52+hash(`${decisionId}:${option.id}:fallback-probability`)%31;
+  return [
+    { id:`${option.id}-expected`, label:option.result??'决定按预期执行，但付出了相应代价', probability:expected, changes:{} },
+    { id:`${option.id}-variance`, label:'执行过程出现偏差，收益与代价发生变化', probability:100-expected, changes:{ ability:(option.changes.ability??0)>0?-2:1, connections:(option.changes.connections??0)>0?-2:1, health:(option.changes.health??0)>0?-2:0 } },
+  ];
+};
+const instantiateDecision = (template: Omit<Decision, 'id'>, id: string): Decision => ({ ...template, id, options: template.options.map(option => ({ ...option, outcomes:(option.outcomes?.length?option.outcomes:fallbackOutcomes(option,id)).map((outcome,index) => ({ ...outcome, id:outcome.id??`${id}-${option.id}-${index}` })) })) });
 const configuredDecision=(templateId:string,id:string,values:Record<string,string|number>,optionLogic:Array<Pick<DecisionOption,'id'|'changes'|'outcomes'> & {result?:string}>,filter?:(optionId:string)=>boolean):Decision=>{
   const template=getDecisionTemplate(templateId,values);
   const options=template.options.filter(option=>filter?filter(option.id):true).map(copy=>{const logic=optionLogic.find(option=>option.id===copy.id);if(!logic)throw new Error(`${templateId} 缺少选项逻辑 ${copy.id}`);const outcomes=logic.outcomes?.map(outcome=>{const text=copy.outcomes?.find(item=>item.id===outcome.id);if(!text)throw new Error(`${templateId}/${copy.id} 缺少结果文案 ${outcome.id}`);return {...outcome,label:text.label};});return {...copy,...logic,outcomes};});
@@ -116,38 +119,29 @@ const eventCountFor = (state: CareerState) => {
 };
 const pickCatalogEvent = (state:CareerState, kind:Decision['kind'], key:string, timing?:Decision['timing'],tournament?:TournamentResult,excludeCategories?:string[]) => {
   const context=eventContextFor(state,tournament);
-  const template=pickEvent(EVENT_DEFINITIONS,context,{kind,timing,excludeCategories,excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
+  const template=pickEvent(EVENT_DEFINITIONS,context,{kind,timing,excludeTimings:timing?undefined:['post-report'],excludeCategories,excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
   return template?instantiateEvent(template,`${key}-${template.catalogId}`,context):undefined;
 };
-const rookieSafeFieldEvent=(state:CareerState,key:string,tournament?:TournamentResult)=>{
+const rookieSafeFieldEvent=(state:CareerState,key:string,tournament?:TournamentResult,timing:Decision['timing']='in-season')=>{
   const context=eventContextFor(state,tournament);
-  const template=pickEvent(EVENT_DEFINITIONS,context,{kind:'field',excludeCategories:['赛事内关键局','赛事内非关键突发','伤病健康','合规风险','治安'],excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
+  const template=pickEvent(EVENT_DEFINITIONS,context,{kind:'field',timing,excludeCategories:['赛事内关键局','伤病健康','合规风险','治安'],excludeTitles:recentEventTitles(state)},seeded(state,`${key}:pick`)());
   return template?instantiateEvent(template,key,context):undefined;
 };
 const emergenciesFor = (state:CareerState) => {
-  if(state.season===1){
-    if(state.pace!=='hardcore'||seeded(state,'rookie-safe-event')()>=1)return [];
-    const event=rookieSafeFieldEvent(state,`s${state.season}-rookie-safe`);
-    return event?[event]:[];
-  }
-  if(state.season===2){
-    if(seeded(state,'rookie-severe-event')()>=.03)return [];
-    const event=pickCatalogEvent(state,'emergency',`s${state.season}-rookie-risk`,undefined,undefined,['赛事内关键局','赛事内非关键突发']);
-    return event?[event]:[];
-  }
+  if(state.season<=2)return [];
   return Array.from({ length: eventCountFor(state) }, (_, index) => pickCatalogEvent(state,'emergency',`s${state.season}-e${index+1}`,undefined,undefined,['赛事内关键局','赛事内非关键突发'])).filter((event):event is Decision=>Boolean(event));
 };
 const tournamentEventFor = (state: CareerState, result: TournamentResult, index: number) => {
   const trigger=state.season===1?(state.pace==='hardcore'?.3:state.pace==='standard'?.04:0):state.season===2?.03:state.pace==='hardcore'?.08:state.pace==='standard'?.04:0;
   if(!trigger)return undefined;
   if(seeded(state,`tournament-event-trigger:${index}:${result.tournamentId}`)()>=trigger)return undefined;
-  if(state.season<=2)return rookieSafeFieldEvent(state,`s${state.season}-t${index+1}-rookie-safe`,result);
+  if(state.season<=2)return rookieSafeFieldEvent(state,`s${state.season}-t${index+1}-rookie-safe`,result,'in-season');
   return pickCatalogEvent(state,'field',`s${state.season}-t${index+1}`, 'in-season',result);
 };
 const cnTeams=new Set(['TYLOO','Lynn Vision','Rare Atom','JiJieHao','Steel Helmet']);
 const isCnTeam=(state:CareerState)=>cnTeams.has(state.team);
 const hasInternationalResume=(state:CareerState)=>state.history.flatMap(record=>record.tournaments).some(result=>isLargeOrHigher(result.honorClass)&&result.rating>=1.08);
-const isHighPotential=(state:CareerState,rating=state.history.at(-1)?.rating??state.stats.rating)=>state.age<23&&state.ability>=75&&state.health>=65&&rating>=marketRatingFloor(state)&&state.integrity>=35;
+const isHighPotential=(state:CareerState,rating=state.history.at(-1)?.rating??state.stats.rating)=>state.hiddenFlags.worldClassPotential===1&&state.age<23&&state.ability>=75&&state.health>=65&&rating>=marketRatingFloor(state)&&state.integrity>=35;
 const internationalEligible=(state:CareerState)=>isCnTeam(state)&&state.age<23&&((state.ability>=75&&state.internationalAdaptation>=45)||(state.history.at(-1)?.rating??0)>=1.12&&hasInternationalResume(state));
 const internationalOfferFor=(state:CareerState):Decision=>configuredDecision('international-offer',`s${state.season}-international`,{},[{id:'join-international',changes:{internationalTransfer:true,contractTier:'t1',connections:-6,teamForm:-5,fame:7,internationalAdaptation:10}},{id:'stay-cn',changes:{connections:6,preserveCore:true}}]);
 const relativeTierLabel=(state:CareerState,target:ContractTier)=>{const current=teamTierForRank(state.globalRank);if(current===target)return target==='t1'?'同级 1.5 线队':'同级强队';if(target==='t1')return '升至 1.5 线';if(target==='t2')return current==='t3'?'升至二线':'降至二线';return '降至三线';};
@@ -185,15 +179,18 @@ const streamerChoiceFor=(state:CareerState):Decision=>{
     {id:'stream-tryout',changes:{assets:-(livingCost+7),connections:-2,ability:-2,employmentStatus:'streamer'},outcomes:[{id:'tryout-no-offer',label:'',probability:Math.max(12,100-Math.round(offerChance*1.15)),changes:{}},{id:'tryout-t1',label:'',probability:Math.min(88,Math.round(offerChance*1.15)),changes:{contractTier:'t1',internationalTransfer:internationalEligible(state),employmentStatus:'signed',noOfferWindows:0,connections:2,internationalAdaptation:internationalEligible(state)?6:0}}]},
   ]);
 };
-const marketOffersFor=(state:CareerState,rating:number):MarketOffer[]=>{
+const marketOffersFor=(state:CareerState,rating:number,currentResults:readonly TournamentResult[]=[]):MarketOffer[]=>{
   const baseline=marketRatingFloor(state);
   const recentRatings=[...state.history.map(record=>record.rating),rating].slice(-2);
   const priorTwo=recentRatings.length===2&&recentRatings.every(value=>value>=baseline+.06);
   const singleBreakthrough=rating>=baseline+.12;
-  if(state.season<=2||(!priorTwo&&!singleBreakthrough))return [];
+  const top1=state.top20History.at(-1)?.playerRank===1;
+  const majorChampion=currentResults.some(result=>result.tier==='Major'&&result.qualified!==false&&result.placement==='冠军')||state.history.at(-1)?.tournaments.some(result=>result.tier==='Major'&&result.placement==='冠军')===true;
+  const guaranteedT1=top1||majorChampion;
+  if(!guaranteedT1&&(state.season<=2||(!priorTwo&&!singleBreakthrough)))return [];
   const currentRank=state.globalRank;
   const currentTier=teamTierForRank(currentRank);
-  const guaranteedBand:ContractTier=currentTier==='t3'?'t2':'t1';
+  const guaranteedBand:ContractTier=guaranteedT1?'t1':currentTier==='t3'?'t2':'t1';
   const eliteEvidence=state.history.at(-1)?.tournaments.some(result=>isLargeOrHigher(result.honorClass)&&result.qualified!==false)??false;
   const extremeThreshold=state.role==='igl'&&state.iglArchetype==='awp-caller'?.20:.18;
   const extreme=rating>=baseline+extremeThreshold&&state.ability>=78&&eliteEvidence;
@@ -204,8 +201,9 @@ const marketOffersFor=(state:CareerState,rating:number):MarketOffer[]=>{
     const candidates=CAREER_TEAMS.filter(team=>team.baseRank>=range.min&&team.baseRank<=range.max&&team.id!==state.teamId);
     const team=candidates[Math.floor(seeded(state,`rating-offer:${index}:${rating}`)()*candidates.length)]??CAREER_TEAMS.find(team=>team.id!==state.teamId&&team.baseRank<currentRank)!;
     const formal=singleBreakthrough&&state.ability>=72||priorTwo;
-    const role:MarketOffer['role']=index===0&&formal?'首发':range.role;
-    return {id:`${state.season}-${team.id}-${index}`,teamId:team.id,team:team.name,rank:team.baseRank,tier:tierForRank(team.baseRank),role,salary:Math.round(monthlySalaryFor({...state,globalRank:team.baseRank})*(isHighPotential(state)?1.25:1)),contractHalfSeasons:isHighPotential(state)?6:4,signingBonus:Math.round(transferFeeFor(state)*signingRateFor(state)*(isHighPotential(state)?1.4:1)),reason:singleBreakthrough?'单季 Rating 超过位置基准 +0.12':'连续两个赛季 Rating 超过位置基准 +0.06',cost:team.baseRank<=20?'首发保障降低，需要适应更严格的体系':'离开当前队伍，关系短期下降',international:false};
+    const role:MarketOffer['role']=guaranteedT1||index===0&&formal?'首发':range.role;
+    const reason=top1?'年度 TOP1 身份获得一线战队正式报价':majorChampion?'Major 冠军履历获得一线战队正式报价':singleBreakthrough?'单季 Rating 超过位置基准 +0.12':'连续两个赛季 Rating 超过位置基准 +0.06';
+    return {id:`${state.season}-${team.id}-${index}`,teamId:team.id,team:team.name,rank:team.baseRank,tier:tierForRank(team.baseRank),role,salary:Math.round(monthlySalaryFor({...state,globalRank:team.baseRank})*(isHighPotential(state)?1.25:1)),contractHalfSeasons:isHighPotential(state)?6:4,signingBonus:Math.round(transferFeeFor(state)*signingRateFor(state)*(isHighPotential(state)?1.4:1)),reason,cost:team.baseRank<=20?'需要适应更严格的一线体系':'离开当前队伍，关系短期下降',international:false};
   });
 };
 const teammateProfile=(state:CareerState,nick:string)=>state.roster.find(player=>player.nick===nick)??{ability:60+Math.floor(seeded(state,`teammate-ability:${state.teamId}:${nick}`)()*36),fame:25+Math.floor(seeded(state,`teammate-fame:${state.teamId}:${nick}`)()*71)};
@@ -456,9 +454,12 @@ const tournamentCalendarFor = (state: CareerState) => {
     .map(tournament=>({tournament,order:seeded(state,`calendar-order:${tournament.id}`)()}))
     .sort((a,b)=>a.order-b.order)
     .map((item,index)=>hostedTournament(state,item.tournament,index));
-  const entered=ordered.filter(tournament=>invitationFor(state,tournament).invited);
+  const invitedT1=ordered.filter(tournament=>tournament.tier==='T1'&&invitationFor(state,tournament).invited);
+  const enteredOther=ordered.filter(tournament=>tournament.tier!=='T1'&&invitationFor(state,tournament).invited);
   const fallback=ordered.filter(tournament=>tournament.tier==='unranked'||tournament.tier==='T2');
-  const unique=[...new Map([...entered,...fallback].map(tournament=>[tournament.id,tournament])).values()];
+  const guaranteedT1=state.globalRank<=12?3:state.globalRank<=20?2:state.globalRank<=40?1:0;
+  const priority=[...invitedT1.slice(0,guaranteedT1),...invitedT1.slice(guaranteedT1),...enteredOther,...fallback];
+  const unique=[...new Map(priority.map(tournament=>[tournament.id,tournament])).values()];
   const reserve=1;
   const picked=unique.slice(0,count-reserve);
   picked.splice(Math.min(picked.length,Math.floor(picked.length*.65)),0,major);
@@ -520,7 +521,9 @@ const simulateTournament = (state: CareerState, tournament: typeof TOURNAMENTS[n
   const awpCallerFatigue=state.role==='igl'&&state.iglArchetype==='awp-caller'&&state.health<65?(tournament.tier==='Major'||tournament.tier==='T1'?.08:tournament.tier==='T2'?.05:.03):0;
   let rating = Number(Math.max(.55,rawRating-pressure/220+dataBonus-slumpPenalty-cnChoking+bootcampBonus-awpCallerFatigue-state.nextSeasonRatingPenalty).toFixed(2));
   const upset = upsetFor(state,tournament);
-  const adjustedPlacement = upset?.kind==='negative' ? (performance>=73?'小组赛出局':'首轮出局') : upset?.kind==='positive' ? (performance>=64?'冠军':'四强') : placement;
+  const proposedPlacement = upset?.kind==='negative' ? (performance>=73?'小组赛出局':'首轮出局') : upset?.kind==='positive' ? (performance>=64?'冠军':'四强') : placement;
+  const majorTitleChance=state.hiddenFlags.worldClassPotential===1?.08:.005;
+  const adjustedPlacement=tournament.tier==='Major'&&proposedPlacement==='冠军'&&seeded(state,`major-title:${tournament.id}`)()>=majorTitleChance?'亚军':proposedPlacement;
   const matches = adjustedPlacement === '冠军' ? 7 : adjustedPlacement === '亚军' ? 6 : adjustedPlacement === '四强' ? 5 : adjustedPlacement === '八强' ? 4 : 3;
   const wins = adjustedPlacement === '冠军' ? matches : adjustedPlacement === '亚军' ? matches - 1 : adjustedPlacement === '四强' ? matches - 1 : adjustedPlacement === '八强' ? matches - 2 : Math.max(0, matches - 2);
   const maps=Array.from({length:matches},(_,seriesIndex)=>{
@@ -618,6 +621,8 @@ const tierForCandidate=(profile:ApsProfile,honors:HonorAward[],score:number):Top
 export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecord[]): AnnualTop20 => {
   const calendarYear=CAREER_START_YEAR+state.careerYear-1;
   const results=yearRecords.flatMap(record=>record.tournaments).filter(result=>result.qualified!==false);
+  const t1Results=results.filter(result=>result.tier==='T1'||result.tier==='Major');
+  const t1Maps=t1Results.reduce((sum,result)=>sum+result.maps,0);
   const honors=yearRecords.flatMap(record=>record.honors);
   const weightedMaps=results.reduce((sum,result)=>sum+result.maps*eventWeightFor(result.honorClass,result.tier),0);
   const weightedRating=results.reduce((sum,result)=>sum+result.rating*result.maps*eventWeightFor(result.honorClass,result.tier),0)/Math.max(1,weightedMaps);
@@ -627,7 +632,7 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
   const edgeConditions=[profile.evp>=2,profile.vp>=5,profile.playoffs>=1.05].filter(Boolean).length;
   const majorMvpCount=new Set(honors.filter(honor=>honor.kind==='MVP'&&honor.honorClass==='major').map(honor=>honor.tournamentName)).size;
   const guaranteedTop1=majorMvpCount>=1&&profile.rating>=1.30&&profile.playoffs>=profile.rating&&profile.vsTop5>=1.15;
-  const eligible=profile.maps>=40||guaranteedTop1;
+  const eligible=t1Maps>=40;
   const playerTop3Qualified=playerAps>=4500&&profile.rating>=1.30&&tierQualified(profile,honors,'TOP 1');
   const seenNpcNicks=new Set<string>();
   const npcProfiles=CAREER_TEAMS.slice(0,30).flatMap(team=>team.roster.flatMap(player=>{
@@ -672,7 +677,7 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
   const rest=candidates.filter(candidate=>!top3.includes(candidate));
   const pool=[...top3,...rest].slice(0,20);
   let entries=pool.map((entry,index)=>({playerId:entry.playerId,nick:entry.nick,team:entry.team,score:Math.round(entry.score),isPlayer:entry.isPlayer,isTeammate:entry.isTeammate,rating:entry.rating,adr:entry.adr,maps:entry.maps,tier:entry.tier,rank:index+1}));
-  if(guaranteedTop1){
+  if(guaranteedTop1&&eligible){
     const playerEntry={playerId:`career-player-${state.seed}`,nick:state.name,team:state.team,score:Math.round(playerAps),isPlayer:true,isTeammate:false,rating:Number(weightedRating.toFixed(2)),adr:Math.round(weightedAdr),maps:profile.maps,tier:tierForCandidate(profile,honors,playerAps),rank:1};
     entries=[playerEntry,...entries.filter(entry=>!entry.isPlayer)].slice(0,20).map((entry,index)=>({...entry,rank:index+1}));
   }
@@ -690,7 +695,7 @@ export const generateAnnualTop20 = (state: CareerState, yearRecords: SeasonRecor
   const quoteIndex=Math.floor(seeded(state,`top20-quote-pick:${calendarYear}:${CAREER_CONTENT_VERSION}`)()*top20InterviewPolicy.quotes.length);
   const generatedQuote=playerRank&&quoteRoll*10000<top20InterviewPolicy.chanceBps?`“${top20InterviewPolicy.quotes[quoteIndex].text}”${top20InterviewPolicy.suffix}`:undefined;
   const playerTier=entries.find(entry=>entry.isPlayer)?.tier;
-  return {calendarYear,careerYear:state.careerYear,eligible,playerRank,entries,review,generatedQuote,t1Maps:profile.maps,nominationChance:eligible?100:0,apsScore:Math.round(playerAps),playerTier};
+  return {calendarYear,careerYear:state.careerYear,eligible,playerRank,entries,review,generatedQuote,t1Maps,nominationChance:eligible?100:0,apsScore:Math.round(playerAps),playerTier};
 };
 
 const applyOriginVariance = (base: number, radius:number, seed: number, originId:string,key: string) => {
@@ -713,7 +718,7 @@ export const createCareer = (input: { seed: string; name: string; pace: Pace; or
   const team = initialTeamFor(origin.id);
   return {
     version: CAREER_VERSION, rulesVersion: CAREER_RULES_VERSION, dataVersion: CAREER_DATA_VERSION, contentVersion:CAREER_CONTENT_VERSION,seed, pace: input.pace, name, origin, talents,role: input.role, defensiveSite:input.role==='entry'?'a':input.role==='support'?'b':'rotator', positionFamiliarity:clamp(68+talentEffect('positionFamiliarity')),
-    age: 16, careerYear: 1, half: 'first', season: 1, teamId: team.id, team: team.name, region: team.region, roster: rosterWithPlayer(team, name, input.role,seed), coreMemberIds:team.roster.slice(0,3).map(player=>player.id), tier: tierForRank(team.baseRank), globalRank: team.baseRank, regionRank: regionRankFor(team.baseRank, team.region), rankingPoints: Math.max(120,Math.round(1800-team.baseRank*15)), vrsActive:true, rebuildPoints:0, lastTransferFee:0, teamForm:Math.round(Math.max(55,75-team.baseRank*.15)), rosterStability:72, negativeUpsetStreak:0, internationalAdaptation:clamp(originConfig.baseStats.internationalAdaptation+talentEffect('internationalAdaptation')), cncsRevival:false, ability, connections, integrity, fame, health:clamp(originConfig.baseStats.health+talentEffect('health')), salary:initialSalaryFor(team.baseRank,ability,fame), rolePreparation: 'none', roleChangeCooldown: 0, roleChangeCount: 0, iglArchetype:input.role==='igl'?(input.iglArchetype&&input.iglArchetype!=='dynasty'?input.iglArchetype:'brain'):undefined, bootcampCount: 0, highPressureChokingRisk:clamp(20+talentEffect('highPressureChokingRisk')), hiddenFlags:{rookieStartAbility:ability}, worldlines:{}, eventHistory:{}, pendingConsequences:[], top3SeasonStreak:0, tacticalFatigue:false, crisisCooldowns:{}, nextSeasonRatingPenalty:0, employmentStatus:'signed', noOfferWindows:0, contractHalfSeasonsRemaining:originConfig.contractHalfSeasons, assets:originConfig.startingAssets, streamerWindows:0, highPotential:false, status: 'active', phase: 'ready', pendingEmergencies: [], resolvedEmergencies: [], honors: [], top20History: [],
+    age: 16, careerYear: 1, half: 'first', season: 1, teamId: team.id, team: team.name, region: team.region, roster: rosterWithPlayer(team, name, input.role,seed), coreMemberIds:team.roster.slice(0,3).map(player=>player.id), tier: tierForRank(team.baseRank), globalRank: team.baseRank, regionRank: regionRankFor(team.baseRank, team.region), rankingPoints: Math.max(120,Math.round(1800-team.baseRank*15)), vrsActive:true, rebuildPoints:0, lastTransferFee:0, teamForm:Math.round(Math.max(55,75-team.baseRank*.15)), rosterStability:72, negativeUpsetStreak:0, internationalAdaptation:clamp(originConfig.baseStats.internationalAdaptation+talentEffect('internationalAdaptation')), cncsRevival:false, ability, connections, integrity, fame, health:clamp(originConfig.baseStats.health+talentEffect('health')), salary:initialSalaryFor(team.baseRank,ability,fame), rolePreparation: 'none', roleChangeCooldown: 0, roleChangeCount: 0, iglArchetype:input.role==='igl'?(input.iglArchetype&&input.iglArchetype!=='dynasty'?input.iglArchetype:'brain'):undefined, bootcampCount: 0, highPressureChokingRisk:clamp(20+talentEffect('highPressureChokingRisk')), hiddenFlags:{rookieStartAbility:ability,worldClassPotential:makeRng(hash(`${seed}:world-class-potential:v1`))()<.05?1:0}, worldlines:{}, eventHistory:{}, pendingConsequences:[], top3SeasonStreak:0, tacticalFatigue:false, crisisCooldowns:{}, nextSeasonRatingPenalty:0, employmentStatus:'signed', noOfferWindows:0, contractHalfSeasonsRemaining:originConfig.contractHalfSeasons, assets:originConfig.startingAssets, streamerWindows:0, highPotential:false, status: 'active', phase: 'ready', pendingEmergencies: [], resolvedEmergencies: [], honors: [], top20History: [],
     stats: { matches: 0, rating: 1.01, kd: 1.02, adr: 72, trophies: 0, mvps: 0, earnings: 0, salaryIncome:0, prizeIncome:0, signingIncome:0 }, history: [], log: [`16 岁 / 生涯第 1 年上半年 / 加入 ${team.name}`, DATA_SNAPSHOT_NOTE],
   };
 };
@@ -798,7 +803,7 @@ const finishSeason = (state: CareerState): CareerState => {
   const completedHistory = [...state.history, record];
   const top3SeasonStreak=globalRank<=3?state.top3SeasonStreak+1:0;
   const dynastyCrisis=dynastyCrisisFor({...interim,top3SeasonStreak},tournaments,top3SeasonStreak);
-  const ratingOffers=employmentStatus==='signed'?marketOffersFor(interim,rating):[];
+  const ratingOffers=employmentStatus==='signed'?marketOffersFor(interim,rating,tournaments):[];
   let completed: CareerState = { ...interim,employmentStatus,top3SeasonStreak,tacticalFatigue:interim.tacticalFatigue||dynastyCrisis?.title==='王朝危机：战术被摸透',noOfferWindows:employmentStatus==='free-agent'?state.noOfferWindows+1:0,contractHalfSeasonsRemaining:nextContract,renewalEvaluation:market,marketOffers:ratingOffers.length?ratingOffers:undefined,marketHeat:ratingOffers.length?'连续进步引起多支队伍关注':undefined,status: forcedRetirement ? 'retired' : 'active', phase: forcedRetirement ? 'retired' : 'report', history: completedHistory, resolvedEmergencies: [], seasonProgress:undefined, lastEventResult:undefined, seasonBaseline: undefined, eventResume: undefined, postReportEvent: forcedRetirement ? undefined : dynastyCrisis??state.postReportEvent, log: [market?.summary,dynastyLog,crisisLog,burnoutLog,awpCallerResponsibility?`指挥狙为 Major 未晋级承担主要责任：名气额外 -${awpCallerResponsibility}`:'',growthLog,highPotential&&!state.highPotential?'年轻高潜状态生效：成长与市场机会提高':'',`生涯第 ${state.careerYear} 年${state.half === 'first' ? '上半年' : '下半年'} / 全球第 ${globalRank} / ${record.placement}`, ...state.log].filter((item):item is string=>Boolean(item)) };
   if(!forcedRetirement){
     const availableWorldlines=eligibleWorldlines(WORLDLINE_DEFINITIONS,eventContextFor(completed));
@@ -865,11 +870,11 @@ export const continueTournament = (state:CareerState):CareerState => {
   return state;
 };
 
-const outcomesFor=(option:DecisionOption)=>option.outcomes?.length?option.outcomes:fallbackOutcomes(option);
+const outcomesFor=(option:DecisionOption,decisionId='decision')=>option.outcomes?.length?option.outcomes:fallbackOutcomes(option,decisionId);
 export const previewDecisionOutcome=(state:CareerState,decision:Decision,optionId:string):OutcomePreview|null=>{
   const option=decision.options.find(item=>item.id===optionId);
   if(!option)return null;
-  const outcomes=outcomesFor(option);
+  const outcomes=outcomesFor(option,decision.id);
   const total=outcomes.reduce((sum,outcome)=>sum+outcome.probability,0);
   const roll=seeded(state,`outcome:${decision.id}:${option.id}`)()*total;
   let cumulative=0;
@@ -877,7 +882,8 @@ export const previewDecisionOutcome=(state:CareerState,decision:Decision,optionI
   return {optionId,outcomeId:outcome.id??`${decision.id}-${option.id}-${outcomes.indexOf(outcome)}`,outcomeLabel:outcome.label,probability:Number((outcome.probability/total*100).toFixed(1)),changes:outcome.changes,resultPatch:outcome.resultPatch,delayedRisk:outcome.delayed?.riskHint};
 };
 const scheduleDelayedOutcome=(state:CareerState,decision:Decision,option:DecisionOption,preview:OutcomePreview)=>{
-  const outcome=outcomesFor(option).find(item=>(item.id??`${decision.id}-${option.id}-${outcomesFor(option).indexOf(item)}`)===preview.outcomeId);
+  const optionOutcomes=outcomesFor(option,decision.id);
+  const outcome=optionOutcomes.find(item=>(item.id??`${decision.id}-${option.id}-${optionOutcomes.indexOf(item)}`)===preview.outcomeId);
   if(!outcome?.delayed)return state;
   const delaySpan=Math.max(0,outcome.delayed.maxSeasons-outcome.delayed.minSeasons);
   const dueSeason=state.season+outcome.delayed.minSeasons+Math.floor(seeded(state,`delay:${decision.id}:${option.id}:${preview.outcomeId}`)()*(delaySpan+1));
@@ -933,7 +939,11 @@ const advanceAfterReport = (state: CareerState): CareerState => {
   if (state.half === 'second' && !state.top20History.some(item => item.careerYear === state.careerYear)) {
     const yearRecords = state.history.filter(record => record.careerYear === state.careerYear);
     const award = generateAnnualTop20(state, yearRecords);
-    return { ...state, roster:applyTeammateTop20(state.roster,award), phase: 'awards', top20History: [...state.top20History, award], decision: undefined, postReportEvent: undefined, eventResume: undefined };
+    const top1=award.playerRank===1;
+    const globalRank=top1?Math.min(state.globalRank,12):state.globalRank;
+    const awardedState:CareerState={...state,globalRank,regionRank:top1?regionRankFor(globalRank,state.region):state.regionRank,tier:top1?tierForRank(globalRank):state.tier,roster:applyTeammateTop20(state.roster,award),top20History:[...state.top20History,award]};
+    const top1Offers=top1?marketOffersFor(awardedState,state.history.at(-1)?.rating??state.stats.rating):[];
+    return { ...awardedState, marketOffers:top1Offers.length?top1Offers:state.marketOffers,marketHeat:top1Offers.length?'年度 TOP1 身份触发一线正式报价':state.marketHeat,phase: 'awards', decision: undefined, postReportEvent: undefined, eventResume: undefined };
   }
   if(state.marketOffers?.length)return enterChoiceAfterReport(state);
   if(state.employmentStatus!=='signed')return enterChoiceAfterReport(state);

@@ -165,6 +165,9 @@ export interface Rating {
   draws: number;
 }
 
+export type FeedbackCategory = 'bug' | 'balance' | 'content' | 'ui' | 'other';
+export interface PlayerFeedback { id:string; gameId:'cs-career'; category:FeedbackCategory; message:string; phase?:string; saveVersion?:number; rulesVersion?:string; clientVersion?:string; principalId:string; createdAt:Date; }
+
 export interface RatingSettlement {
   matchId: string;
   accountId: string;

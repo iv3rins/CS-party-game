@@ -1,4 +1,4 @@
-import type { Account, Activity, ChatMessage, CommandLog, MatchRecord, PersistedProposal, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
+import type { Account, Activity, ChatMessage, CommandLog, MatchRecord, PersistedProposal, PlayerFeedback, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
 
 export interface Repository {
   createAccount(username: string, usernameNormalized: string, passwordHash: string): Promise<Account>;
@@ -26,6 +26,7 @@ export interface Repository {
   getMatch(matchId: string): Promise<MatchRecord | null>;
   appendCommand(command: CommandLog): Promise<boolean>;
   getCommand(matchId: string, commandId: string): Promise<CommandLog | null>;
+  submitFeedback(feedback:PlayerFeedback):Promise<void>;
   getRating(accountId: string, seasonId: string): Promise<Rating>;
   settleRanked(matchId: string, winnerAccountId: string | null, accountIds: [string, string], seasonId: string): Promise<RatingSettlement[]>;
   deleteCommandsBefore(before: Date): Promise<number>;

@@ -1,0 +1,29 @@
+[
+  {
+    "schemaVersion":"1.0","catalogId":"wl-ordinary-sunday-001","revision":1,"category":"家庭生活","kind":"offseason","timing":"in-season","title":"一个没有比赛的周日下午","briefing":"队友临时约加练，家里也只问了一句：回来吃饭吗？两边都说不来也没关系。","tags":["worldline:wl-ordinary-sunday:ordinary-sunday","普通选择","家庭"],"source":{"type":"human-authored","reviewStatus":"approved","reviewer":"career-event-design"},"minAge":18,"maxAge":20,"eligibility":{"op":"all","args":[{"op":"lte","left":{"var":"player.ability"},"right":{"const":74}}]},"triggerWeight":{"const":95},"cooldownSeasons":8,"maxOccurrences":1,"worldline":{"worldlineId":"wl-ordinary-sunday","stages":["ordinary-sunday"],"statuses":["active"]},
+    "options":[
+      {"id":"stay-for-pugs","label":"留下打几张图","detail":"小幅提升训练与默契，错过一顿普通家宴。","changes":{"ability":1,"connections":1},"worldlineTransitions":[{"worldlineId":"wl-ordinary-sunday","action":"advance","toStage":"quiet-distance","branchId":"chose-team"}],"outcomes":[
+        {"id":"routine-session","label":"加练平淡结束","probability":65,"changes":{},"delayed":{"tag":"missed-family-sunday","riskHint":"这顿饭以后未必还凑得齐","minSeasons":3,"maxSeasons":4,"changes":{"connections":-4,"health":-1},"revealText":"后来家里聚餐时，大家已经习惯不等你了。"}},
+        {"id":"useful-session","label":"加练帮你坐稳位置","probability":35,"changes":{"ability":2,"connections":2},"delayed":{"tag":"missed-family-sunday","riskHint":"职业收益可能换来家庭距离","minSeasons":3,"maxSeasons":4,"changes":{"connections":-6,"health":-2},"revealText":"翻到当天聊天记录时，你已想不起那顿饭谁坐在你的位子上。"}}
+      ]},
+      {"id":"take-train-home","label":"赶末班车回家","detail":"恢复健康，缺席一次看似普通的队内加练。","changes":{"health":2,"connections":1,"ability":-1},"worldlineTransitions":[{"worldlineId":"wl-ordinary-sunday","action":"advance","toStage":"quiet-distance","branchId":"chose-family"}],"outcomes":[
+        {"id":"ordinary-dinner","label":"吃了一顿普通晚饭","probability":65,"changes":{"health":1},"delayed":{"tag":"missed-team-sunday","riskHint":"队内默契可能在缺席时重新排列","minSeasons":3,"maxSeasons":4,"changes":{"connections":-3,"positionFamiliarity":-3},"revealText":"队友回忆磨合期时说的是‘我们几个’，其中已经没有你。"}},
+        {"id":"warm-dinner","label":"久违地和家人坐在一起","probability":35,"changes":{"health":3,"connections":2},"delayed":{"tag":"missed-team-sunday","riskHint":"原本的位置可能被别人练熟","minSeasons":3,"maxSeasons":4,"changes":{"connections":-5,"positionFamiliarity":-4},"revealText":"新分工公布时，你原来的位置已经被别人练熟。"}}
+      ]}
+    ]
+  },
+  {
+    "schemaVersion":"1.0","catalogId":"wl-ordinary-sunday-002","revision":1,"category":"家庭生活","kind":"offseason","timing":"in-season","title":"又一锅慢慢凉掉的汤","briefing":"22岁后，你终于听懂家里那句‘忙就别回来’。这个窗口又有一顿饭。","tags":["worldline:wl-ordinary-sunday:quiet-distance","救赎"],"source":{"type":"human-authored","reviewStatus":"approved","reviewer":"career-event-design"},"minAge":22,"maxAge":35,"requiresHiddenFlag":"missed-family-sunday","eligibility":{"op":"gte","left":{"var":"career.age"},"right":{"const":22}},"triggerWeight":{"const":90},"cooldownSeasons":8,"maxOccurrences":1,"worldline":{"worldlineId":"wl-ordinary-sunday","stages":["quiet-distance"],"statuses":["active"]},
+    "options":[
+      {"id":"book-ticket","label":"先买票，再请假","detail":"放弃活动和收入，用行动修复关系。","changes":{"assets":-3,"fame":-2,"connections":7,"health":4},"worldlineTransitions":[{"worldlineId":"wl-ordinary-sunday","action":"complete","toStage":"quiet-distance","branchId":"family-repaired"}],"outcomes":[{"id":"seat-kept","label":"你回到一直留着的椅子","probability":70,"changes":{"connections":4}},{"id":"slow-warmth","label":"生疏之后，家里又开始问你的日期","probability":30,"changes":{"connections":2,"health":1}}]},
+      {"id":"weekly-call","label":"固定每周打一通电话","detail":"不承诺盛大补偿，只保证不会再次失联。","changes":{"connections":5,"health":2},"worldlineTransitions":[{"worldlineId":"wl-ordinary-sunday","action":"complete","toStage":"quiet-distance","branchId":"family-repaired"}],"outcomes":[{"id":"conversation","label":"聊天不再只剩吃了吗","probability":65,"changes":{"connections":3}},{"id":"slow-repair","label":"修复很慢，但不再继续变淡","probability":35,"changes":{"connections":1}}]}
+    ]
+  },
+  {
+    "schemaVersion":"1.0","catalogId":"wl-ordinary-sunday-003","revision":1,"category":"队内体系","kind":"offseason","timing":"in-season","title":"训练室里空着的椅子","briefing":"22岁后，你发现老队友仍在练那套配合，只是身边已经换了人。","tags":["worldline:wl-ordinary-sunday:quiet-distance","救赎"],"source":{"type":"human-authored","reviewStatus":"approved","reviewer":"career-event-design"},"minAge":22,"maxAge":35,"requiresHiddenFlag":"missed-team-sunday","eligibility":{"op":"gte","left":{"var":"career.age"},"right":{"const":22}},"triggerWeight":{"const":90},"cooldownSeasons":8,"maxOccurrences":1,"worldline":{"worldlineId":"wl-ordinary-sunday","stages":["quiet-distance"],"statuses":["active"]},
+    "options":[
+      {"id":"ask-review","label":"带两杯咖啡一起复盘","detail":"放低姿态，重新进入彼此的训练节奏。","changes":{"assets":-1,"connections":6,"positionFamiliarity":5},"worldlineTransitions":[{"worldlineId":"wl-ordinary-sunday","action":"complete","toStage":"quiet-distance","branchId":"team-repaired"}],"outcomes":[{"id":"start-over","label":"他把时间轴拖回开头","probability":70,"changes":{"connections":4,"teamForm":2}},{"id":"polite-return","label":"气氛客气，但你回到了训练房","probability":30,"changes":{"connections":2,"positionFamiliarity":2}}]},
+      {"id":"unwanted-role","label":"先把没人做的位置做好","detail":"牺牲数据，用脏活重新换取信任。","changes":{"ability":-2,"connections":5,"positionFamiliarity":7,"teamForm":3},"worldlineTransitions":[{"worldlineId":"wl-ordinary-sunday","action":"complete","toStage":"quiet-distance","branchId":"team-repaired"}],"outcomes":[{"id":"flash-trust","label":"他们又开始等你的闪光","probability":65,"changes":{"connections":4,"rosterStability":3}},{"id":"trust-not-role","label":"没拿回位置，但拿回了信任","probability":35,"changes":{"connections":3,"fame":-1}}]}
+    ]
+  }
+]

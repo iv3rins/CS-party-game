@@ -58,9 +58,11 @@ run_migrations() {
   local migration_file="$SOURCE_DIR/server/migrations/001_initial.sql"
   local production_migration_file="$SOURCE_DIR/server/migrations/002_production_infrastructure.sql"
   local room_member_migration_file="$SOURCE_DIR/server/migrations/003_fix_room_member_history.sql"
+  local feedback_migration_file="$SOURCE_DIR/server/migrations/004_player_feedback.sql"
   [[ -f "$migration_file" ]] || fail "迁移文件不存在: $migration_file"
   [[ -f "$production_migration_file" ]] || fail "迁移文件不存在: $production_migration_file"
   [[ -f "$room_member_migration_file" ]] || fail "迁移文件不存在: $room_member_migration_file"
+  [[ -f "$feedback_migration_file" ]] || fail "迁移文件不存在: $feedback_migration_file"
 
   # 所有结构迁移必须由 PostgreSQL 管理员执行，应用用户不应拥有 ALTER TABLE 权限。
   if sudo -u postgres psql -d "$DATABASE_NAME" -c "\dt accounts" 2>/dev/null | grep -q accounts; then
@@ -73,6 +75,7 @@ run_migrations() {
   log "执行生产结构迁移"
   sudo -u postgres psql -v ON_ERROR_STOP=1 -d "$DATABASE_NAME" -f "$production_migration_file"
   sudo -u postgres psql -v ON_ERROR_STOP=1 -d "$DATABASE_NAME" -f "$room_member_migration_file"
+  sudo -u postgres psql -v ON_ERROR_STOP=1 -d "$DATABASE_NAME" -f "$feedback_migration_file"
 
   log "授权数据库应用用户"
   sudo -u postgres psql -v ON_ERROR_STOP=1 -d "$DATABASE_NAME" \

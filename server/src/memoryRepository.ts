@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { Account, Activity, ChatMessage, CommandLog, MatchRecord, PersistedProposal, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
+import type { Account, Activity, ChatMessage, CommandLog, MatchRecord, PersistedProposal, PlayerFeedback, Principal, QueueEntry, Rating, RatingSettlement, Room, Session } from './domain.js';
 import type { Repository } from './repository.js';
 import { defaultGlickoRating, settleGlicko2 } from './glicko2.js';
 
@@ -17,6 +17,7 @@ export class MemoryRepository implements Repository {
   private commands = new Map<string, CommandLog>();
   private ratings = new Map<string, Rating>();
   private settlements = new Map<string, RatingSettlement[]>();
+  private feedback:PlayerFeedback[]=[];
 
   async createAccount(username: string, usernameNormalized: string, passwordHash: string) {
     if ([...this.accounts.values()].some(account => account.usernameNormalized === usernameNormalized)) throw new Error('USERNAME_TAKEN');
@@ -67,6 +68,7 @@ export class MemoryRepository implements Repository {
     return true;
   }
   async getCommand(matchId: string, commandId: string) { return copy(this.commands.get(`${matchId}:${commandId}`) ?? null); }
+  async submitFeedback(feedback:PlayerFeedback){this.feedback.push(copy(feedback));}
   async getRating(accountId: string, seasonId: string) {
     const key = `${accountId}:${seasonId}`;
     const rating = this.ratings.get(key) ?? defaultGlickoRating(accountId, seasonId);

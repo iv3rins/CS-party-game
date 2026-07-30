@@ -57,6 +57,8 @@ describe('online lobby HTTP contract', () => {
     expect(new Set([firstState.side, secondState.side])).toEqual(new Set(['ct', 't']));
   });
 
+  it('accepts bounded CS Career feedback from a signed session',async()=>{const app=await makeApp();const cookie=await guestCookie(app);const response=await app.inject({method:'POST',url:'/api/feedback',headers:{cookie},payload:{gameId:'cs-career',category:'balance',message:'Major 冠军过于容易获得',phase:'report',saveVersion:17,rulesVersion:'test'}});expect(response.statusCode).toBe(201);});
+
   it('lets another browser join a private room by its six digit code', async () => {
     const app = await makeApp();
     const hostCookie = await guestCookie(app);

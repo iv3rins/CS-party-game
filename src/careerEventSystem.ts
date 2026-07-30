@@ -5,7 +5,7 @@ import type {
 } from './careerEventTypes';
 
 export interface EventValidationResult { valid: boolean; errors: string[]; }
-export interface EventQuery { kind: EventKind; timing?: EventTiming; categories?: string[]; excludeCategories?: string[]; excludeCatalogIds?: string[]; excludeTitles?: string[]; }
+export interface EventQuery { kind: EventKind; timing?: EventTiming; excludeTimings?: EventTiming[]; categories?: string[]; excludeCategories?: string[]; excludeCatalogIds?: string[]; excludeTitles?: string[]; }
 
 const STAT_KEYS = new Set<keyof StatChange>(['ability','connections','integrity','fame','health','earnings','signingBonus','contractSalary','assets','teamForm','rosterStability','positionFamiliarity','defensiveSite','resetVrs','preserveCore','transfer','internationalTransfer','contractTier','contractTeamId','contractHalfSeasons','employmentStatus','noOfferWindows','rolePreparation','roleChange','iglArchetype','bootcampBonus','highPressureChokingRisk','internationalAdaptation']);
 const KINDS = new Set(['emergency','field','offseason','annual']);
@@ -156,10 +156,13 @@ export const parseEventPack=(value:unknown):{events:CareerEventDefinition[];erro
   return {events,errors};
 };
 
-const fallbackOutcomeDefinitions=(option:DecisionOption):ProbabilityOutcomeDefinition[]=>[
-  {id:`${option.id}-expected`,label:option.result??'决定按预期执行，但付出了相应代价',probability:62,changes:{}},
-  {id:`${option.id}-variance`,label:'执行过程出现偏差，收益与代价发生变化',probability:38,changes:{ability:(option.changes.ability??0)>0?-2:1,connections:(option.changes.connections??0)>0?-2:1,health:(option.changes.health??0)>0?-2:0}},
-];
+const fallbackOutcomeDefinitions=(option:DecisionOption,instanceId:string):ProbabilityOutcomeDefinition[]=>{
+  const expected=52+[...`${instanceId}:${option.id}`].reduce((value,char)=>(value*31+char.charCodeAt(0))>>>0,7)%31;
+  return [
+    {id:`${option.id}-expected`,label:option.result??'决定按预期执行，但付出了相应代价',probability:expected,changes:{}},
+    {id:`${option.id}-variance`,label:'执行过程出现偏差，收益与代价发生变化',probability:100-expected,changes:{ability:(option.changes.ability??0)>0?-2:1,connections:(option.changes.connections??0)>0?-2:1,health:(option.changes.health??0)>0?-2:0}},
+  ];
+};
 const normalizeOutcomes=(definitions:ProbabilityOutcomeDefinition[],context:CareerEventContext,instanceId:string,optionId:string):ProbabilityOutcome[]=>{
   const weights=definitions.map(outcome=>weightOf(outcome.weight,context,outcome.probability??0));
   const total=weights.reduce((sum,weight)=>sum+weight,0);
@@ -173,7 +176,7 @@ const normalizeOutcomes=(definitions:ProbabilityOutcomeDefinition[],context:Care
 export const instantiateEvent=(definition:CareerEventDefinition,instanceId:string,context:CareerEventContext):Decision=>{
   const options:DecisionOption[]=definition.options.map(option=>{
     const base={...option,changes:{...option.changes}} as DecisionOption;
-    const outcomes=normalizeOutcomes(option.outcomes?.length?option.outcomes:fallbackOutcomeDefinitions(base),context,instanceId,option.id);
+    const outcomes=normalizeOutcomes(option.outcomes?.length?option.outcomes:fallbackOutcomeDefinitions(base,instanceId),context,instanceId,option.id);
     const detail=option.detail??outcomes.map(outcome=>`${outcome.probability}% ${outcome.delayed?'存在长期风险':outcome.label}`).join(' / ');
     return {...base,detail,outcomes};
   });
@@ -199,6 +202,7 @@ export const isEventEligible=(definition:CareerEventDefinition,context:CareerEve
 export const queryEvents=(definitions:readonly CareerEventDefinition[],context:CareerEventContext,query:EventQuery)=>definitions.filter(definition=>{
   if(definition.kind!==query.kind)return false;
   if(query.timing&&definition.timing&&definition.timing!==query.timing)return false;
+  if(query.excludeTimings?.includes(definition.timing as EventTiming))return false;
   if(query.categories&&!query.categories.includes(definition.category))return false;
   if(query.excludeCategories?.includes(definition.category))return false;
   if(query.excludeCatalogIds?.includes(definition.catalogId))return false;

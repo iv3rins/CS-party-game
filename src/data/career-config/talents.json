@@ -1,17 +1,209 @@
 {
-  "schemaVersion":"1.0",
-  "contentVersion":"career-content-v1",
-  "selectionPolicy":{"count":2},
-  "talents":[
-    {"id":"first-bullet-instinct","revision":1,"name":"首发直觉","description":"进入对枪状态更快，但更容易依赖临场感觉。","weight":70,"poolTags":["mechanics"],"exclusiveGroup":"mechanical-style","effects":{"ability":3,"highPressureChokingRisk":2},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"patient-reader","revision":1,"name":"耐心读局","description":"更擅长等待信息，个人爆发成长相对平缓。","weight":65,"poolTags":["tactics","learning"],"exclusiveGroup":"decision-style","effects":{"connections":2,"ability":1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"pressure-reader","revision":1,"name":"大场面阅读","description":"高压回合中的判断更稳定，日常数据没有额外优势。","weight":35,"poolTags":["pressure","grit"],"exclusiveGroup":"pressure-style","effects":{"highPressureChokingRisk":-8,"fame":1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"training-sponge","revision":1,"name":"训练海绵","description":"吸收新体系更快，但初期个人风格不够鲜明。","weight":55,"poolTags":["learning","discipline"],"exclusiveGroup":"growth-style","effects":{"positionFamiliarity":5,"fame":-1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"locker-room-bridge","revision":1,"name":"更衣室桥梁","description":"容易连接不同性格的队友，也会承担更多沟通负担。","weight":60,"poolTags":["network","communication"],"exclusiveGroup":"social-style","effects":{"connections":5,"health":-1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"cross-region-ear","revision":1,"name":"跨区语感","description":"理解不同赛区沟通方式更快，国内人脉成长较慢。","weight":50,"poolTags":["adaptation","communication"],"exclusiveGroup":"adaptation-style","effects":{"internationalAdaptation":8,"connections":-1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"disciplined-routine","revision":1,"name":"纪律作息","description":"身体状态更稳定，但临时加练的收益不会特别突出。","weight":65,"poolTags":["discipline","grit"],"exclusiveGroup":"routine-style","effects":{"health":4,"ability":-1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"self-made-grit","revision":1,"name":"草根韧性","description":"逆境中更愿意继续投入，但早期资源仍然有限。","weight":70,"poolTags":["grit"],"exclusiveGroup":"pressure-style","effects":{"health":2,"integrity":2},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"analytical-memory","revision":1,"name":"战术记忆","description":"更快记住复杂默认和对手习惯，关系建立较慢。","weight":45,"poolTags":["tactics","learning"],"exclusiveGroup":"decision-style","effects":{"ability":2,"connections":-1},"source":{"type":"human-authored","reviewStatus":"approved"}},
-    {"id":"camera-composure","revision":1,"name":"镜头镇定","description":"面对采访和关注更自然，也更容易被推到公众面前。","weight":45,"poolTags":["network","adaptation"],"exclusiveGroup":"social-style","effects":{"fame":4,"highPressureChokingRisk":1},"source":{"type":"human-authored","reviewStatus":"approved"}}
+  "schemaVersion": "1.0",
+  "contentVersion": "career-content-v1",
+  "selectionPolicy": {
+    "count": 2
+  },
+  "talents": [
+    {
+      "id": "first-bullet-instinct",
+      "revision": 1,
+      "name": "首发直觉",
+      "description": "进入对枪状态更快，但更容易依赖临场感觉。",
+      "weight": 70,
+      "poolTags": [
+        "mechanics"
+      ],
+      "exclusiveGroup": "mechanical-style",
+      "effects": {
+        "ability": 6,
+        "highPressureChokingRisk": 2
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "patient-reader",
+      "revision": 1,
+      "name": "耐心读局",
+      "description": "更擅长等待信息，个人爆发成长相对平缓。",
+      "weight": 65,
+      "poolTags": [
+        "tactics",
+        "learning"
+      ],
+      "exclusiveGroup": "decision-style",
+      "effects": {
+        "connections": 2,
+        "ability": 2
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "pressure-reader",
+      "revision": 1,
+      "name": "大场面阅读",
+      "description": "高压回合中的判断更稳定，日常数据没有额外优势。",
+      "weight": 35,
+      "poolTags": [
+        "pressure",
+        "grit"
+      ],
+      "exclusiveGroup": "pressure-style",
+      "effects": {
+        "highPressureChokingRisk": -8,
+        "fame": 1
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "training-sponge",
+      "revision": 1,
+      "name": "训练海绵",
+      "description": "吸收新体系更快，但初期个人风格不够鲜明。",
+      "weight": 55,
+      "poolTags": [
+        "learning",
+        "discipline"
+      ],
+      "exclusiveGroup": "growth-style",
+      "effects": {
+        "positionFamiliarity": 5,
+        "fame": -1,
+        "ability": 3
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "locker-room-bridge",
+      "revision": 1,
+      "name": "更衣室桥梁",
+      "description": "容易连接不同性格的队友，也会承担更多沟通负担。",
+      "weight": 60,
+      "poolTags": [
+        "network",
+        "communication"
+      ],
+      "exclusiveGroup": "social-style",
+      "effects": {
+        "connections": 5,
+        "health": -1
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "cross-region-ear",
+      "revision": 1,
+      "name": "跨区语感",
+      "description": "理解不同赛区沟通方式更快，国内人脉成长较慢。",
+      "weight": 50,
+      "poolTags": [
+        "adaptation",
+        "communication"
+      ],
+      "exclusiveGroup": "adaptation-style",
+      "effects": {
+        "internationalAdaptation": 8,
+        "connections": -1
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "disciplined-routine",
+      "revision": 1,
+      "name": "纪律作息",
+      "description": "身体状态更稳定，但临时加练的收益不会特别突出。",
+      "weight": 65,
+      "poolTags": [
+        "discipline",
+        "grit"
+      ],
+      "exclusiveGroup": "routine-style",
+      "effects": {
+        "health": 4,
+        "ability": -4
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "self-made-grit",
+      "revision": 1,
+      "name": "草根韧性",
+      "description": "逆境中更愿意继续投入，但早期资源仍然有限。",
+      "weight": 70,
+      "poolTags": [
+        "grit"
+      ],
+      "exclusiveGroup": "pressure-style",
+      "effects": {
+        "health": 2,
+        "integrity": 2,
+        "ability": 1
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "analytical-memory",
+      "revision": 1,
+      "name": "战术记忆",
+      "description": "更快记住复杂默认和对手习惯，关系建立较慢。",
+      "weight": 45,
+      "poolTags": [
+        "tactics",
+        "learning"
+      ],
+      "exclusiveGroup": "decision-style",
+      "effects": {
+        "ability": 5,
+        "connections": -1
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    },
+    {
+      "id": "camera-composure",
+      "revision": 1,
+      "name": "镜头镇定",
+      "description": "面对采访和关注更自然，也更容易被推到公众面前。",
+      "weight": 45,
+      "poolTags": [
+        "network",
+        "adaptation"
+      ],
+      "exclusiveGroup": "social-style",
+      "effects": {
+        "fame": 4,
+        "highPressureChokingRisk": 1
+      },
+      "source": {
+        "type": "human-authored",
+        "reviewStatus": "approved"
+      }
+    }
   ]
 }

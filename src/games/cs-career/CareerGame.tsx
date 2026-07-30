@@ -4,6 +4,7 @@ import { advanceTournament, becomeStreamer, CareerState, CareerTrophy, clearCare
 import { platform } from '../../platform';
 import { RoleIcon } from '../../shared/icons';
 import { MVPCelebration } from '../../components/career/MVPCelebration';
+import { CareerFeedback } from '../../components/career/CareerFeedback';
 import { InlineTournamentBadge, TournamentBadge } from '../../components/career/TournamentBadge';
 import '../../styles/mvp-celebration.css';
 import '../../styles/tournament-badges.css';
@@ -255,6 +256,7 @@ function OutcomeDecision({state,decision,onCommit}:{state:CareerState;decision:D
   const windowRef=useRef<HTMLDivElement|null>(null);
   const resultRef=useRef<HTMLDivElement|null>(null);
   const [mobile,setMobile]=useState(()=>typeof window!=='undefined'&&window.matchMedia('(max-width: 850px)').matches);
+  useEffect(()=>{setSelected(null);setPreview(null);setStage('choices');setTrackX(0);},[decision.id]);
   const option=decision.options.find(item=>item.id===selected);
   const slotData=preview&&option?.outcomes?.length?buildSlotTickets(option.outcomes,preview.outcomeId):null;
   const targetX=slotData&&windowRef.current?windowRef.current.clientWidth/2-SLOT_PADDING-slotData.winnerIndex*(SLOT_CELL_WIDTH+SLOT_GAP)-SLOT_CELL_WIDTH/2:0;
@@ -359,5 +361,5 @@ export default function CareerApp() {
   const restart = () => { clearCareer(); setCareer(null); };
   if (!career) return <Entry onStart={setCareer} />;
   if (career.status === 'retired') return <Retired state={career} onRestart={restart} />;
-  return <ActiveCareer state={career} setState={setCareer} onRestart={restart} />;
+  return <><ActiveCareer state={career} setState={setCareer} onRestart={restart}/><CareerFeedback phase={career.phase} saveVersion={career.version} rulesVersion={career.rulesVersion}/></>;
 }

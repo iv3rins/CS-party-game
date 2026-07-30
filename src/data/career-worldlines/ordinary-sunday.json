@@ -1,0 +1,25 @@
+[
+  {
+    "schemaVersion": "1.0",
+    "worldlineId": "wl-ordinary-sunday",
+    "revision": 1,
+    "title": "普通星期天",
+    "description": "一次普通的周日选择，几年后变成需要认真弥补的遗憾。",
+    "tags": ["普通人", "家庭", "队友", "可修复遗憾"],
+    "source": {"type": "human-authored", "reviewStatus": "approved", "reviewer": "career-worldline-design"},
+    "entry": {"op": "all", "args": [
+      {"op": "gte", "left": {"var": "career.age"}, "right": {"const": 18}},
+      {"op": "lte", "left": {"var": "career.age"}, "right": {"const": 20}},
+      {"op": "lte", "left": {"var": "player.ability"}, "right": {"const": 74}}
+    ]},
+    "initialStage": "ordinary-sunday",
+    "stages": [
+      {"id": "ordinary-sunday", "title": "空下来的周日", "description": "队友约加练，家里问你是否回来吃饭。", "eventTags": ["worldline:wl-ordinary-sunday:ordinary-sunday"]},
+      {"id": "quiet-distance", "title": "悄悄拉开的距离", "description": "没有争吵，只是彼此不再默认你会出现。", "eventTags": ["worldline:wl-ordinary-sunday:quiet-distance"]}
+    ],
+    "endings": [
+      {"id": "family-repaired", "title": "补上的那顿饭", "description": "用稳定陪伴重新接上关系。"},
+      {"id": "team-repaired", "title": "重新坐回旁边", "description": "把缺席的信任一场场补回来。"}
+    ]
+  }
+]

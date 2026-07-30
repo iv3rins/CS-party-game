@@ -101,7 +101,7 @@ describe('career weighted event contracts', () => {
   });
 
   it('previews outcomes deterministically and rejects a forged result', () => {
-    let state = startSeason(create('weighted-preview'));
+    let state = startSeason({...create('weighted-preview'),season:3,careerYear:2,age:17});
     for (let i = 0; i < 12 && state.phase !== 'emergency'; i += 1) state = advanceTournament(state);
     expect(state.phase).toBe('emergency');
     const decision = state.decision!;
@@ -161,12 +161,15 @@ describe('career weighted event contracts', () => {
   it('guarantees annual TOP1 for two distinct Major MVPs and keeps a full TOP20', () => {
     const state=createCareer({seed:'double-major',name:'Spec',pace:'fast',originId:'academy',role:'entry'});
     const context={major:1.31,elite:1.31,playoffs:1.31,arena:1.28,bigMatches:1.25,finals:1.30,elimination:1.28,vsTop5:1.20,vsTop10:1.22,vsTop20:1.24};
-    const tournament=(id:string):TournamentResult=>({id,tournamentId:id,name:`${id} Major`,organizer:'虚构赛事方',city:'成都',tier:'Major',honorClass:'major',invited:true,qualified:true,invitationReason:'测试',placement:'冠军',matches:5,wins:5,maps:15,mapWins:10,teamPrize:100,playerPrize:13.6,salaryPaid:0,rating:1.31,rankingDelta:10,context});
+    const tournament=(id:string):TournamentResult=>({id,tournamentId:id,name:`${id} Major`,organizer:'虚构赛事方',city:'成都',tier:'Major',honorClass:'major',invited:true,qualified:true,invitationReason:'测试',placement:'冠军',matches:7,wins:7,maps:20,mapWins:14,teamPrize:100,playerPrize:13.6,salaryPaid:0,rating:1.31,rankingDelta:10,context});
     const record=(half:'first'|'second',result:TournamentResult):SeasonRecord=>{const mvp:HonorAward={id:`${result.id}-mvp`,season:half==='first'?1:2,tournamentName:result.name,kind:'MVP',honorClass:'major'};return {season:half==='first'?1:2,careerYear:1,half,age:16,team:state.team,tier:state.tier,rating:1.31,kd:1,adr:70,matches:5,winRate:50,placement:'冠军',teamPrize:100,playerPrize:13.6,salaryPaid:0,note:'测试',deltas:{ability:0,connections:0,integrity:0,fame:0,health:0,earnings:0},tournaments:[result],globalRank:10,regionRank:1,rankingDelta:10,honors:[mvp]};};
     const annual=generateAnnualTop20(state,[record('first',tournament('spring')),record('second',tournament('autumn'))]);
     expect(annual).toMatchObject({eligible:true,playerRank:1});
     expect(annual.entries).toHaveLength(20);
     expect(annual.entries.filter(entry=>entry.isPlayer)).toEqual([expect.objectContaining({rank:1,nick:'Spec'})]);
+    const shortMajor=tournament('short');shortMajor.maps=19;
+    const shortAnnual=generateAnnualTop20(state,[record('first',shortMajor)]);
+    expect(shortAnnual).toMatchObject({eligible:false,playerRank:undefined});
     const championRoster={...state,roster:state.roster.map((player,index)=>player.isPlayer?player:{...player,ability:92-index,seasonPerformances:[{season:1,careerYear:1,rating:1.18+index*.01,adr:78+index,maps:52,mvp:index===1?1:0,evp:2,vp:3,majorTitles:1,eliteTitles:2},{season:2,careerYear:1,rating:1.2+index*.01,adr:79+index,maps:54,mvp:0,evp:2,vp:3,majorTitles:1,eliteTitles:2}]})};
     const championAnnual=generateAnnualTop20(championRoster,[record('first',tournament('spring')),record('second',tournament('autumn'))]);
     const rankedTeammates=championAnnual.entries.filter(entry=>entry.isTeammate);
@@ -201,10 +204,13 @@ describe('career weighted event contracts', () => {
     expect(streamer.decision).toEqual(becomeStreamer(state).decision);
   });
 
-  it('never offers match decisions before the first tournament starts', () => {
+  it('keeps rookie protection clear of match and post-report events', () => {
     for (const seed of ['pre-match-1','pre-match-2','pre-match-3','pre-match-4','pre-match-5']) {
       const state=startSeason(createCareer({seed,name:'Timing',pace:'hardcore',originId:'academy',role:'entry'}));
-      if(state.phase==='emergency')expect(state.decision?.category).not.toMatch(/^赛事内/);
+      if(state.phase==='emergency'){
+        expect(state.decision?.category).not.toMatch(/^赛事内/);
+        expect(state.decision?.title).not.toBe('赛季末体系坚持');
+      }
     }
   });
 
@@ -235,6 +241,11 @@ describe('career weighted event contracts', () => {
     expect(superElite.every(item => item.honorClass === 'super-elite' && item.tier !== 'Major')).toBe(true);
     expect(first[0].name).toMatch(/^(PJL|ESI|遮天电竞|BURST|NovaLadder) .+ Major$/);
     expect(MAJOR_CITIES).toContain(first[0].city);
+    for(const rank of [5,12,20]){
+      const ranked=startSeason({...create(`t1-calendar-${rank}`),globalRank:rank,regionRank:1});
+      const t1Count=ranked.seasonProgress!.tournamentIds.filter(id=>TOURNAMENTS.find(item=>item.id===id)?.tier==='T1').length;
+      expect(t1Count).toBeGreaterThanOrEqual(rank<=12?3:2);
+    }
     if(first[0].qualified===false)expect(first[0]).toMatchObject({placement:'预选出局',matches:0,teamPrize:0,playerPrize:0});
     if(first[0].qualified===false){expect(first[0].qualifierStage).toBeTruthy();expect(first[0].qualifierOpponent).toBeTruthy();expect(first[0].qualifierScore).toMatch(/^[01]:2$/);}
   });
@@ -259,6 +270,13 @@ describe('career weighted event contracts', () => {
     }
     expect(found?.tacticalFatigue).toBe(true);
     expect(found?.postReportEvent?.title).toBe('王朝危机：战术被摸透');
+  });
+
+  it('enforces semantic age bounds from event JSON', () => {
+    const retirement=ALL_CAREER_EVENTS.find(event=>event.catalogId==='core-184')!;
+    const rookie=ALL_CAREER_EVENTS.find(event=>event.catalogId==='core-183')!;
+    expect(retirement).toMatchObject({minAge:30});
+    expect(rookie).toMatchObject({minAge:16,maxAge:22});
   });
 
   it('uses APS without a random nomination gate', () => {
