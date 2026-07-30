@@ -124,6 +124,37 @@ describe('career weighted event contracts', () => {
     if(first[0].qualified===false){expect(first[0].qualifierStage).toBeTruthy();expect(first[0].qualifierOpponent).toBeTruthy();expect(first[0].qualifierScore).toMatch(/^[01]:2$/);}
   });
 
+  it('applies deterministic burnout penalties to low-health AWP callers', () => {
+    const awpCaller=createCareer({seed:'awp-caller-burnout',name:'Caller',pace:'standard',originId:'academy',role:'igl',iglArchetype:'awp-caller'});
+    const healthy={...awpCaller,health:90,globalRank:15,regionRank:5};
+    const tired={...healthy,health:50};
+    const settle=(initial:typeof healthy)=>{let state=startSeason(initial);while(state.phase!=='report'){if(state.phase==='emergency'&&state.decision)state=resolveEmergency(state,state.decision.options[0].id);else state=advanceTournament(state);}return state;};
+    const healthyReport=settle(healthy).history[0];
+    const tiredReport=settle(tired).history[0];
+    expect(healthyReport.rating-tiredReport.rating).toBeGreaterThanOrEqual(.04);
+  });
+
+  it('triggers tactical fatigue after three consecutive top-three half seasons', () => {
+    const state=createCareer({seed:'meta-shift',name:'Dynasty',pace:'standard',originId:'academy',role:'igl',iglArchetype:'brain'});
+    let found:typeof state|undefined;
+    for(let index=0;index<80&&!found;index+=1){
+      let report=startSeason({...state,seed:state.seed+index,globalRank:1,regionRank:1,rankingPoints:2400,top3SeasonStreak:2,ability:100,teamForm:100,rosterStability:100});
+      while(report.phase!=='report'){if(report.phase==='emergency'&&report.decision)report=resolveEmergency(report,report.decision.options[0].id);else report=advanceTournament(report);}
+      if(report.tacticalFatigue)found=report;
+    }
+    expect(found?.tacticalFatigue).toBe(true);
+    expect(found?.postReportEvent?.title).toBe('王朝危机：战术被摸透');
+  });
+
+  it('uses APS without a random nomination gate', () => {
+    let state=createCareer({seed:'aps-awards',name:'APS',pace:'standard',originId:'academy',role:'entry'});
+    state={...state,careerYear:4,season:8,half:'second',ability:100,teamForm:100,rosterStability:100,health:100};
+    let report=startSeason(state);while(report.phase!=='report'){if(report.phase==='emergency'&&report.decision)report=resolveEmergency(report,report.decision.options[0].id);else report=advanceTournament(report);}
+    let awards=continueFromReport(report);while(awards.phase==='emergency'&&awards.decision)awards=resolveEmergency(awards,awards.decision.options[0].id);
+    expect(awards.top20History.at(-1)?.nominationChance).toBeGreaterThanOrEqual(0);
+    expect(awards.top20History.at(-1)?.apsScore).toBeGreaterThanOrEqual(0);
+  });
+
   it('settles only one tournament per engine step and records maps', () => {
     let state = startSeason(createCareer({ seed: 'one-step', name: 'Spec', pace: 'standard', originId: 'academy', role: 'entry' }));
     while(state.phase==='emergency'&&state.decision)state=resolveEmergency(state,state.decision.options[0].id);
