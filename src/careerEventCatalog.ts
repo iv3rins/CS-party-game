@@ -1,4 +1,5 @@
 import type { CareerState, Decision, DecisionOption, ProbabilityOutcome, Role } from './careerEngine';
+import { EXTERNAL_CAREER_EVENTS } from './careerExternalEvents';
 
 export type EventCategory =
   | '赛事内关键局' | '赛事内非关键突发' | '训练状态' | '伤病健康' | '队内体系'
@@ -479,7 +480,9 @@ const makeDreamVariant=([route,titleA,optionA,detailA,optionB,detailB]:[string,s
 const DREAM_VARIANTS=dreamVariants.map(makeDreamVariant);
 export const DREAM_EVENT_CATALOG = [...dreamScenarios,...DREAM_VARIANTS];
 
-export const eligibleCatalogEvents = (state: CareerState, kind: Decision['kind'], timing?: Decision['timing']) => [...CAREER_EVENT_CATALOG,...DREAM_EVENT_CATALOG].filter(event => {
+export const ALL_CAREER_EVENTS = [...CAREER_EVENT_CATALOG, ...DREAM_EVENT_CATALOG, ...EXTERNAL_CAREER_EVENTS];
+
+export const eligibleCatalogEvents = (state: CareerState, kind: Decision['kind'], timing?: Decision['timing']) => ALL_CAREER_EVENTS.filter(event => {
   if (event.kind !== kind) return false;
   if (timing && event.timing && event.timing !== timing) return false;
   if (event.minAge !== undefined && state.age < event.minAge) return false;
@@ -491,3 +494,4 @@ export const eligibleCatalogEvents = (state: CareerState, kind: Decision['kind']
 });
 
 export const EVENT_CATALOG_SIZE = CAREER_EVENT_CATALOG.length;
+export const TOTAL_EVENT_COUNT = ALL_CAREER_EVENTS.length;

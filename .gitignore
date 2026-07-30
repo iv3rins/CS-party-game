@@ -6,6 +6,7 @@ artifacts/
 test-results/
 *.test.ts
 *.test.tsx
+*.spec.ts
 !server/test/*.test.ts
 .pi-vite.log
 .pi-subagents/
